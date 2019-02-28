@@ -1,0 +1,12 @@
+rootProject.name = 'rpc-toy'
+include 'rpc-core'
+include 'rpc-consumer'
+include 'rpc-provider'
+include 'rpc-registry'
+include 'rpc-example'
+include 'rpc-example:provider'
+findProject(':rpc-example:provider')?.name = 'provider'
+include 'rpc-example:consumer'
+findProject(':rpc-example:consumer')?.name = 'consumer'
+include 'rpc-common'
+
