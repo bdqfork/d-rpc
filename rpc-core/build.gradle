@@ -23,6 +23,8 @@ dependencies {
     compile "org.slf4j:slf4j-api:${libs.slf4j}"
 
     compile "org.springframework:spring-context:${libs.spring}"
-    
+
+    compile "com.caucho:hessian:${libs.hessian}"
+
     compile project(':rpc-common')
 }

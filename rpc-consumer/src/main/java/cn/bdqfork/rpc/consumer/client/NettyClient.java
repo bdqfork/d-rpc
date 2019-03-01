@@ -4,6 +4,7 @@ import cn.bdqfork.common.exception.RpcException;
 import cn.bdqfork.rpc.netty.DataDecoder;
 import cn.bdqfork.rpc.netty.DataEncoder;
 import cn.bdqfork.rpc.netty.NettyChannel;
+import cn.bdqfork.rpc.serializer.HessianSerializer;
 import cn.bdqfork.rpc.serializer.JdkSerializer;
 import cn.bdqfork.rpc.serializer.Serializer;
 import io.netty.bootstrap.Bootstrap;
@@ -28,7 +29,7 @@ public class NettyClient {
     private EventLoopGroup group;
 
     public NettyClient(String host, Integer port) {
-        this(host, port, new JdkSerializer());
+        this(host, port, new HessianSerializer());
     }
 
     public NettyClient(String host, Integer port, Serializer serializer) {

@@ -4,6 +4,7 @@ import cn.bdqfork.rpc.invoker.Invoker;
 import cn.bdqfork.rpc.netty.DataDecoder;
 import cn.bdqfork.rpc.netty.DataEncoder;
 import cn.bdqfork.rpc.netty.RpcResponse;
+import cn.bdqfork.rpc.serializer.HessianSerializer;
 import cn.bdqfork.rpc.serializer.JdkSerializer;
 import cn.bdqfork.rpc.serializer.Serializer;
 import io.netty.bootstrap.ServerBootstrap;
@@ -30,7 +31,7 @@ public class NettyServer {
     private NioEventLoopGroup worker;
 
     public NettyServer(String host, Integer port, Invoker<RpcResponse> invoker) {
-        this(host, port, invoker, new JdkSerializer());
+        this(host, port, invoker, new HessianSerializer());
     }
 
     public NettyServer(String host, Integer port, Invoker<RpcResponse> invoker, Serializer serializer) {

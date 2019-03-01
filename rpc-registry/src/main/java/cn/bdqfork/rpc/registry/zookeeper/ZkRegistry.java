@@ -43,15 +43,7 @@ public class ZkRegistry implements Registry, ZkClient {
         client.getConnectionStateListenable().addListener(new ConnectionStateListener() {
             @Override
             public void stateChanged(CuratorFramework client, ConnectionState newState) {
-                if (newState == ConnectionState.LOST) {
-                    log.warn("connection lost");
-                    try {
-                        client.blockUntilConnected();
-                        recover();
-                    } catch (InterruptedException e) {
-                        log.error(e.getMessage(), e);
-                    }
-                }
+                recover();
             }
         });
         client.start();
