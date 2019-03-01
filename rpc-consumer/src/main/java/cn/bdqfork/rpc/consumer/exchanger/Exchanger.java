@@ -3,16 +3,15 @@ package cn.bdqfork.rpc.consumer.exchanger;
 import cn.bdqfork.rpc.consumer.client.ClientPool;
 import cn.bdqfork.rpc.registry.URL;
 import cn.bdqfork.common.constant.Const;
-import cn.bdqfork.common.exception.RpcException;
 import cn.bdqfork.rpc.consumer.config.Configration;
-import cn.bdqfork.rpc.consumer.client.NettyClient;
 import cn.bdqfork.rpc.registry.Notifier;
 import cn.bdqfork.rpc.registry.*;
+import cn.bdqfork.rpc.registry.event.NodeEvent;
+import cn.bdqfork.rpc.registry.event.RegistryEvent;
 import cn.bdqfork.rpc.registry.zookeeper.ZkRegistryEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.security.acl.Group;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -62,7 +61,7 @@ public class Exchanger implements Notifier {
     @Override
     public void notify(URL url, RegistryEvent event) {
         ZkRegistryEvent zkRegistryEvent = (ZkRegistryEvent) event;
-        if ("NodeChildrenChanged".equals(zkRegistryEvent.getEvent())) {
+        if (NodeEvent.CHANGED == zkRegistryEvent.getEvent()) {
             refreshRemoteServcie(url);
             registry.subscribe(url, this);
         }

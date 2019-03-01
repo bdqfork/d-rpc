@@ -1,11 +1,7 @@
 package cn.bdqfork.rpc.consumer.client;
 
-import cn.bdqfork.common.constant.Const;
 import cn.bdqfork.common.exception.RpcException;
 import cn.bdqfork.rpc.consumer.exchanger.RefreshCallback;
-import cn.bdqfork.rpc.registry.Notifier;
-import cn.bdqfork.rpc.registry.RegistryEvent;
-import cn.bdqfork.rpc.registry.URL;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;

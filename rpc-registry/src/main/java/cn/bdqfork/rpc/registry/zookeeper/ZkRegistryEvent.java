@@ -1,7 +1,9 @@
 package cn.bdqfork.rpc.registry.zookeeper;
 
-import cn.bdqfork.rpc.registry.RegistryEvent;
+import cn.bdqfork.rpc.registry.event.NodeEvent;
+import cn.bdqfork.rpc.registry.event.RegistryEvent;
 import org.apache.zookeeper.WatchedEvent;
+import org.apache.zookeeper.Watcher;
 
 
 /**
@@ -16,8 +18,11 @@ public class ZkRegistryEvent implements RegistryEvent {
     }
 
     @Override
-    public String getEvent() {
-        return watchEvent.getType().name();
+    public NodeEvent getEvent() {
+        if (Watcher.Event.EventType.NodeChildrenChanged == watchEvent.getType()) {
+            return NodeEvent.CHANGED;
+        }
+        return NodeEvent.NONE;
     }
 
 }
