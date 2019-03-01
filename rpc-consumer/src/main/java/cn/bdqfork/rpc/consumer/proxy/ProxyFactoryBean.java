@@ -4,12 +4,11 @@ import cn.bdqfork.rpc.invoker.Invoker;
 
 /**
  * @author bdq
- * @date 2019-02-15
+ * @date 2019-03-01
  */
-public class DefaultProxyFactory implements ProxyFactory {
-
+public class ProxyFactoryBean implements ProxyFactory {
     @Override
-    public <T> T getRemoteProxyInstance(Invoker<Object> invoker, Class<T> serviceInterface, String refName) {
+    public <T> T getJdkProxy(Invoker<Object> invoker, Class<T> serviceInterface, String refName) {
         return (T) new JdkInvocationHandler(invoker, serviceInterface, refName).newProxyInstance();
     }
 }

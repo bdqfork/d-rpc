@@ -9,6 +9,6 @@ import cn.bdqfork.common.exception.TimeoutException;
  */
 public interface Invoker<T> {
 
-    T invoke(Invocation invocation) throws RpcException, InterruptedException;
+    T invoke(Invocation invocation) throws RpcException;
 
 }

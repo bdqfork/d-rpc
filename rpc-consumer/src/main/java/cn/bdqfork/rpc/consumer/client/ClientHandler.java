@@ -1,6 +1,6 @@
-package cn.bdqfork.rpc.netty.client;
+package cn.bdqfork.rpc.consumer.client;
 
-import cn.bdqfork.rpc.netty.DefaultFuture;
+import cn.bdqfork.rpc.consumer.context.RpcContextManager;
 import cn.bdqfork.rpc.netty.NettyChannel;
 import cn.bdqfork.rpc.netty.RpcResponse;
 import io.netty.channel.ChannelHandlerContext;
@@ -24,7 +24,7 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        DefaultFuture.doReceived((RpcResponse) msg);
+        RpcContextManager.doReceived((RpcResponse) msg);
     }
 
 }

@@ -1,4 +1,4 @@
-package cn.bdqfork.rpc.netty.client;
+package cn.bdqfork.rpc.consumer.client;
 
 import cn.bdqfork.common.exception.RpcException;
 import cn.bdqfork.rpc.netty.DataDecoder;

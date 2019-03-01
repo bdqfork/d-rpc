@@ -17,5 +17,5 @@ public interface ProxyFactory {
      * @param <T>
      * @return
      */
-    <T> T getRemoteProxyInstance(Invoker<Object> invoker, Class<T> serviceInterface, String refName);
+    <T> T getJdkProxy(Invoker<Object> invoker, Class<T> serviceInterface, String refName);
 }

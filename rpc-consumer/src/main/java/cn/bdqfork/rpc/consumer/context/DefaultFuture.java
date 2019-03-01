@@ -1,29 +1,29 @@
-package cn.bdqfork.rpc.netty;
+package cn.bdqfork.rpc.consumer.context;
 
+import cn.bdqfork.common.exception.RpcException;
 import cn.bdqfork.common.exception.TimeoutException;
+import cn.bdqfork.rpc.netty.RpcResponse;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * @author bdq
  * @date 2019-02-22
  */
-public class DefaultFuture {
+public class DefaultFuture<T> implements RpcFuture<T> {
 
-    private static Map<String, DefaultFuture> futureMap = new ConcurrentHashMap<>();
+    private T result;
 
-    private Object result;
-
-    public DefaultFuture(String requestId) {
-        futureMap.put(requestId, this);
-    }
-
+    @Override
     public boolean isDone() {
         return result != null;
     }
 
-    public synchronized Object get(long timeout) throws TimeoutException {
+    @Override
+    public synchronized T get(long timeout) throws RpcException {
         long currentTime = System.currentTimeMillis();
         while (!isDone()) {
             if (!isDone()) {
@@ -45,13 +45,10 @@ public class DefaultFuture {
         return result;
     }
 
-    private synchronized void setResult(Object result) {
+    @Override
+    public synchronized void setResult(T result) {
         this.result = result;
         notify();
     }
 
-    public static void doReceived(RpcResponse rpcResponse) {
-        DefaultFuture future = futureMap.get(rpcResponse.getRequestId());
-        future.setResult(rpcResponse);
-    }
 }

@@ -2,10 +2,10 @@ package cn.bdqfork.consuemr.client;
 
 import cn.bdqfork.provider.api.UserService;
 import cn.bdqfork.rpc.consumer.config.Configration;
-import cn.bdqfork.rpc.consumer.remote.Exchanger;
 import cn.bdqfork.rpc.consumer.proxy.ProxyFactory;
-import cn.bdqfork.rpc.consumer.proxy.DefaultProxyFactory;
-import cn.bdqfork.rpc.consumer.invoker.LocalInvoker;
+import cn.bdqfork.rpc.consumer.proxy.ProxyFactoryBean;
+import cn.bdqfork.rpc.consumer.remote.Exchanger;
+import cn.bdqfork.rpc.consumer.invoker.RpcInvoker;
 import cn.bdqfork.rpc.registry.Registry;
 import cn.bdqfork.rpc.registry.zookeeper.ZkRegistry;
 
@@ -25,12 +25,12 @@ public class Main {
         exchanger.register("rpc-test", UserService.class.getName());
         exchanger.subscribe("rpc-test", UserService.class.getName());
 
-        LocalInvoker invoker = new LocalInvoker(exchanger, 100L, 3);
+        RpcInvoker invoker = new RpcInvoker(exchanger, 100L, 3);
         invoker.setGroup("rpc-test");
 
-        ProxyFactory proxyFactory = new DefaultProxyFactory();
+        ProxyFactory proxyFactory = new ProxyFactoryBean();
 
-        UserService service = proxyFactory.getRemoteProxyInstance(invoker, UserService.class, "userService");
+        UserService service = proxyFactory.getJdkProxy(invoker, UserService.class, "userService");
 
         while (true){
             try {
