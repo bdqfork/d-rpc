@@ -12,7 +12,7 @@ import org.apache.zookeeper.WatchedEvent;
 import org.apache.zookeeper.Watcher;
 import org.apache.zookeeper.ZooDefs;
 
-import java.util.List;
+import java.util.*;
 
 /**
  * @author bdq
@@ -26,7 +26,7 @@ public class ZkRegistry implements Registry, ZkClient {
         RetryPolicy retryPolicy = new RetryForever(1000);
         client = CuratorFrameworkFactory.builder()
                 .connectString(connectionInfo)
-                .sessionTimeoutMs(5000)
+                .sessionTimeoutMs(60000)
                 .connectionTimeoutMs(6000)
                 .retryPolicy(retryPolicy)
                 .build();
@@ -64,7 +64,7 @@ public class ZkRegistry implements Registry, ZkClient {
     @Override
     public void subscribe(URL url, Notifier notifier) {
         String group = url.getParameter(Const.GROUP_KEY, DEFAULT_ROOT);
-        String path = "/" + group + url.toServiceCategory() + "/server";
+        String path = "/" + group + url.toServicePath();
         try {
             if (client.checkExists().forPath(path) != null) {
                 client.getChildren().usingWatcher(new Watcher() {
@@ -77,6 +77,20 @@ public class ZkRegistry implements Registry, ZkClient {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public Set<String> getServiceAddress(URL url) {
+        String group = url.getParameter(Const.GROUP_KEY, DEFAULT_ROOT);
+        String path = "/" + group + url.toServicePath();
+        try {
+            if (client.checkExists().forPath(path) != null) {
+                return new HashSet<>(client.getChildren().forPath(path));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return Collections.emptySet();
     }
 
     @Override

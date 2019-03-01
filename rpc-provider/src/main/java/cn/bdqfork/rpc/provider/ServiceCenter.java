@@ -5,22 +5,23 @@ import cn.bdqfork.rpc.invoker.Invoker;
 import cn.bdqfork.rpc.invoker.Provider;
 import cn.bdqfork.rpc.netty.RpcResponse;
 import cn.bdqfork.rpc.netty.server.NettyServer;
+import cn.bdqfork.rpc.registry.Registry;
 
 /**
  * @author bdq
  * @date 2019-02-15
  */
 public class ServiceCenter implements Server {
-    private LocalRegistry localRegistry;
-    private Invoker<RpcResponse> invoker;
-    private boolean isRunning;
     private String host;
     private int port;
+    private Exporter exporter;
+    private Invoker<RpcResponse> invoker;
+    private boolean isRunning;
 
-    public ServiceCenter(String host, int port, LocalRegistry localRegistry) {
+    public ServiceCenter(String host, int port, Exporter exporter) {
         this.host = host;
         this.port = port;
-        this.localRegistry = localRegistry;
+        this.exporter = exporter;
     }
 
     @Override
@@ -35,8 +36,8 @@ public class ServiceCenter implements Server {
     }
 
     @Override
-    public void register(String serviceInterface, Object impl) {
-        localRegistry.register(serviceInterface, impl);
+    public void register(String group, String serviceInterface, Object impl) {
+        exporter.export(group, serviceInterface, impl);
     }
 
     @Override
@@ -52,4 +53,5 @@ public class ServiceCenter implements Server {
     public void setInvoker(Invoker<RpcResponse> invoker) {
         this.invoker = invoker;
     }
+
 }

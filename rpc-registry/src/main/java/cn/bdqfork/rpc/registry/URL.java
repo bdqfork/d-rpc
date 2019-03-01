@@ -72,4 +72,7 @@ public class URL {
         return builder.toString();
     }
 
+    public String getServiceName() {
+        return path;
+    }
 }

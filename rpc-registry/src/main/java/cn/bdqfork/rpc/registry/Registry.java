@@ -1,6 +1,7 @@
 package cn.bdqfork.rpc.registry;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author bdq
@@ -29,5 +30,7 @@ public interface Registry {
      * @param notifier
      */
     void subscribe(URL url, Notifier notifier);
+
+    Set<String> getServiceAddress(URL url);
 
 }

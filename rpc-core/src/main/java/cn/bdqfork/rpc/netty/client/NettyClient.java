@@ -37,7 +37,7 @@ public class NettyClient {
         this.serializer = serializer;
     }
 
-    public void open() throws InterruptedException {
+    public void open() {
         group = new NioEventLoopGroup();
         try {
             Bootstrap bootstrap = new Bootstrap();

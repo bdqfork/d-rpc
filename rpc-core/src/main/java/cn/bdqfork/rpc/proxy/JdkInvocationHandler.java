@@ -41,7 +41,7 @@ public class JdkInvocationHandler implements InvocationHandler {
             return invoker.hashCode();
         }
         Class<?>[] parameterTypes = method.getParameterTypes();
-        Invocation invocation = new Invocation(IdUtils.getUUID(), proxy.getClass().getName(), refName, method.getName());
+        Invocation invocation = new Invocation(IdUtils.getUUID(), serviceInterface.getName(), refName, method.getName());
         if (parameterTypes.length != 0) {
             invocation.setParameterTypes(parameterTypes);
             invocation.setArguments(args);

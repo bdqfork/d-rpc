@@ -9,7 +9,7 @@ public interface Server {
 
     void start();
 
-    void register(String serviceInterface, Object impl);
+    void register(String group, String serviceInterface, Object impl);
 
     boolean isRunning();
 

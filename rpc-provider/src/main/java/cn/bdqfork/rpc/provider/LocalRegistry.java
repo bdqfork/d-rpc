@@ -1,6 +1,5 @@
 package cn.bdqfork.rpc.provider;
 
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -8,13 +7,13 @@ import java.util.concurrent.ConcurrentHashMap;
  * @date 2019-02-28
  */
 public class LocalRegistry {
-    private Map<String, Object> serviceRegistry = new ConcurrentHashMap<>();
+    private static ConcurrentHashMap<String, Object> serviceRegistry = new ConcurrentHashMap<>();
 
-    public void register(String serviceInterface, Object instance) {
+    public static void register(String serviceInterface, Object instance) {
         serviceRegistry.put(serviceInterface, instance);
     }
 
-    public Object lookup(String serviceInterface) {
+    public static Object lookup(String serviceInterface) {
         return serviceRegistry.get(serviceInterface);
     }
 }

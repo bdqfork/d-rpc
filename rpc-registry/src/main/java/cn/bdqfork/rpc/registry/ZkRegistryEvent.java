@@ -14,7 +14,7 @@ public class ZkRegistryEvent implements RegistryEvent {
         this.watchEvent = watchEvent;
     }
 
-    public WatchedEvent getWatchedEvent() {
-        return watchEvent;
+    public String getEvent() {
+        return watchEvent.getType().name();
     }
 }

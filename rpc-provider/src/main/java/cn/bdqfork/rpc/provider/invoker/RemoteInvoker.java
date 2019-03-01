@@ -16,15 +16,10 @@ import java.lang.reflect.Method;
  */
 public class RemoteInvoker implements Invoker<RpcResponse> {
     private static final Logger log = LoggerFactory.getLogger(RemoteInvoker.class);
-    private LocalRegistry localRegistry;
-
-    public RemoteInvoker(LocalRegistry localRegistry) {
-        this.localRegistry = localRegistry;
-    }
 
     @Override
     public RpcResponse invoke(Invocation invocation) {
-        Object instance = localRegistry.lookup(invocation.getRefName());
+        Object instance = LocalRegistry.lookup(invocation.getServiceInterface());
         Class<?> clazz = instance.getClass();
         try {
             Method method = clazz.getMethod(invocation.getMethodName(), invocation.getParameterTypes());
