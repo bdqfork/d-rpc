@@ -4,36 +4,52 @@ import cn.bdqfork.common.constant.Const;
 import org.apache.curator.RetryPolicy;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
-import org.apache.curator.framework.api.CuratorEvent;
-import org.apache.curator.framework.api.CuratorListener;
+import org.apache.curator.framework.state.ConnectionState;
+import org.apache.curator.framework.state.ConnectionStateListener;
 import org.apache.curator.retry.RetryForever;
+import org.apache.curator.retry.RetryNTimes;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.WatchedEvent;
 import org.apache.zookeeper.Watcher;
 import org.apache.zookeeper.ZooDefs;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author bdq
  * @date 2019-02-26
  */
 public class ZkRegistry implements Registry, ZkClient {
+    private static final Logger log = LoggerFactory.getLogger(ZkRegistry.class);
+
     private static final String DEFAULT_ROOT = "rpc";
     private CuratorFramework client;
+    private Map<String, URL> cacheNodeMap = new ConcurrentHashMap<>();
+    private Map<String, CacheWatcher> cacheWatcherMap = new ConcurrentHashMap<>();
 
-    public ZkRegistry(String connectionInfo) {
-        RetryPolicy retryPolicy = new RetryForever(1000);
+    public ZkRegistry(String connectionInfo, int sessionTimeout, int connectionTimeout) {
+        RetryPolicy retryPolicy = new RetryNTimes(3, 1000);
         client = CuratorFrameworkFactory.builder()
                 .connectString(connectionInfo)
-                .sessionTimeoutMs(60000)
-                .connectionTimeoutMs(6000)
+                .sessionTimeoutMs(sessionTimeout)
+                .connectionTimeoutMs(connectionTimeout)
                 .retryPolicy(retryPolicy)
                 .build();
-        client.getCuratorListenable().addListener(new CuratorListener() {
+        client.getConnectionStateListenable().addListener(new ConnectionStateListener() {
             @Override
-            public void eventReceived(CuratorFramework client, CuratorEvent event) throws Exception {
-                System.out.println(event.getType());
+            public void stateChanged(CuratorFramework client, ConnectionState newState) {
+                if (newState == ConnectionState.LOST) {
+                    log.warn("connection lost");
+                    try {
+                        client.blockUntilConnected();
+                        recover();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
             }
         });
         client.start();
@@ -51,6 +67,7 @@ public class ZkRegistry implements Registry, ZkClient {
                         .withACL(ZooDefs.Ids.OPEN_ACL_UNSAFE)
                         .forPath(path);
             }
+            cacheNodeMap.putIfAbsent(path, url);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -73,6 +90,8 @@ public class ZkRegistry implements Registry, ZkClient {
                         notifier.notify(url, new ZkRegistryEvent(event));
                     }
                 }).forPath(path);
+                CacheWatcher cacheWatcher = new CacheWatcher(url, notifier);
+                cacheWatcherMap.putIfAbsent(path, cacheWatcher);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -96,5 +115,28 @@ public class ZkRegistry implements Registry, ZkClient {
     @Override
     public void close() {
         client.close();
+    }
+
+    private void recover() {
+        cacheNodeMap.values().forEach(this::register);
+        cacheWatcherMap.values().forEach(cacheWatcher -> subscribe(cacheWatcher.getUrl(), cacheWatcher.getNotifier()));
+    }
+
+    private class CacheWatcher {
+        private URL url;
+        private Notifier notifier;
+
+        public CacheWatcher(URL url, Notifier notifier) {
+            this.url = url;
+            this.notifier = notifier;
+        }
+
+        public URL getUrl() {
+            return url;
+        }
+
+        public Notifier getNotifier() {
+            return notifier;
+        }
     }
 }

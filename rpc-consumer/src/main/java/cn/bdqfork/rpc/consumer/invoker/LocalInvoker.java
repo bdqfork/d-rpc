@@ -1,5 +1,6 @@
 package cn.bdqfork.rpc.consumer.invoker;
 
+import cn.bdqfork.common.exception.RpcException;
 import cn.bdqfork.common.exception.TimeoutException;
 import cn.bdqfork.rpc.consumer.remote.Exchanger;
 import cn.bdqfork.rpc.invoker.Invocation;
@@ -18,34 +19,68 @@ import java.util.List;
 public class LocalInvoker implements Invoker<Object> {
     private static final Logger log = LoggerFactory.getLogger(LocalInvoker.class);
     private Exchanger exchanger;
+    private String group = "rpc";
     private int i;
     private long timeout;
+    private int retryTime;
 
-    public LocalInvoker(Exchanger exchanger, long timeout) {
+    public LocalInvoker(Exchanger exchanger, long timeout, int retryTime) {
         this.exchanger = exchanger;
         this.timeout = timeout;
+        this.retryTime = retryTime;
     }
 
     @Override
-    public Object invoke(Invocation invocation) {
-        String serviceName = invocation.getServiceInterface();
+    public Object invoke(Invocation invocation) throws RpcException {
+        int retryCount = 0;
+        while (true) {
+            String serviceName = invocation.getServiceInterface();
 
-        List<NettyClient> nettyClients = exchanger.getNettyClients(serviceName);
+            List<NettyClient> nettyClients = exchanger.getNettyClients(group, serviceName);
 
-        //负载均衡
-        if (i == Integer.MAX_VALUE) {
-            i = 0;
+            //负载均衡
+            if (i == Integer.MAX_VALUE) {
+                i = 0;
+            }
+
+            NettyClient client = nettyClients.get(i++ % nettyClients.size());
+
+            try {
+                client.send(invocation);
+            } catch (RpcException e) {
+                exchanger.removeNettyClient(serviceName, client);
+            }
+
+            DefaultFuture defaultFuture = new DefaultFuture(invocation.getRequestId());
+            try {
+                return defaultFuture.get(timeout);
+            } catch (TimeoutException e) {
+                retryCount = retry(retryCount, e);
+            }
         }
-        NettyClient client = nettyClients.get(i++ % nettyClients.size());
+    }
 
-        client.send(invocation);
+    private int retry(int retryCount, RpcException e) throws RpcException {
+        retryCount++;
+        int delayTime = 1000 * retryCount;
+        if (retryCount <= retryTime) {
+            log.warn("failed to invoke method , will retry after {} second !", delayTime);
+        } else {
+            throw e;
+        }
+        delay(delayTime);
+        return retryCount;
+    }
 
-        DefaultFuture defaultFuture = new DefaultFuture(invocation.getRequestId());
+    private void delay(int delayTime) {
         try {
-            return defaultFuture.get(timeout);
-        } catch (TimeoutException e) {
+            Thread.sleep(delayTime);
+        } catch (InterruptedException e) {
             log.error(e.getMessage(), e);
-            return null;
         }
+    }
+
+    public void setGroup(String group) {
+        this.group = group;
     }
 }

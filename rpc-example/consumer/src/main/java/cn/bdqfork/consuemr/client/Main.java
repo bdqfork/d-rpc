@@ -19,28 +19,29 @@ public class Main {
         Configration configration = new Configration();
         configration.setHost("127.0.0.1");
         configration.setPort(8080);
-        Registry registry = new ZkRegistry("127.0.0.1:2181");
+        Registry registry = new ZkRegistry("127.0.0.1:2181", 60, 60);
 
         Exchanger exchanger = new Exchanger(configration, registry);
 
         exchanger.register("rpc-test", UserService.class.getName());
-        exchanger.subscribe("rpc-test",UserService.class.getName());
+        exchanger.subscribe("rpc-test", UserService.class.getName());
 
-        Invoker<Object> invoker = new LocalInvoker(exchanger, 10000000L);
+        LocalInvoker invoker = new LocalInvoker(exchanger, 100L, 3);
+        invoker.setGroup("rpc-test");
 
         ProxyFactory proxyFactory = new DefaultProxyFactory();
 
         UserService service = proxyFactory.getRemoteProxyInstance(invoker, UserService.class, "userService");
 
-        String userName = service.getUserName();
-
-        while (true) {
-            service.sayHello(userName);
+        while (true){
             try {
+                String userName = service.getUserName();
+                service.sayHello(userName);
                 Thread.sleep(1000);
-            } catch (InterruptedException e) {
+            } catch (Throwable e) {
                 e.printStackTrace();
             }
         }
+
     }
 }

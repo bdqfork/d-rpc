@@ -1,6 +1,7 @@
 package cn.bdqfork.rpc.registry;
 
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * rpc://10.20.153.10:1234/barService?param=value
@@ -75,4 +76,22 @@ public class URL {
     public String getServiceName() {
         return path;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        URL url = (URL) o;
+        return port == url.port &&
+                Objects.equals(protocol, url.protocol) &&
+                Objects.equals(host, url.host) &&
+                Objects.equals(path, url.path) &&
+                Objects.equals(parameterMap, url.parameterMap);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(protocol, host, port, path, parameterMap);
+    }
+
 }

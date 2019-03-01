@@ -12,7 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class DefaultFuture {
 
     private static Map<String, DefaultFuture> futureMap = new ConcurrentHashMap<>();
-    
+
     private Object result;
 
     public DefaultFuture(String requestId) {
@@ -35,6 +35,8 @@ public class DefaultFuture {
             }
             if (isDone()) {
                 return result;
+            } else {
+                break;
             }
         }
         if (!isDone() || System.currentTimeMillis() - currentTime > timeout) {

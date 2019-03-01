@@ -13,7 +13,7 @@ public class ZkRegistryTest {
     @BeforeClass
     public static void init() {
         String connectionInfo = "127.0.0.1:2181";
-        registry = new ZkRegistry(connectionInfo);
+        registry = new ZkRegistry(connectionInfo,60,60);
     }
 
     @Test

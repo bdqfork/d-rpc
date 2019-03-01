@@ -1,9 +1,12 @@
 package cn.bdqfork.rpc.consumer.remote;
 
 import cn.bdqfork.common.constant.Const;
+import cn.bdqfork.common.exception.RpcException;
 import cn.bdqfork.rpc.consumer.config.Configration;
 import cn.bdqfork.rpc.netty.client.NettyClient;
 import cn.bdqfork.rpc.registry.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -13,7 +16,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @date 2019-03-01
  */
 public class Exchanger implements Notifier {
-
+    private static final Logger log = LoggerFactory.getLogger(Exchanger.class);
     private Configration configration;
 
     private ConcurrentHashMap<String, Map<String, NettyClient>> map = new ConcurrentHashMap<>();
@@ -45,11 +48,7 @@ public class Exchanger implements Notifier {
                 .forEach(address -> {
                     String[] hostPort = address.split(":");
                     NettyClient nettyClient = new NettyClient(hostPort[0], Integer.parseInt(hostPort[1]));
-                    try {
-                        nettyClient.open();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
+                    nettyClient.open();
                     clientMap.put(address, nettyClient);
                 });
     }
@@ -72,9 +71,33 @@ public class Exchanger implements Notifier {
         refreshRemoteServcie(url);
     }
 
-    public List<NettyClient> getNettyClients(String serviceName) {
-        return new ArrayList<>(map.get(serviceName)
-                .values());
+    public List<NettyClient> getNettyClients(String group, String serviceName) throws RpcException {
+        Map<String, String> paramterMap = new HashMap<>(8);
+        paramterMap.put(Const.GROUP_KEY, group);
+        paramterMap.put(Const.SIDE_KEY, Const.PROVIDER_SIDE);
+        URL url = new URL("consumer", configration.getHost(), configration.getPort(), serviceName, paramterMap);
+        while (true) {
+            List<NettyClient> nettyClients = new LinkedList<>(map.get(serviceName).values());
+            if (nettyClients.size() != 0) {
+                return nettyClients;
+            } else {
+                delay();
+                refreshRemoteServcie(url);
+                throw new RpcException("No provider available from registry");
+            }
+        }
+    }
+
+    public void removeNettyClient(String service, NettyClient nettyClient) {
+        map.get(service).remove(nettyClient.getHost() + ":" + nettyClient.getPort());
+    }
+
+    private void delay() {
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
 
@@ -83,6 +106,7 @@ public class Exchanger implements Notifier {
         ZkRegistryEvent zkRegistryEvent = (ZkRegistryEvent) event;
         if ("NodeChildrenChanged".equals(zkRegistryEvent.getEvent())) {
             refreshRemoteServcie(url);
+            registry.subscribe(url, this);
         }
     }
 
