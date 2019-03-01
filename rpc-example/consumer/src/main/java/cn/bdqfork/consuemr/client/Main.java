@@ -1,10 +1,11 @@
 package cn.bdqfork.consuemr.client;
 
 import cn.bdqfork.provider.api.UserService;
+import cn.bdqfork.rpc.consumer.client.ClientPool;
 import cn.bdqfork.rpc.consumer.config.Configration;
 import cn.bdqfork.rpc.consumer.proxy.ProxyFactory;
 import cn.bdqfork.rpc.consumer.proxy.ProxyFactoryBean;
-import cn.bdqfork.rpc.consumer.remote.Exchanger;
+import cn.bdqfork.rpc.consumer.exchanger.Exchanger;
 import cn.bdqfork.rpc.consumer.invoker.RpcInvoker;
 import cn.bdqfork.rpc.registry.Registry;
 import cn.bdqfork.rpc.registry.zookeeper.ZkRegistry;
@@ -25,14 +26,14 @@ public class Main {
         exchanger.register("rpc-test", UserService.class.getName());
         exchanger.subscribe("rpc-test", UserService.class.getName());
 
-        RpcInvoker invoker = new RpcInvoker(exchanger, 100L, 3);
-        invoker.setGroup("rpc-test");
+        ClientPool clientPool = exchanger.getClientPool("rpc-test", UserService.class.getName());
+        RpcInvoker invoker = new RpcInvoker(clientPool, 100L, 3);
 
         ProxyFactory proxyFactory = new ProxyFactoryBean();
 
         UserService service = proxyFactory.getJdkProxy(invoker, UserService.class, "userService");
 
-        while (true){
+        while (true) {
             try {
                 String userName = service.getUserName();
                 service.sayHello(userName);

@@ -3,9 +3,10 @@ package cn.bdqfork.rpc.consumer.invoker;
 import cn.bdqfork.common.constant.Const;
 import cn.bdqfork.common.exception.RpcException;
 import cn.bdqfork.common.exception.TimeoutException;
+import cn.bdqfork.rpc.consumer.client.ClientPool;
 import cn.bdqfork.rpc.consumer.context.RpcContext;
 import cn.bdqfork.rpc.consumer.context.RpcContextManager;
-import cn.bdqfork.rpc.consumer.remote.Exchanger;
+import cn.bdqfork.rpc.consumer.exchanger.Exchanger;
 import cn.bdqfork.rpc.invoker.Invocation;
 import cn.bdqfork.rpc.invoker.Invoker;
 import cn.bdqfork.rpc.consumer.context.DefaultFuture;
@@ -22,14 +23,12 @@ import java.util.List;
  */
 public class RpcInvoker implements Invoker<Object> {
     private static final Logger log = LoggerFactory.getLogger(RpcInvoker.class);
-    private Exchanger exchanger;
-    private String group = Const.DEFAULT_GROUP;
-    private int i;
+    private ClientPool clientPool;
     private long timeout;
     private int retryTime;
 
-    public RpcInvoker(Exchanger exchanger, long timeout, int retryTime) {
-        this.exchanger = exchanger;
+    public RpcInvoker(ClientPool clientPool, long timeout, int retryTime) {
+        this.clientPool = clientPool;
         this.timeout = timeout;
         this.retryTime = retryTime;
     }
@@ -43,21 +42,13 @@ public class RpcInvoker implements Invoker<Object> {
 
         int retryCount = 0;
         while (true) {
-            String serviceName = invocation.getServiceInterface();
 
-            List<NettyClient> nettyClients = exchanger.getNettyClients(group, serviceName);
-
-            //负载均衡
-            if (i == Integer.MAX_VALUE) {
-                i = 0;
-            }
-
-            NettyClient client = nettyClients.get(i++ % nettyClients.size());
+            NettyClient client = clientPool.getNettyClient();
 
             try {
                 client.send(invocation);
             } catch (RpcException e) {
-                exchanger.removeNettyClient(serviceName, client);
+                clientPool.removeClient(client);
             }
 
             try {
@@ -90,7 +81,4 @@ public class RpcInvoker implements Invoker<Object> {
         return retryCount;
     }
 
-    public void setGroup(String group) {
-        this.group = group;
-    }
 }
