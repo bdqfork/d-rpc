@@ -25,7 +25,6 @@ public class NettyClient {
     private String host;
     private Integer port;
     private Serializer serializer;
-    private boolean isRunning;
     private EventLoopGroup group;
 
     public NettyClient(String host, Integer port) {
@@ -56,7 +55,6 @@ public class NettyClient {
                         }
                     });
             bootstrap.connect().sync();
-            isRunning = true;
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             close();
@@ -81,10 +79,6 @@ public class NettyClient {
         }
     }
 
-    public boolean isRunning() {
-        return isRunning;
-    }
-
     public String getHost() {
         return host;
     }
@@ -95,6 +89,5 @@ public class NettyClient {
 
     public void close() {
         group.shutdownGracefully();
-        isRunning = false;
     }
 }

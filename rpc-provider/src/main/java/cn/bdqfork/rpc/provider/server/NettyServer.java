@@ -1,4 +1,4 @@
-package cn.bdqfork.rpc.netty.server;
+package cn.bdqfork.rpc.provider.server;
 
 import cn.bdqfork.rpc.invoker.Invoker;
 import cn.bdqfork.rpc.netty.DataDecoder;
@@ -21,11 +21,13 @@ import org.slf4j.LoggerFactory;
  */
 public class NettyServer {
     private static final Logger log = LoggerFactory.getLogger(NettyServer.class);
+
     private String host;
     private Integer port;
     private Invoker<RpcResponse> invoker;
     private Serializer serializer;
-    private NioEventLoopGroup group;
+    private NioEventLoopGroup boss;
+    private NioEventLoopGroup worker;
 
     public NettyServer(String host, Integer port, Invoker<RpcResponse> invoker) {
         this(host, port, invoker, new JdkSerializer());
@@ -39,10 +41,11 @@ public class NettyServer {
     }
 
     public void start() {
-        group = new NioEventLoopGroup();
+        boss = new NioEventLoopGroup();
+        worker = new NioEventLoopGroup();
         try {
             ServerBootstrap bootstrap = new ServerBootstrap();
-            bootstrap.group(group)
+            bootstrap.group(boss, worker)
                     .channel(NioServerSocketChannel.class)
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
@@ -62,6 +65,7 @@ public class NettyServer {
     }
 
     public void close() {
-        group.shutdownGracefully();
+        boss.shutdownGracefully();
+        worker.shutdownGracefully();
     }
 }

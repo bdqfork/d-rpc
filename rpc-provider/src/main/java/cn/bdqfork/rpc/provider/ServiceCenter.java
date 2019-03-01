@@ -3,7 +3,7 @@ package cn.bdqfork.rpc.provider;
 
 import cn.bdqfork.rpc.invoker.Invoker;
 import cn.bdqfork.rpc.netty.RpcResponse;
-import cn.bdqfork.rpc.netty.server.NettyServer;
+import cn.bdqfork.rpc.provider.server.NettyServer;
 
 /**
  * @author bdq

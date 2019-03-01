@@ -14,8 +14,8 @@ import java.lang.reflect.Method;
  * @author bdq
  * @date 2019-02-28
  */
-public class RemoteInvoker implements Invoker<RpcResponse> {
-    private static final Logger log = LoggerFactory.getLogger(RemoteInvoker.class);
+public class RpcRemoteInvoker implements Invoker<RpcResponse> {
+    private static final Logger log = LoggerFactory.getLogger(RpcRemoteInvoker.class);
 
     @Override
     public RpcResponse invoke(Invocation invocation) {

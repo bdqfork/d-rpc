@@ -1,4 +1,4 @@
-package cn.bdqfork.rpc.netty.server;
+package cn.bdqfork.rpc.provider.server;
 
 import cn.bdqfork.rpc.invoker.Invocation;
 import cn.bdqfork.rpc.invoker.Invoker;
