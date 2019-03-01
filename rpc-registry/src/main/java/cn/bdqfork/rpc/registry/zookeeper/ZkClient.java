@@ -1,4 +1,4 @@
-package cn.bdqfork.rpc.registry;
+package cn.bdqfork.rpc.registry.zookeeper;
 
 /**
  * @author bdq

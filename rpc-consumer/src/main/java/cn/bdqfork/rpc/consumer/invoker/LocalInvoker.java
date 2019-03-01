@@ -1,5 +1,6 @@
 package cn.bdqfork.rpc.consumer.invoker;
 
+import cn.bdqfork.common.constant.Const;
 import cn.bdqfork.common.exception.RpcException;
 import cn.bdqfork.common.exception.TimeoutException;
 import cn.bdqfork.rpc.consumer.remote.Exchanger;
@@ -19,7 +20,7 @@ import java.util.List;
 public class LocalInvoker implements Invoker<Object> {
     private static final Logger log = LoggerFactory.getLogger(LocalInvoker.class);
     private Exchanger exchanger;
-    private String group = "rpc";
+    private String group = Const.DEFAULT_GROUP;
     private int i;
     private long timeout;
     private int retryTime;

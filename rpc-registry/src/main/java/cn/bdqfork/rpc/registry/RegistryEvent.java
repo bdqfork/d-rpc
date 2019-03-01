@@ -5,4 +5,5 @@ package cn.bdqfork.rpc.registry;
  * @date 2019-02-28
  */
 public interface RegistryEvent {
+    String getEvent();
 }

@@ -1,5 +1,6 @@
 package cn.bdqfork.rpc.registry;
 
+import cn.bdqfork.rpc.registry.zookeeper.ZkRegistry;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;

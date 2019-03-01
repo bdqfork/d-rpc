@@ -1,12 +1,14 @@
-package cn.bdqfork.rpc.registry;
+package cn.bdqfork.rpc.registry.zookeeper;
 
+import cn.bdqfork.rpc.registry.URL;
 import cn.bdqfork.common.constant.Const;
+import cn.bdqfork.rpc.registry.Notifier;
+import cn.bdqfork.rpc.registry.Registry;
 import org.apache.curator.RetryPolicy;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.framework.state.ConnectionState;
 import org.apache.curator.framework.state.ConnectionStateListener;
-import org.apache.curator.retry.RetryForever;
 import org.apache.curator.retry.RetryNTimes;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.WatchedEvent;
@@ -47,7 +49,7 @@ public class ZkRegistry implements Registry, ZkClient {
                         client.blockUntilConnected();
                         recover();
                     } catch (InterruptedException e) {
-                        e.printStackTrace();
+                        log.error(e.getMessage(), e);
                     }
                 }
             }
@@ -119,24 +121,17 @@ public class ZkRegistry implements Registry, ZkClient {
 
     private void recover() {
         cacheNodeMap.values().forEach(this::register);
-        cacheWatcherMap.values().forEach(cacheWatcher -> subscribe(cacheWatcher.getUrl(), cacheWatcher.getNotifier()));
+        cacheWatcherMap.values().forEach(cacheWatcher -> subscribe(cacheWatcher.url, cacheWatcher.notifier));
     }
 
     private class CacheWatcher {
         private URL url;
         private Notifier notifier;
 
-        public CacheWatcher(URL url, Notifier notifier) {
+        private CacheWatcher(URL url, Notifier notifier) {
             this.url = url;
             this.notifier = notifier;
         }
 
-        public URL getUrl() {
-            return url;
-        }
-
-        public Notifier getNotifier() {
-            return notifier;
-        }
     }
 }

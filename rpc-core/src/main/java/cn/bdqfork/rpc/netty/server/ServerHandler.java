@@ -3,7 +3,6 @@ package cn.bdqfork.rpc.netty.server;
 import cn.bdqfork.rpc.invoker.Invocation;
 import cn.bdqfork.rpc.invoker.Invoker;
 import cn.bdqfork.rpc.netty.RpcResponse;
-import cn.bdqfork.rpc.invoker.Provider;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 

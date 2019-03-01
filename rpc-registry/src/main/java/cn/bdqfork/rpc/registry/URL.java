@@ -93,5 +93,5 @@ public class URL {
     public int hashCode() {
         return Objects.hash(protocol, host, port, path, parameterMap);
     }
-
 }
+

@@ -3,12 +3,11 @@ package cn.bdqfork.consuemr.client;
 import cn.bdqfork.provider.api.UserService;
 import cn.bdqfork.rpc.consumer.config.Configration;
 import cn.bdqfork.rpc.consumer.remote.Exchanger;
-import cn.bdqfork.rpc.proxy.ProxyFactory;
-import cn.bdqfork.rpc.proxy.DefaultProxyFactory;
+import cn.bdqfork.rpc.consumer.proxy.ProxyFactory;
+import cn.bdqfork.rpc.consumer.proxy.DefaultProxyFactory;
 import cn.bdqfork.rpc.consumer.invoker.LocalInvoker;
-import cn.bdqfork.rpc.invoker.Invoker;
 import cn.bdqfork.rpc.registry.Registry;
-import cn.bdqfork.rpc.registry.ZkRegistry;
+import cn.bdqfork.rpc.registry.zookeeper.ZkRegistry;
 
 /**
  * @author bdq

@@ -31,6 +31,12 @@ public interface Registry {
      */
     void subscribe(URL url, Notifier notifier);
 
+    /**
+     * 获取服务地址
+     *
+     * @param url
+     * @return
+     */
     Set<String> getServiceAddress(URL url);
 
 }

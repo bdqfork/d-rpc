@@ -1,7 +1,5 @@
 package cn.bdqfork.rpc.registry;
 
-import org.apache.zookeeper.WatchedEvent;
-
 /**
  * @author bdq
  * @date 2019-02-27

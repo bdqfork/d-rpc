@@ -1,4 +1,4 @@
-package cn.bdqfork.rpc.proxy;
+package cn.bdqfork.rpc.consumer.proxy;
 
 import cn.bdqfork.rpc.invoker.Invoker;
 

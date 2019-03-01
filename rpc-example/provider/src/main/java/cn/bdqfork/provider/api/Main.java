@@ -3,7 +3,7 @@ package cn.bdqfork.provider.api;
 import cn.bdqfork.rpc.provider.Exporter;
 import cn.bdqfork.rpc.provider.ServiceCenter;
 import cn.bdqfork.rpc.provider.invoker.RemoteInvoker;
-import cn.bdqfork.rpc.registry.ZkRegistry;
+import cn.bdqfork.rpc.registry.zookeeper.ZkRegistry;
 
 /**
  * @author bdq
