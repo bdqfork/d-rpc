@@ -14,7 +14,6 @@ import java.util.concurrent.locks.ReentrantLock;
  * @date 2019-02-22
  */
 public class DefaultFuture<T> implements RpcFuture<T> {
-
     private T result;
 
     @Override
@@ -25,18 +24,11 @@ public class DefaultFuture<T> implements RpcFuture<T> {
     @Override
     public synchronized T get(long timeout) throws RpcException {
         long currentTime = System.currentTimeMillis();
-        while (!isDone()) {
-            if (!isDone()) {
-                try {
-                    wait(timeout);
-                } catch (InterruptedException e) {
-                    break;
-                }
-            }
-            if (isDone()) {
-                return result;
-            } else {
-                break;
+        if (!isDone()) {
+            try {
+                wait(timeout);
+            } catch (InterruptedException e) {
+                throw new RpcException(e);
             }
         }
         if (!isDone() || System.currentTimeMillis() - currentTime > timeout) {
