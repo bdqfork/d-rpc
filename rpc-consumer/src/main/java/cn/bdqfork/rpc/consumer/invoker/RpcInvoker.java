@@ -1,21 +1,17 @@
 package cn.bdqfork.rpc.consumer.invoker;
 
-import cn.bdqfork.common.constant.Const;
 import cn.bdqfork.common.exception.RpcException;
 import cn.bdqfork.common.exception.TimeoutException;
 import cn.bdqfork.rpc.consumer.client.ClientPool;
+import cn.bdqfork.rpc.consumer.client.NettyClient;
+import cn.bdqfork.rpc.consumer.context.DefaultFuture;
 import cn.bdqfork.rpc.consumer.context.RpcContext;
 import cn.bdqfork.rpc.consumer.context.RpcContextManager;
-import cn.bdqfork.rpc.consumer.exchanger.Exchanger;
 import cn.bdqfork.rpc.invoker.Invocation;
 import cn.bdqfork.rpc.invoker.Invoker;
-import cn.bdqfork.rpc.consumer.context.DefaultFuture;
 import cn.bdqfork.rpc.netty.RpcResponse;
-import cn.bdqfork.rpc.consumer.client.NettyClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.List;
 
 /**
  * @author bdq

@@ -1,5 +1,6 @@
 package cn.bdqfork.consuemr.client;
 
+import cn.bdqfork.common.exception.RpcException;
 import cn.bdqfork.provider.api.UserService;
 import cn.bdqfork.rpc.consumer.client.ClientPool;
 import cn.bdqfork.rpc.consumer.config.Configration;
@@ -7,6 +8,7 @@ import cn.bdqfork.rpc.consumer.proxy.ProxyFactory;
 import cn.bdqfork.rpc.consumer.proxy.ProxyFactoryBean;
 import cn.bdqfork.rpc.consumer.exchanger.Exchanger;
 import cn.bdqfork.rpc.consumer.invoker.RpcInvoker;
+import cn.bdqfork.rpc.consumer.proxy.ProxyType;
 import cn.bdqfork.rpc.registry.Registry;
 import cn.bdqfork.rpc.registry.zookeeper.ZkRegistry;
 
@@ -15,7 +17,7 @@ import cn.bdqfork.rpc.registry.zookeeper.ZkRegistry;
  * @date 2019-02-15
  */
 public class Main {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws RpcException {
         Configration configration = new Configration();
         configration.setHost("127.0.0.1");
         configration.setPort(8080);
@@ -29,9 +31,13 @@ public class Main {
         ClientPool clientPool = exchanger.getClientPool("rpc-test", UserService.class.getName());
         RpcInvoker invoker = new RpcInvoker(clientPool, 100L, 3);
 
-        ProxyFactory proxyFactory = new ProxyFactoryBean();
+        ProxyFactory<UserService> proxyFactory = new ProxyFactoryBean.Builder<UserService>()
+                .invoker(invoker)
+                .serviceInterface(UserService.class)
+                .refName("userService")
+                .build();
 
-        UserService service = proxyFactory.getJdkProxy(invoker, UserService.class, "userService");
+        UserService service = proxyFactory.getProxy(ProxyType.JAVASSIST);
 
         while (true) {
             try {

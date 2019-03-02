@@ -1,5 +1,6 @@
 package cn.bdqfork.rpc.consumer.client;
 
+import cn.bdqfork.common.exception.RemoteConnectionLostException;
 import cn.bdqfork.common.exception.RpcException;
 import cn.bdqfork.rpc.netty.DataDecoder;
 import cn.bdqfork.rpc.netty.DataEncoder;
@@ -62,10 +63,10 @@ public class NettyClient {
         }
     }
 
-    public void send(Object data) throws RpcException {
+    public void send(Object data) throws RemoteConnectionLostException {
         Channel channel = NettyChannel.getChannel(host, port);
         if (channel == null) {
-            throw new RpcException("connection lost !");
+            throw new RemoteConnectionLostException("connection lost !");
         }
         ChannelFuture future = channel.writeAndFlush(data);
         try {

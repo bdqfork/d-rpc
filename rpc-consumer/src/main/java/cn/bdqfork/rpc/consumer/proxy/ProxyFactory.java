@@ -1,21 +1,19 @@
 package cn.bdqfork.rpc.consumer.proxy;
 
 
-import cn.bdqfork.rpc.invoker.Invoker;
+import cn.bdqfork.common.exception.RpcException;
 
 /**
  * @author bdq
  * @date 2019-02-15
  */
-public interface ProxyFactory {
+public interface ProxyFactory<T> {
     /**
      * 获取远程代理
      *
-     * @param invoker
-     * @param serviceInterface
-     * @param refName
-     * @param <T>
+     * @param proxyType
      * @return
+     * @throws RpcException
      */
-    <T> T getJdkProxy(Invoker<Object> invoker, Class<T> serviceInterface, String refName);
+     T getProxy(ProxyType proxyType) throws RpcException;
 }
