@@ -1,7 +1,7 @@
 package cn.bdqfork.rpc.consumer.exchanger;
 
-import cn.bdqfork.rpc.common.constant.Const;
-import cn.bdqfork.rpc.protocol.client.ClientPool;
+import cn.bdqfork.common.constant.Const;
+import cn.bdqfork.rpc.consumer.client.ClientPool;
 import cn.bdqfork.rpc.config.Configration;
 import cn.bdqfork.rpc.registry.Notifier;
 import cn.bdqfork.rpc.registry.Registry;

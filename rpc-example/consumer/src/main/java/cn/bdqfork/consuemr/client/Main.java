@@ -1,8 +1,8 @@
 package cn.bdqfork.consuemr.client;
 
-import cn.bdqfork.rpc.common.exception.RpcException;
+import cn.bdqfork.common.exception.RpcException;
 import cn.bdqfork.provider.api.UserService;
-import cn.bdqfork.rpc.protocol.client.ClientPool;
+import cn.bdqfork.rpc.consumer.client.ClientPool;
 import cn.bdqfork.rpc.config.Configration;
 import cn.bdqfork.rpc.proxy.RpcProxyFactory;
 import cn.bdqfork.rpc.proxy.RpcProxyFactoryBean;

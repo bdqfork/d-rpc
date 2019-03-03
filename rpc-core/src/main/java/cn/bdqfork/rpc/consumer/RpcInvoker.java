@@ -1,9 +1,9 @@
 package cn.bdqfork.rpc.consumer;
 
-import cn.bdqfork.rpc.common.exception.RpcException;
-import cn.bdqfork.rpc.common.exception.TimeoutException;
-import cn.bdqfork.rpc.protocol.client.ClientPool;
-import cn.bdqfork.rpc.protocol.client.NettyClient;
+import cn.bdqfork.common.exception.RpcException;
+import cn.bdqfork.common.exception.TimeoutException;
+import cn.bdqfork.rpc.consumer.client.ClientPool;
+import cn.bdqfork.rpc.consumer.client.NettyClient;
 import cn.bdqfork.rpc.consumer.context.DefaultFuture;
 import cn.bdqfork.rpc.consumer.context.RpcContext;
 import cn.bdqfork.rpc.consumer.context.RpcContextManager;

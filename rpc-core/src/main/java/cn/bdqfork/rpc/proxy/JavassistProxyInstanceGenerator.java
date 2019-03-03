@@ -1,6 +1,6 @@
 package cn.bdqfork.rpc.proxy;
 
-import cn.bdqfork.rpc.common.exception.RpcException;
+import cn.bdqfork.common.exception.RpcException;
 import cn.bdqfork.rpc.protocol.invoker.Invoker;
 import javassist.util.proxy.MethodHandler;
 import javassist.util.proxy.ProxyFactory;

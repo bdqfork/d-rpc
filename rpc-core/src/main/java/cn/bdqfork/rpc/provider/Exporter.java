@@ -1,7 +1,7 @@
 package cn.bdqfork.rpc.provider;
 
 
-import cn.bdqfork.rpc.common.constant.Const;
+import cn.bdqfork.common.constant.Const;
 import cn.bdqfork.rpc.registry.Registry;
 import cn.bdqfork.rpc.registry.URL;
 

@@ -1,13 +1,11 @@
-plugins {
-    id 'java'
-}
+apply plugin: 'java'
 
 group 'cn.bdqfork'
 version '1.0-SNAPSHOT'
 
-sourceCompatibility = 1.8
-
 def libs = rootProject.ext.libraries // 库
+
+sourceCompatibility = 1.8
 
 repositories {
     mavenCentral()
@@ -16,15 +14,9 @@ repositories {
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
 
-    compile "org.apache.commons:commons-lang3:${libs.common_lang3}"
-
+    compile "io.netty:netty-all:${libs.netty}"
+    compile "com.caucho:hessian:${libs.hessian}"
     compile "org.slf4j:slf4j-api:${libs.slf4j}"
 
-    compile "org.springframework:spring-context:${libs.spring}"
-
-    compile "javassist:javassist:${libs.javassist}"
-
     compile project(':rpc-common')
-    compile project(':rpc-protocol')
-
 }

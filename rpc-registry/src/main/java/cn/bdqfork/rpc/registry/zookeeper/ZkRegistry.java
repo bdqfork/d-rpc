@@ -1,7 +1,7 @@
 package cn.bdqfork.rpc.registry.zookeeper;
 
 import cn.bdqfork.rpc.registry.URL;
-import cn.bdqfork.rpc.common.constant.Const;
+import cn.bdqfork.common.constant.Const;
 import cn.bdqfork.rpc.registry.Notifier;
 import cn.bdqfork.rpc.registry.Registry;
 import org.apache.curator.RetryPolicy;
