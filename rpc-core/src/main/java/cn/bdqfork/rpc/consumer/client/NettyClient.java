@@ -91,6 +91,10 @@ public class NettyClient {
     }
 
     public void close() {
-        group.shutdownGracefully();
+        try {
+            group.shutdownGracefully().sync();
+        } catch (InterruptedException e) {
+            log.error(e.getMessage(), e);
+        }
     }
 }

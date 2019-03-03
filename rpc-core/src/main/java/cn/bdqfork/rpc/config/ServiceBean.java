@@ -26,6 +26,8 @@ public class ServiceBean implements ApplicationContextAware, InitializingBean, D
     private static final Logger log = LoggerFactory.getLogger(ServiceBean.class);
     public static final String SERVICE_BEAN_NAME = "serviceBean";
 
+    private Registry registry;
+
     private ApplicationContext context;
 
     private ClassLoader classLoader;
@@ -45,6 +47,7 @@ public class ServiceBean implements ApplicationContextAware, InitializingBean, D
 
         log.info("closing server");
 
+        registry.close();
         nettyServer.close();
 
         log.info("server closed");
@@ -60,7 +63,7 @@ public class ServiceBean implements ApplicationContextAware, InitializingBean, D
 
         Class<?> clazz = Class.forName(client, false, classLoader);
 
-        Registry registry = (Registry) clazz.newInstance();
+        registry = (Registry) clazz.newInstance();
 
         registry.setRegistryConfig(registryConfig);
 

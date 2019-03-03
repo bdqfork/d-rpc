@@ -65,7 +65,11 @@ public class NettyServer {
     }
 
     public void close() {
-        boss.shutdownGracefully();
-        worker.shutdownGracefully();
+        try {
+            boss.shutdownGracefully().sync();
+            worker.shutdownGracefully().sync();
+        } catch (InterruptedException e) {
+            log.error(e.getMessage(), e);
+        }
     }
 }

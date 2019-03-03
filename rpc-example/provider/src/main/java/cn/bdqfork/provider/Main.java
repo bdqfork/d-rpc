@@ -1,9 +1,8 @@
 package cn.bdqfork.provider;
 
-import cn.bdqfork.provider.api.UserService;
 import cn.bdqfork.provider.config.RpcConfigration;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.context.support.AbstractApplicationContext;
 
 /**
  * @author bdq
@@ -11,8 +10,7 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
  */
 public class Main {
     public static void main(String[] args) {
-        ApplicationContext applicationContext = new AnnotationConfigApplicationContext(RpcConfigration.class);
-        UserService userService = applicationContext.getBean(UserService.class);
-        userService.sayHello("test");
+        AbstractApplicationContext applicationContext = new AnnotationConfigApplicationContext(RpcConfigration.class);
+        applicationContext.registerShutdownHook();
     }
 }
