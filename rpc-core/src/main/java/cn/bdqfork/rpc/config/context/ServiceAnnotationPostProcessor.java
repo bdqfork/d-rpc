@@ -49,7 +49,7 @@ public class ServiceAnnotationPostProcessor implements BeanDefinitionRegistryPos
 
         Set<String> resolvedPackages = resolvePackages();
 
-        if (resolvedPackages!=null && resolvedPackages.size()>0){
+        if (resolvedPackages != null && resolvedPackages.size() > 0) {
             registerBean(registry, resolvedPackages);
         }
 
@@ -74,11 +74,7 @@ public class ServiceAnnotationPostProcessor implements BeanDefinitionRegistryPos
 
             Service service = clazz.getAnnotation(Service.class);
 
-            ServiceConfig serviceConfig = new ServiceConfig();
-            serviceConfig.setGroup(service.group());
-            serviceConfig.setServiceName(service.serviceInterface().getName());
-            serviceConfig.setRefName(service.refName());
-            serviceConfigs.add(serviceConfig);
+            serviceConfigs.add(ServiceConfig.build(service));
 
         }
 
