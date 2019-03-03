@@ -20,5 +20,5 @@ dependencies {
 
     compile "org.slf4j:slf4j-api:${libs.slf4j}"
 
-    compile project(':rpc-common')
+    compile project(':rpc-core')
 }

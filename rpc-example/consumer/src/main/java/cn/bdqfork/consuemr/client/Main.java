@@ -4,8 +4,8 @@ import cn.bdqfork.common.exception.RpcException;
 import cn.bdqfork.provider.api.UserService;
 import cn.bdqfork.rpc.consumer.client.ClientPool;
 import cn.bdqfork.rpc.consumer.config.Configration;
-import cn.bdqfork.rpc.consumer.proxy.ProxyFactory;
-import cn.bdqfork.rpc.consumer.proxy.ProxyFactoryBean;
+import cn.bdqfork.rpc.consumer.proxy.RpcProxyFactory;
+import cn.bdqfork.rpc.consumer.proxy.RpcProxyFactoryBean;
 import cn.bdqfork.rpc.consumer.exchanger.Exchanger;
 import cn.bdqfork.rpc.consumer.invoker.RpcInvoker;
 import cn.bdqfork.rpc.consumer.proxy.ProxyType;
@@ -31,13 +31,13 @@ public class Main {
         ClientPool clientPool = exchanger.getClientPool("rpc-test", UserService.class.getName());
         RpcInvoker invoker = new RpcInvoker(clientPool, 100L, 3);
 
-        ProxyFactory<UserService> proxyFactory = new ProxyFactoryBean.Builder<UserService>()
+        RpcProxyFactory<UserService> rpcProxyFactory = new RpcProxyFactoryBean.Builder<UserService>()
                 .invoker(invoker)
                 .serviceInterface(UserService.class)
                 .refName("userService")
                 .build();
 
-        UserService service = proxyFactory.getProxy(ProxyType.JAVASSIST);
+        UserService service = rpcProxyFactory.getProxy(ProxyType.JAVASSIST);
 
         while (true) {
             try {

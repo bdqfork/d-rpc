@@ -7,12 +7,12 @@ import cn.bdqfork.rpc.invoker.Invoker;
  * @author bdq
  * @date 2019-03-01
  */
-public class ProxyFactoryBean<T> implements ProxyFactory<T> {
+public class RpcProxyFactoryBean<T> implements RpcProxyFactory<T> {
     private Invoker<Object> invoker;
     private Class<T> serviceInterface;
     private String refName;
 
-    private ProxyFactoryBean(Invoker<Object> invoker, Class<T> serviceInterface, String refName) {
+    private RpcProxyFactoryBean(Invoker<Object> invoker, Class<T> serviceInterface, String refName) {
         this.invoker = invoker;
         this.serviceInterface = serviceInterface;
         this.refName = refName;
@@ -47,8 +47,8 @@ public class ProxyFactoryBean<T> implements ProxyFactory<T> {
             return this;
         }
 
-        public ProxyFactoryBean<T> build() {
-            return new ProxyFactoryBean<>(invoker, serviceInterface, refName);
+        public RpcProxyFactoryBean<T> build() {
+            return new RpcProxyFactoryBean<>(invoker, serviceInterface, refName);
         }
     }
 

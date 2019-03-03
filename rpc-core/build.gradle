@@ -26,5 +26,8 @@ dependencies {
 
     compile "com.caucho:hessian:${libs.hessian}"
 
+    compile "javassist:javassist:${libs.javassist}"
+
     compile project(':rpc-common')
+
 }

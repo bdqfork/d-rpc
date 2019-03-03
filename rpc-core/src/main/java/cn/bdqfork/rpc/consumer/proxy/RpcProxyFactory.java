@@ -7,7 +7,7 @@ import cn.bdqfork.common.exception.RpcException;
  * @author bdq
  * @date 2019-02-15
  */
-public interface ProxyFactory<T> {
+public interface RpcProxyFactory<T> {
     /**
      * 获取远程代理
      *

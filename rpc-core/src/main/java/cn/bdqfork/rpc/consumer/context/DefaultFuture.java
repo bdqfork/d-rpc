@@ -2,12 +2,6 @@ package cn.bdqfork.rpc.consumer.context;
 
 import cn.bdqfork.common.exception.RpcException;
 import cn.bdqfork.common.exception.TimeoutException;
-import cn.bdqfork.rpc.netty.RpcResponse;
-
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * @author bdq

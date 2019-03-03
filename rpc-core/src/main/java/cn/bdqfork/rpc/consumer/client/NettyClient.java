@@ -1,15 +1,16 @@
 package cn.bdqfork.rpc.consumer.client;
 
 import cn.bdqfork.common.exception.RemoteConnectionLostException;
-import cn.bdqfork.common.exception.RpcException;
 import cn.bdqfork.rpc.netty.DataDecoder;
 import cn.bdqfork.rpc.netty.DataEncoder;
 import cn.bdqfork.rpc.netty.NettyChannel;
 import cn.bdqfork.rpc.serializer.HessianSerializer;
-import cn.bdqfork.rpc.serializer.JdkSerializer;
 import cn.bdqfork.rpc.serializer.Serializer;
 import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.*;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;

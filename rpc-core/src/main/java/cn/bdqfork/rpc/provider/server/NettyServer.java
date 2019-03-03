@@ -5,7 +5,6 @@ import cn.bdqfork.rpc.netty.DataDecoder;
 import cn.bdqfork.rpc.netty.DataEncoder;
 import cn.bdqfork.rpc.netty.RpcResponse;
 import cn.bdqfork.rpc.serializer.HessianSerializer;
-import cn.bdqfork.rpc.serializer.JdkSerializer;
 import cn.bdqfork.rpc.serializer.Serializer;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelInitializer;
