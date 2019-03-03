@@ -1,6 +1,6 @@
 package cn.bdqfork.rpc.consumer.context;
 
-import cn.bdqfork.common.exception.RpcException;
+import cn.bdqfork.rpc.common.exception.RpcException;
 
 /**
  * @author bdq

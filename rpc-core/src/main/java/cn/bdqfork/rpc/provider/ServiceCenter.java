@@ -1,9 +1,9 @@
 package cn.bdqfork.rpc.provider;
 
 
-import cn.bdqfork.rpc.invoker.Invoker;
-import cn.bdqfork.rpc.netty.RpcResponse;
-import cn.bdqfork.rpc.provider.server.NettyServer;
+import cn.bdqfork.rpc.protocol.invoker.Invoker;
+import cn.bdqfork.rpc.protocol.RpcResponse;
+import cn.bdqfork.rpc.protocol.server.NettyServer;
 
 /**
  * @author bdq

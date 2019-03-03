@@ -1,6 +1,6 @@
 package cn.bdqfork.rpc.consumer.context;
 
-import cn.bdqfork.rpc.netty.RpcResponse;
+import cn.bdqfork.rpc.protocol.RpcResponse;
 
 /**
  * @author bdq

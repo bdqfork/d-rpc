@@ -1,4 +1,5 @@
 rootProject.name = 'rpc-toy-parent'
+include 'rpc-toy'
 include 'rpc-core'
 include 'rpc-registry'
 include 'rpc-example'
@@ -6,7 +7,4 @@ include 'rpc-example:provider'
 findProject(':rpc-example:provider')?.name = 'provider'
 include 'rpc-example:consumer'
 findProject(':rpc-example:consumer')?.name = 'consumer'
-include 'rpc-common'
-include 'rpc-config'
-include 'rpc-toy'
 

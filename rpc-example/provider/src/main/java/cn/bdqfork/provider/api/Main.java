@@ -2,7 +2,7 @@ package cn.bdqfork.provider.api;
 
 import cn.bdqfork.rpc.provider.Exporter;
 import cn.bdqfork.rpc.provider.ServiceCenter;
-import cn.bdqfork.rpc.provider.invoker.RpcRemoteInvoker;
+import cn.bdqfork.rpc.provider.RpcRemoteInvoker;
 import cn.bdqfork.rpc.registry.zookeeper.ZkRegistry;
 
 /**

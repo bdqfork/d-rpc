@@ -1,7 +1,7 @@
 package cn.bdqfork.rpc.consumer.context;
 
-import cn.bdqfork.common.exception.RpcException;
-import cn.bdqfork.common.exception.TimeoutException;
+import cn.bdqfork.rpc.common.exception.RpcException;
+import cn.bdqfork.rpc.common.exception.TimeoutException;
 
 /**
  * @author bdq
