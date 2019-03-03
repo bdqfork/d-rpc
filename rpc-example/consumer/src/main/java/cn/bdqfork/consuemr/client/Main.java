@@ -2,8 +2,9 @@ package cn.bdqfork.consuemr.client;
 
 import cn.bdqfork.common.exception.RpcException;
 import cn.bdqfork.provider.api.UserService;
+import cn.bdqfork.rpc.config.RegistryConfig;
 import cn.bdqfork.rpc.consumer.client.ClientPool;
-import cn.bdqfork.rpc.config.Configration;
+import cn.bdqfork.rpc.config.ProtocolConfig;
 import cn.bdqfork.rpc.proxy.RpcProxyFactory;
 import cn.bdqfork.rpc.proxy.RpcProxyFactoryBean;
 import cn.bdqfork.rpc.consumer.exchanger.Exchanger;
@@ -18,12 +19,18 @@ import cn.bdqfork.rpc.registry.zookeeper.ZkRegistry;
  */
 public class Main {
     public static void main(String[] args) throws RpcException {
-        Configration configration = new Configration();
-        configration.setHost("127.0.0.1");
-        configration.setPort(8080);
-        Registry registry = new ZkRegistry("127.0.0.1:2181", 60, 60);
+        ProtocolConfig protocolConfig = new ProtocolConfig();
+        protocolConfig.setHost("127.0.0.1");
+        protocolConfig.setPort(8080);
 
-        Exchanger exchanger = new Exchanger(configration, registry);
+        RegistryConfig registryConfig = new RegistryConfig();
+        registryConfig.setClient(ZkRegistry.class.getName());
+        registryConfig.setUrl("127.0.0.1:2181");
+        Registry registry = new ZkRegistry();
+        registry.setRegistryConfig(registryConfig);
+        registry.init();
+
+        Exchanger exchanger = new Exchanger(protocolConfig, registry);
 
         exchanger.register("rpc-test", UserService.class.getName());
         exchanger.subscribe("rpc-test", UserService.class.getName());

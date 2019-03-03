@@ -23,13 +23,13 @@ public class Exporter {
         this.registry = registry;
     }
 
-    public void export(String group, String serviceName, Object instance) {
-
-        LocalRegistry.register(serviceName, instance);
+    public void export(String applicationName, String group, String serviceName, String refName) {
 
         Map<String, String> map = new HashMap<>(8);
         map.put(Const.GROUP_KEY, group);
         map.put(Const.SIDE_KEY, Const.PROVIDER_SIDE);
+        map.put("application", applicationName);
+        map.put("refName", refName);
         URL url = new URL("provider", host, port, serviceName, map);
 
         registry.register(url);

@@ -1,5 +1,8 @@
 package cn.bdqfork.rpc.config.annotation;
 
+import cn.bdqfork.rpc.config.context.RpcComponentScanRegistrar;
+import org.springframework.context.annotation.Import;
+
 import java.lang.annotation.*;
 
 /**
@@ -9,8 +12,11 @@ import java.lang.annotation.*;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
+@Import(RpcComponentScanRegistrar.class)
 public @interface RpcComponentScan {
 
-    String[] value();
+    String[] value() default {};
+
+    String[] basePackages() default {};
 
 }

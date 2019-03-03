@@ -11,8 +11,12 @@ import java.lang.annotation.*;
 @Documented
 public @interface Service {
 
+    Class<?> serviceInterface();
+
     long timeout() default 5000;
 
-    String group() default "";
-    
+    String group() default "rpc";
+
+    String refName() default "";
+
 }

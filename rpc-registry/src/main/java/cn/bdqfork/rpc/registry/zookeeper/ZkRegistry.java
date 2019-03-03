@@ -1,5 +1,7 @@
 package cn.bdqfork.rpc.registry.zookeeper;
 
+import cn.bdqfork.rpc.config.RegistryConfig;
+import cn.bdqfork.rpc.registry.AbstractRegistry;
 import cn.bdqfork.rpc.registry.URL;
 import cn.bdqfork.common.constant.Const;
 import cn.bdqfork.rpc.registry.Notifier;
@@ -24,7 +26,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author bdq
  * @date 2019-02-26
  */
-public class ZkRegistry implements Registry, ZkClient {
+public class ZkRegistry extends AbstractRegistry {
     private static final Logger log = LoggerFactory.getLogger(ZkRegistry.class);
 
     private static final String DEFAULT_ROOT = "rpc";
@@ -32,17 +34,26 @@ public class ZkRegistry implements Registry, ZkClient {
     private Map<String, URL> cacheNodeMap = new ConcurrentHashMap<>();
     private Map<String, CacheWatcher> cacheWatcherMap = new ConcurrentHashMap<>();
 
-    public ZkRegistry(String connectionInfo, int sessionTimeout, int connectionTimeout) {
+    @Override
+    public void init() {
         RetryPolicy retryPolicy = new RetryNTimes(3, 1000);
+        RegistryConfig registryConfig = getRegistryConfig();
         client = CuratorFrameworkFactory.builder()
-                .connectString(connectionInfo)
-                .sessionTimeoutMs(sessionTimeout)
-                .connectionTimeoutMs(connectionTimeout)
+                .connectString(registryConfig.getUrl())
+                .sessionTimeoutMs(registryConfig.getSessionTimeout())
+                .connectionTimeoutMs(registryConfig.getConnectionTimeout())
                 .retryPolicy(retryPolicy)
                 .build();
         client.getConnectionStateListenable().addListener(new ConnectionStateListener() {
             @Override
             public void stateChanged(CuratorFramework client, ConnectionState newState) {
+                if (!newState.isConnected()) {
+                    try {
+                        client.blockUntilConnected();
+                    } catch (InterruptedException e) {
+                        log.error(e.getMessage(), e);
+                    }
+                }
                 recover();
             }
         });

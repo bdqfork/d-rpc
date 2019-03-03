@@ -4,7 +4,7 @@ package cn.bdqfork.rpc.config;
  * @author bdq
  * @date 2019-02-28
  */
-public class Configration {
+public class ProtocolConfig {
 
     private String host;
 

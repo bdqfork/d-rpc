@@ -6,6 +6,10 @@ package cn.bdqfork.common.exception;
  */
 public class RemoteException extends RpcException {
 
+    public RemoteException(Throwable cause) {
+        super(cause);
+    }
+
     public RemoteException(String message, Throwable cause) {
         super(message, cause);
     }
