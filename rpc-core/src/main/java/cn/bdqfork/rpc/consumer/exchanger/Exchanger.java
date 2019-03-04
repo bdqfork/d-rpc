@@ -47,8 +47,8 @@ public class Exchanger implements Notifier {
         paramterMap.put(Const.SIDE_KEY, Const.PROVIDER_SIDE);
         URL url = new URL("consumer", protocolConfig.getHost(), protocolConfig.getPort(), serviceName, paramterMap);
         registry.subscribe(url, this);
-        map.putIfAbsent(getKey(url), new ClientPool(() -> refreshRemoteServcie(url)));
-        refreshRemoteServcie(url);
+        map.putIfAbsent(getKey(url), new ClientPool(() -> refreshRemoteServices(url)));
+        refreshRemoteServices(url);
     }
 
     public ClientPool getClientPool(String group, String serviceName) {
@@ -62,12 +62,12 @@ public class Exchanger implements Notifier {
     @Override
     public void notify(URL url, RegistryEvent event) {
         if (NodeEvent.CHANGED == event.getEvent()) {
-            refreshRemoteServcie(url);
+            refreshRemoteServices(url);
             registry.subscribe(url, this);
         }
     }
 
-    private void refreshRemoteServcie(URL url) {
+    private void refreshRemoteServices(URL url) {
         Set<String> remoteAddress = registry.getServiceAddress(url);
         ClientPool clientPool = map.get(getKey(url));
         clientPool.refresh(remoteAddress);

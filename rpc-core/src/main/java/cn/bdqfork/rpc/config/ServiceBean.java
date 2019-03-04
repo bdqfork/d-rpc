@@ -88,6 +88,8 @@ public class ServiceBean implements ApplicationContextAware, InitializingBean, D
         nettyServer.start();
 
         log.info("server started");
+
+        serviceConfigs.clear();
     }
 
     @Override

@@ -21,12 +21,11 @@ public class RpcInvoker implements Invoker<Object> {
     private static final Logger log = LoggerFactory.getLogger(RpcInvoker.class);
     private ClientPool clientPool;
     private long timeout;
-    private int retryTime;
+    private int retries;
 
-    public RpcInvoker(ClientPool clientPool, long timeout, int retryTime) {
-        this.clientPool = clientPool;
+    public RpcInvoker(long timeout, int retries) {
         this.timeout = timeout;
-        this.retryTime = retryTime;
+        this.retries = retries;
     }
 
     @Override
@@ -52,7 +51,7 @@ public class RpcInvoker implements Invoker<Object> {
             } catch (TimeoutException e) {
                 retryCount = retry(retryCount);
 
-                if (retryCount > retryTime) {
+                if (retryCount > retries) {
                     RpcContextManager.removeContext(rpcContext.getRequestId());
                     throw e;
                 }
@@ -65,7 +64,7 @@ public class RpcInvoker implements Invoker<Object> {
         retryCount++;
         int delayTime = 1000 * retryCount;
 
-        if (retryCount <= retryTime) {
+        if (retryCount <= retries) {
             log.warn("failed to invoke method , will retry after {} second !", delayTime);
         }
         try {
@@ -77,4 +76,7 @@ public class RpcInvoker implements Invoker<Object> {
         return retryCount;
     }
 
+    public void setClientPool(ClientPool clientPool) {
+        this.clientPool = clientPool;
+    }
 }

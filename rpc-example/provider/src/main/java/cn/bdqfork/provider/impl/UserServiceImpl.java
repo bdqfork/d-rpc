@@ -1,5 +1,6 @@
-package cn.bdqfork.provider.api;
+package cn.bdqfork.provider.impl;
 
+import cn.bdqfork.provider.api.UserService;
 import cn.bdqfork.rpc.config.annotation.Service;
 
 /**

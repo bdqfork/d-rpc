@@ -44,7 +44,6 @@ public class ServiceAnnotationPostProcessor implements BeanDefinitionRegistryPos
 
     @Override
     public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) throws BeansException {
-
         registerInvoker(registry);
 
         Set<String> resolvedPackages = resolvePackages();

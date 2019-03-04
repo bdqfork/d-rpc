@@ -27,27 +27,27 @@ public class RpcProxyFactoryBean<T> implements RpcProxyFactory<T> {
         }
     }
 
-    public static class Builder<T> {
+    public static class Builder {
         private Invoker<Object> invoker;
-        private Class<T> serviceInterface;
+        private Class<?> serviceInterface;
         private String refName;
 
-        public Builder<T> invoker(Invoker<Object> invoker) {
+        public Builder invoker(Invoker<Object> invoker) {
             this.invoker = invoker;
             return this;
         }
 
-        public Builder<T> serviceInterface(Class<T> serviceInterface) {
+        public Builder serviceInterface(Class<?> serviceInterface) {
             this.serviceInterface = serviceInterface;
             return this;
         }
 
-        public Builder<T> refName(String refName) {
+        public Builder refName(String refName) {
             this.refName = refName;
             return this;
         }
 
-        public RpcProxyFactoryBean<T> build() {
+        public RpcProxyFactoryBean<?> build() {
             return new RpcProxyFactoryBean<>(invoker, serviceInterface, refName);
         }
     }

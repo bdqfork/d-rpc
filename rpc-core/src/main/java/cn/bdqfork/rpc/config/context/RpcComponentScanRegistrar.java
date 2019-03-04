@@ -24,6 +24,7 @@ public class RpcComponentScanRegistrar implements ImportBeanDefinitionRegistrar 
 
         registerServiceAnnotationPostProcessor(registry, packagesToScan);
 
+        registerReferenceAnnotationPostProcessor(registry);
     }
 
     private void registerServiceAnnotationPostProcessor(BeanDefinitionRegistry registry, Set<String> packagesToScan) {
@@ -32,6 +33,13 @@ public class RpcComponentScanRegistrar implements ImportBeanDefinitionRegistrar 
                 .setRole(BeanDefinition.ROLE_INFRASTRUCTURE)
                 .getBeanDefinition();
         registry.registerBeanDefinition(ServiceAnnotationPostProcessor.SERVICE_ANNOTATION_POST_PROCESSOR_NAME, beanDefinition);
+    }
+
+    private void registerReferenceAnnotationPostProcessor(BeanDefinitionRegistry registry) {
+        AbstractBeanDefinition beanDefinition = BeanDefinitionBuilder.rootBeanDefinition(ReferenceAnnotationPostProcessor.class)
+                .setRole(BeanDefinition.ROLE_INFRASTRUCTURE)
+                .getBeanDefinition();
+        registry.registerBeanDefinition(ReferenceAnnotationPostProcessor.REFERENCE_ANNOTATION_POST_PROCESSOR_NAME, beanDefinition);
     }
 
     private Set<String> resolvePackageToScan(AnnotationMetadata importingClassMetadata) {

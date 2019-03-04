@@ -9,4 +9,3 @@ include 'rpc-example:consumer'
 findProject(':rpc-example:consumer')?.name = 'consumer'
 include 'rpc-protocol'
 include 'rpc-common'
-
