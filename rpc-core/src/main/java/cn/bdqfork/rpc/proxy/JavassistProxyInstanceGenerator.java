@@ -1,6 +1,7 @@
 package cn.bdqfork.rpc.proxy;
 
 import cn.bdqfork.common.exception.RpcException;
+import cn.bdqfork.rpc.protocol.RpcResponse;
 import cn.bdqfork.rpc.protocol.invoker.Invoker;
 import javassist.util.proxy.MethodHandler;
 import javassist.util.proxy.ProxyFactory;
@@ -14,7 +15,7 @@ import java.lang.reflect.Method;
  */
 public class JavassistProxyInstanceGenerator<T> extends AbstractProxyInstanceGenerator<T> implements MethodHandler {
 
-    public JavassistProxyInstanceGenerator(Invoker<Object> invoker, Class<?> serviceInterface, String refName) {
+    public JavassistProxyInstanceGenerator(Invoker<RpcResponse> invoker, Class<?> serviceInterface, String refName) {
         super(invoker, serviceInterface, refName);
     }
 

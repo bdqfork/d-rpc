@@ -8,17 +8,14 @@ import cn.bdqfork.rpc.config.RegistryConfig;
  */
 public abstract class AbstractRegistry implements Registry {
 
-    public static final String REGISTRY_BEAN_NAME = "registry";
-
     private RegistryConfig registryConfig;
 
-    public RegistryConfig getRegistryConfig() {
-        return registryConfig;
+    public AbstractRegistry(RegistryConfig registryConfig) {
+        this.registryConfig = registryConfig;
     }
 
-    @Override
-    public void setRegistryConfig(RegistryConfig registryConfig) {
-        this.registryConfig = registryConfig;
+    protected RegistryConfig getRegistryConfig() {
+        return registryConfig;
     }
 
 }

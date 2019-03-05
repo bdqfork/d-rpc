@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
  * @author bdq
  * @date 2019-02-28
  */
-public class RpcInvoker implements Invoker<Object> {
+public class RpcInvoker implements Invoker<RpcResponse> {
     private static final Logger log = LoggerFactory.getLogger(RpcInvoker.class);
     private ClientPool clientPool;
     private long timeout;
@@ -29,7 +29,7 @@ public class RpcInvoker implements Invoker<Object> {
     }
 
     @Override
-    public Object invoke(Invocation invocation) throws RpcException {
+    public RpcResponse invoke(Invocation invocation) throws RpcException {
 
         DefaultFuture<RpcResponse> defaultFuture = new DefaultFuture<>();
         RpcContext rpcContext = new RpcContext(invocation.getRequestId(), defaultFuture);

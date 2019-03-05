@@ -1,6 +1,7 @@
 package cn.bdqfork.rpc.proxy;
 
 import cn.bdqfork.common.exception.RpcException;
+import cn.bdqfork.rpc.protocol.RpcResponse;
 import cn.bdqfork.rpc.protocol.invoker.Invoker;
 
 /**
@@ -8,11 +9,11 @@ import cn.bdqfork.rpc.protocol.invoker.Invoker;
  * @date 2019-03-01
  */
 public class RpcProxyFactoryBean<T> implements RpcProxyFactory<T> {
-    private Invoker<Object> invoker;
-    private Class<T> serviceInterface;
+    private Invoker<RpcResponse> invoker;
+    private Class<?> serviceInterface;
     private String refName;
 
-    private RpcProxyFactoryBean(Invoker<Object> invoker, Class<T> serviceInterface, String refName) {
+    private RpcProxyFactoryBean(Invoker<RpcResponse> invoker, Class<?> serviceInterface, String refName) {
         this.invoker = invoker;
         this.serviceInterface = serviceInterface;
         this.refName = refName;
@@ -28,11 +29,11 @@ public class RpcProxyFactoryBean<T> implements RpcProxyFactory<T> {
     }
 
     public static class Builder {
-        private Invoker<Object> invoker;
+        private Invoker<RpcResponse> invoker;
         private Class<?> serviceInterface;
         private String refName;
 
-        public Builder invoker(Invoker<Object> invoker) {
+        public Builder invoker(Invoker<RpcResponse> invoker) {
             this.invoker = invoker;
             return this;
         }

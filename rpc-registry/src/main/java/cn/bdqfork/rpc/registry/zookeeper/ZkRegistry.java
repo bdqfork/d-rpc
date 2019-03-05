@@ -34,29 +34,35 @@ public class ZkRegistry extends AbstractRegistry {
     private Map<String, URL> cacheNodeMap = new ConcurrentHashMap<>();
     private Map<String, CacheWatcher> cacheWatcherMap = new ConcurrentHashMap<>();
 
-    @Override
-    public void init() {
+    public ZkRegistry(RegistryConfig registryConfig) {
+        super(registryConfig);
+        init();
+    }
+
+
+    private void init() {
         RetryPolicy retryPolicy = new RetryNTimes(3, 1000);
+
         RegistryConfig registryConfig = getRegistryConfig();
+
         client = CuratorFrameworkFactory.builder()
                 .connectString(registryConfig.getUrl())
                 .sessionTimeoutMs(registryConfig.getSessionTimeout())
                 .connectionTimeoutMs(registryConfig.getConnectionTimeout())
                 .retryPolicy(retryPolicy)
                 .build();
-        client.getConnectionStateListenable().addListener(new ConnectionStateListener() {
-            @Override
-            public void stateChanged(CuratorFramework client, ConnectionState newState) {
-                if (!newState.isConnected()) {
-                    try {
-                        client.blockUntilConnected();
-                    } catch (InterruptedException e) {
-                        log.error(e.getMessage(), e);
-                    }
+
+        client.getConnectionStateListenable().addListener((client, newState) -> {
+            if (!newState.isConnected()) {
+                try {
+                    client.blockUntilConnected();
+                } catch (InterruptedException e) {
+                    log.error(e.getMessage(), e);
                 }
-                recover();
             }
+            recover();
         });
+
         client.start();
     }
 

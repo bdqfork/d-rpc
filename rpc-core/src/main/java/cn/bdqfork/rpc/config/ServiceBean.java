@@ -1,5 +1,6 @@
 package cn.bdqfork.rpc.config;
 
+import cn.bdqfork.rpc.config.annotation.Service;
 import cn.bdqfork.rpc.protocol.RpcResponse;
 import cn.bdqfork.rpc.protocol.invoker.Invoker;
 import cn.bdqfork.rpc.provider.Exporter;
@@ -15,6 +16,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
+import java.lang.reflect.Constructor;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -36,10 +38,10 @@ public class ServiceBean implements ApplicationContextAware, InitializingBean, D
 
     private Exporter exporter;
 
-    private List<ServiceConfig> serviceConfigs = new CopyOnWriteArrayList<>();
+    private List<Service> services = new CopyOnWriteArrayList<>();
 
-    public void setServiceConfigs(List<ServiceConfig> serviceConfigs) {
-        this.serviceConfigs.addAll(serviceConfigs);
+    public void setServices(List<Service> services) {
+        this.services.addAll(services);
     }
 
     @Override
@@ -62,12 +64,9 @@ public class ServiceBean implements ApplicationContextAware, InitializingBean, D
         String client = registryConfig.getClient();
 
         Class<?> clazz = Class.forName(client, false, classLoader);
+        Constructor<?> constructor = clazz.getConstructor(RegistryConfig.class);
 
-        registry = (Registry) clazz.newInstance();
-
-        registry.setRegistryConfig(registryConfig);
-
-        registry.init();
+        registry = (Registry) constructor.newInstance(registryConfig);
 
         ProtocolConfig protocolConfig = context.getBean(ProtocolConfig.class);
 
@@ -75,9 +74,9 @@ public class ServiceBean implements ApplicationContextAware, InitializingBean, D
 
         ApplicationConfig applicationConfig = context.getBean(ApplicationConfig.class);
 
-        serviceConfigs.forEach(serviceConfig -> exporter.export(applicationConfig.getApplicationName(), serviceConfig.getGroup(),
-                serviceConfig.getServiceName(),
-                serviceConfig.getRefName()));
+        services.forEach(service -> exporter.export(applicationConfig.getApplicationName(), service.group(),
+                service.serviceInterface().getName(),
+                service.refName()));
 
         Invoker<RpcResponse> invoker = context.getBean(RpcRemoteInvoker.RPC_REMOTE_INVOKER_BEAN_NAME, RpcRemoteInvoker.class);
 
@@ -89,7 +88,7 @@ public class ServiceBean implements ApplicationContextAware, InitializingBean, D
 
         log.info("server started");
 
-        serviceConfigs.clear();
+        services.clear();
     }
 
     @Override

@@ -1,6 +1,7 @@
 package cn.bdqfork.rpc.config;
 
 import cn.bdqfork.rpc.config.annotation.Reference;
+import cn.bdqfork.rpc.protocol.RpcResponse;
 import cn.bdqfork.rpc.protocol.invoker.Invoker;
 
 /**
@@ -11,9 +12,9 @@ public class ReferenceConfig {
 
     private Reference reference;
 
-    private Invoker<Object> invoker;
+    private Invoker<RpcResponse> invoker;
 
-    public static ReferenceConfig build(Reference reference, Invoker<Object> invoker) {
+    public static ReferenceConfig build(Reference reference, Invoker<RpcResponse> invoker) {
         ReferenceConfig referenceConfig = new ReferenceConfig();
         referenceConfig.setReference(reference);
         referenceConfig.setInvoker(invoker);
@@ -28,11 +29,12 @@ public class ReferenceConfig {
         this.reference = reference;
     }
 
-    public Invoker<Object> getInvoker() {
+    public Invoker<RpcResponse> getInvoker() {
         return invoker;
     }
 
-    public void setInvoker(Invoker<Object> invoker) {
+    public void setInvoker(Invoker<RpcResponse> invoker) {
         this.invoker = invoker;
     }
+
 }
