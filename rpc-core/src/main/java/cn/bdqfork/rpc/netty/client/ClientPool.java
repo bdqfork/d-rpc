@@ -1,7 +1,8 @@
-package cn.bdqfork.rpc.consumer.client;
+package cn.bdqfork.rpc.netty.client;
 
 import cn.bdqfork.common.exception.RpcException;
 import cn.bdqfork.rpc.exporter.RefreshCallback;
+import cn.bdqfork.rpc.netty.NettyInitializer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,11 +15,14 @@ import java.util.concurrent.ConcurrentHashMap;
  * @date 2019-03-01
  */
 public class ClientPool {
+    private static final String ADDRESS_SEPARATOR = ":";
     private Map<String, NettyClient> clientMap = new ConcurrentHashMap<>();
+    private NettyInitializer nettyInitializer;
     private RefreshCallback callback;
     private int i;
 
-    public ClientPool(RefreshCallback callback) {
+    public ClientPool(NettyInitializer nettyInitializer, RefreshCallback callback) {
+        this.nettyInitializer = nettyInitializer;
         this.callback = callback;
     }
 
@@ -37,31 +41,29 @@ public class ClientPool {
         remoteAddress.stream()
                 .filter(address -> !clientMap.containsKey(address))
                 .forEach(address -> {
-                    String[] hostPort = address.split(":");
-                    NettyClient nettyClient = new NettyClient(hostPort[0], Integer.parseInt(hostPort[1]));
+                    String[] hostPort = address.split(ADDRESS_SEPARATOR);
+                    NettyClient nettyClient = new NettyClient(hostPort[0], Integer.parseInt(hostPort[1]), nettyInitializer);
                     nettyClient.open();
                     clientMap.put(address, nettyClient);
                 });
     }
 
     public NettyClient getNettyClient() throws RpcException {
-        while (true) {
-            List<NettyClient> nettyClients = new ArrayList<>(clientMap.values());
-            if (nettyClients.size() != 0) {
-                if (i == Integer.MAX_VALUE) {
-                    i = 0;
-                }
-                //负载均衡
-                return nettyClients.get(i++ % nettyClients.size());
-            } else {
-                callback.refresh();
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                throw new RpcException("No provider available from registry");
+        List<NettyClient> nettyClients = new ArrayList<>(clientMap.values());
+        if (nettyClients.size() != 0) {
+            if (i == Integer.MAX_VALUE) {
+                i = 0;
             }
+            //负载均衡
+            return nettyClients.get(i++ % nettyClients.size());
+        } else {
+            callback.refresh();
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            throw new RpcException("No provider available from registry");
         }
     }
 

@@ -1,4 +1,4 @@
-package cn.bdqfork.rpc.provider.server;
+package cn.bdqfork.rpc.netty.provider;
 
 import cn.bdqfork.rpc.protocol.invoker.Invocation;
 import cn.bdqfork.rpc.protocol.invoker.Invoker;
@@ -10,10 +10,10 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
  * @author bdq
  * @date 2019-02-20
  */
-public class ServerHandler extends ChannelInboundHandlerAdapter {
+public class InvokerHandler extends ChannelInboundHandlerAdapter {
     private Invoker<RpcResponse> invoker;
 
-    public ServerHandler(Invoker<RpcResponse> invoker) {
+    public InvokerHandler(Invoker<RpcResponse> invoker) {
         this.invoker = invoker;
     }
 

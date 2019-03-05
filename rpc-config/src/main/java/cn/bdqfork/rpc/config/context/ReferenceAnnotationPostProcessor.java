@@ -3,7 +3,7 @@ package cn.bdqfork.rpc.config.context;
 import cn.bdqfork.rpc.config.ReferenceBean;
 import cn.bdqfork.rpc.config.ReferenceConfig;
 import cn.bdqfork.rpc.config.annotation.Reference;
-import cn.bdqfork.rpc.consumer.RpcInvoker;
+import cn.bdqfork.rpc.netty.consumer.RpcInvoker;
 import cn.bdqfork.rpc.protocol.RpcResponse;
 import cn.bdqfork.rpc.protocol.invoker.Invoker;
 import cn.bdqfork.rpc.proxy.ProxyType;

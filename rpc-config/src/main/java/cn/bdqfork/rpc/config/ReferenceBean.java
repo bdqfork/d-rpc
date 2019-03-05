@@ -1,8 +1,8 @@
 package cn.bdqfork.rpc.config;
 
 import cn.bdqfork.rpc.config.annotation.Reference;
-import cn.bdqfork.rpc.consumer.RpcInvoker;
-import cn.bdqfork.rpc.consumer.client.ClientPool;
+import cn.bdqfork.rpc.netty.consumer.RpcInvoker;
+import cn.bdqfork.rpc.netty.client.ClientPool;
 import cn.bdqfork.rpc.exporter.Exchanger;
 import cn.bdqfork.rpc.registry.Registry;
 import org.slf4j.Logger;
@@ -43,8 +43,6 @@ public class ReferenceBean extends AbstractRpcBean {
         }
 
         registry = getOrCreateRegistry();
-
-        registry.init();
 
         ProtocolConfig protocolConfig = context.getBean(ProtocolConfig.class);
 

@@ -6,5 +6,13 @@ package cn.bdqfork.rpc.exporter;
  */
 public interface Exporter {
 
+    /**
+     * 注册服务
+     *
+     * @param applicationName
+     * @param group
+     * @param serviceName
+     * @param refName
+     */
     void export(String applicationName, String group, String serviceName, String refName);
 }

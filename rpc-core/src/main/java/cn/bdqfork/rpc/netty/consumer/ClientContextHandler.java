@@ -1,6 +1,6 @@
-package cn.bdqfork.rpc.consumer.client;
+package cn.bdqfork.rpc.netty.consumer;
 
-import cn.bdqfork.rpc.consumer.context.RpcContextManager;
+import cn.bdqfork.rpc.netty.consumer.context.RpcContextManager;
 import cn.bdqfork.rpc.protocol.NettyChannel;
 import cn.bdqfork.rpc.protocol.RpcResponse;
 import io.netty.channel.ChannelHandlerContext;
@@ -10,7 +10,7 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
  * @author bdq
  * @date 2019-02-20
  */
-public class ClientHandler extends ChannelInboundHandlerAdapter {
+public class ClientContextHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {

@@ -1,20 +1,14 @@
-package cn.bdqfork.rpc.consumer.client;
+package cn.bdqfork.rpc.netty.client;
 
 import cn.bdqfork.common.exception.RemoteConnectionLostException;
-import cn.bdqfork.rpc.protocol.DataDecoder;
-import cn.bdqfork.rpc.protocol.DataEncoder;
+import cn.bdqfork.rpc.netty.NettyInitializer;
 import cn.bdqfork.rpc.protocol.NettyChannel;
-import cn.bdqfork.rpc.protocol.serializer.HessianSerializer;
-import cn.bdqfork.rpc.protocol.serializer.Serializer;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelInitializer;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,17 +21,13 @@ public class NettyClient {
 
     private String host;
     private Integer port;
-    private Serializer serializer;
+    private NettyInitializer nettyInitializer;
     private EventLoopGroup group;
 
-    public NettyClient(String host, Integer port) {
-        this(host, port, new HessianSerializer());
-    }
-
-    public NettyClient(String host, Integer port, Serializer serializer) {
+    public NettyClient(String host, Integer port, NettyInitializer nettyInitializer) {
         this.host = host;
         this.port = port;
-        this.serializer = serializer;
+        this.nettyInitializer = nettyInitializer;
     }
 
     public void open() {
@@ -47,16 +37,7 @@ public class NettyClient {
             bootstrap.group(group)
                     .channel(NioSocketChannel.class)
                     .remoteAddress(host, port)
-                    .handler(new ChannelInitializer<SocketChannel>() {
-                        @Override
-                        protected void initChannel(SocketChannel ch) throws Exception {
-                            ch.pipeline()
-                                    .addLast(new LengthFieldBasedFrameDecoder(64 * 1024, 0, 4, 0, 4))
-                                    .addLast(new DataDecoder(serializer))
-                                    .addLast(new DataEncoder(serializer))
-                                    .addLast(new ClientHandler());
-                        }
-                    });
+                    .handler(nettyInitializer);
             bootstrap.connect().sync();
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -75,7 +56,7 @@ public class NettyClient {
             if (future.isSuccess()) {
                 log.debug("send message success !");
             } else {
-                log.error("failed send message !", future.cause());
+                log.error("failed to send message !", future.cause());
             }
         } catch (InterruptedException e) {
             log.error(e.getMessage(), e);

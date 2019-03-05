@@ -4,8 +4,8 @@ import cn.bdqfork.rpc.config.annotation.Service;
 import cn.bdqfork.rpc.protocol.RpcResponse;
 import cn.bdqfork.rpc.protocol.invoker.Invoker;
 import cn.bdqfork.rpc.exporter.ServiceExporter;
-import cn.bdqfork.rpc.provider.RpcRemoteInvoker;
-import cn.bdqfork.rpc.provider.server.NettyServer;
+import cn.bdqfork.rpc.netty.provider.ProviderServer;
+import cn.bdqfork.rpc.netty.provider.RpcRemoteInvoker;
 import cn.bdqfork.rpc.registry.Registry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +23,7 @@ public class ServiceBean extends AbstractRpcBean {
 
     private Registry registry;
 
-    private NettyServer nettyServer;
+    private ProviderServer providerServer;
 
     private ServiceExporter exporter;
 
@@ -39,7 +39,7 @@ public class ServiceBean extends AbstractRpcBean {
         log.info("closing server");
 
         registry.close();
-        nettyServer.close();
+        providerServer.close();
 
         log.info("server closed");
     }
@@ -48,7 +48,6 @@ public class ServiceBean extends AbstractRpcBean {
     @Override
     public void afterPropertiesSet() throws Exception {
         registry = getOrCreateRegistry();
-        registry.init();
 
         ProtocolConfig protocolConfig = context.getBean(ProtocolConfig.class);
 
@@ -62,11 +61,11 @@ public class ServiceBean extends AbstractRpcBean {
 
         Invoker<RpcResponse> invoker = context.getBean(RpcRemoteInvoker.RPC_REMOTE_INVOKER_BEAN_NAME, RpcRemoteInvoker.class);
 
-        nettyServer = new NettyServer(protocolConfig.getHost(), protocolConfig.getPort(), invoker);
+        providerServer = new ProviderServer(protocolConfig, invoker);
 
         log.info("starting server");
 
-        nettyServer.start();
+        providerServer.start();
 
         log.info("server started");
 

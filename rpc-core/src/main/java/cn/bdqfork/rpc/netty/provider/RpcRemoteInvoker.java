@@ -1,4 +1,4 @@
-package cn.bdqfork.rpc.provider;
+package cn.bdqfork.rpc.netty.provider;
 
 import cn.bdqfork.common.exception.RpcException;
 import cn.bdqfork.rpc.protocol.RpcResponse;

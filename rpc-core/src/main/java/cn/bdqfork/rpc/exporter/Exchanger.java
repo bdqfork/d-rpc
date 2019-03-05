@@ -2,7 +2,11 @@ package cn.bdqfork.rpc.exporter;
 
 import cn.bdqfork.common.constant.Const;
 import cn.bdqfork.rpc.config.ProtocolConfig;
-import cn.bdqfork.rpc.consumer.client.ClientPool;
+import cn.bdqfork.rpc.netty.consumer.ClientContextHandler;
+import cn.bdqfork.rpc.netty.NettyInitializer;
+import cn.bdqfork.rpc.netty.client.ClientPool;
+import cn.bdqfork.rpc.protocol.serializer.HessianSerializer;
+import cn.bdqfork.rpc.protocol.serializer.Serializer;
 import cn.bdqfork.rpc.registry.Notifier;
 import cn.bdqfork.rpc.registry.Registry;
 import cn.bdqfork.rpc.registry.URL;
@@ -27,9 +31,16 @@ public class Exchanger implements Exporter, Notifier {
 
     private Registry registry;
 
+    private Serializer serializer;
+
     public Exchanger(ProtocolConfig protocolConfig, Registry registry) {
+        this(protocolConfig, registry, new HessianSerializer());
+    }
+
+    public Exchanger(ProtocolConfig protocolConfig, Registry registry, Serializer serializer) {
         this.protocolConfig = protocolConfig;
         this.registry = registry;
+        this.serializer = serializer;
     }
 
     @Override
@@ -52,7 +63,13 @@ public class Exchanger implements Exporter, Notifier {
     public void subscribe(URL url) {
         url.addParameter(Const.SIDE_KEY, Const.PROVIDER_SIDE);
         registry.subscribe(url, this);
-        map.putIfAbsent(getKey(url), new ClientPool(() -> refreshRemoteServices(url)));
+
+        ClientContextHandler clientContextHandler = new ClientContextHandler();
+        NettyInitializer.ChannelHandlerElement channelHandlerElement = new NettyInitializer.ChannelHandlerElement(clientContextHandler);
+        NettyInitializer nettyInitializer = new NettyInitializer(serializer, channelHandlerElement);
+
+        map.putIfAbsent(getKey(url), new ClientPool(nettyInitializer, () -> refreshRemoteServices(url)));
+
         refreshRemoteServices(url);
     }
 

@@ -19,12 +19,15 @@ public abstract class AbstractRpcBean implements RpcBean {
 
     @Override
     public Registry getOrCreateRegistry() throws ClassNotFoundException {
+        Registry registry;
         try {
-            return context.getBean(Registry.class);
+            registry = context.getBean(Registry.class);
         } catch (NoSuchBeanDefinitionException e) {
             createRegistry();
-            return context.getBean(Registry.class);
+            registry = context.getBean(Registry.class);
         }
+        registry.init();
+        return registry;
     }
 
     private void createRegistry() throws ClassNotFoundException {

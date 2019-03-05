@@ -1,4 +1,4 @@
-package cn.bdqfork.rpc.consumer.context;
+package cn.bdqfork.rpc.netty.consumer.context;
 
 import cn.bdqfork.common.exception.RpcException;
 
