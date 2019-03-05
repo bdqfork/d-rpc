@@ -4,13 +4,12 @@ import cn.bdqfork.rpc.config.ReferenceBean;
 import cn.bdqfork.rpc.config.ReferenceConfig;
 import cn.bdqfork.rpc.config.annotation.Reference;
 import cn.bdqfork.rpc.consumer.RpcInvoker;
+import cn.bdqfork.rpc.protocol.RpcResponse;
 import cn.bdqfork.rpc.protocol.invoker.Invoker;
 import cn.bdqfork.rpc.proxy.ProxyType;
 import cn.bdqfork.rpc.proxy.RpcProxyFactoryBean;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.PropertyValues;
-import org.springframework.beans.factory.DisposableBean;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.InjectionMetadata;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.config.InstantiationAwareBeanPostProcessorAdapter;
@@ -29,7 +28,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * @date 2019-03-04
  */
 public class ReferenceAnnotationPostProcessor extends InstantiationAwareBeanPostProcessorAdapter implements
-        BeanDefinitionRegistryPostProcessor, InitializingBean, DisposableBean {
+        BeanDefinitionRegistryPostProcessor {
     public static final String REFERENCE_ANNOTATION_POST_PROCESSOR_NAME = "referenceAnnotationPostProcessor";
 
     private List<ReferenceConfig> referenceConfigs = new CopyOnWriteArrayList<>();
@@ -45,7 +44,7 @@ public class ReferenceAnnotationPostProcessor extends InstantiationAwareBeanPost
                 continue;
             }
 
-            Invoker<Object> invoker = new RpcInvoker(reference.timeout(), reference.retries());
+            Invoker<RpcResponse> invoker = new RpcInvoker(reference.timeout(), reference.retries());
 
             ReferenceConfig referenceConfig = ReferenceConfig.build(reference, invoker);
             referenceConfigs.add(referenceConfig);
@@ -53,7 +52,7 @@ public class ReferenceAnnotationPostProcessor extends InstantiationAwareBeanPost
             InjectionMetadata.InjectedElement referenceFieldElement = new ReferenceFieldElement(field, reference, invoker);
             referenceFieldElements.add(referenceFieldElement);
         }
-        if (referenceFieldElements.size()>0){
+        if (referenceFieldElements.size() > 0) {
             InjectionMetadata injectionMetadata = new InjectionMetadata(beanClass, referenceFieldElements);
 
             try {
@@ -67,18 +66,9 @@ public class ReferenceAnnotationPostProcessor extends InstantiationAwareBeanPost
     }
 
     @Override
-    public void destroy() throws Exception {
-
-    }
-
-    @Override
-    public void afterPropertiesSet() throws Exception {
-    }
-
-    @Override
     public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) throws BeansException {
         AbstractBeanDefinition beanDefinition = BeanDefinitionBuilder.genericBeanDefinition(ReferenceBean.class)
-                .addPropertyValue("referenceConfigs", referenceConfigs)
+                .addPropertyValue("referenceConfigCallback", (ReferenceBean.ReferenceConfigCallback) () -> referenceConfigs)
                 .getBeanDefinition();
         registry.registerBeanDefinition(ReferenceBean.REFERENCE_BEAN_NAME, beanDefinition);
     }
@@ -91,9 +81,9 @@ public class ReferenceAnnotationPostProcessor extends InstantiationAwareBeanPost
     private class ReferenceFieldElement extends InjectionMetadata.InjectedElement {
         private Field field;
         private Reference reference;
-        private Invoker<Object> invoker;
+        private Invoker<RpcResponse> invoker;
 
-        private ReferenceFieldElement(Field field, Reference reference, Invoker<Object> invoker) {
+        private ReferenceFieldElement(Field field, Reference reference, Invoker<RpcResponse> invoker) {
             super(field, null);
             this.field = field;
             this.reference = reference;

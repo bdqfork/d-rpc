@@ -1,18 +1,15 @@
-package cn.bdqfork.rpc.consumer.exchanger;
+package cn.bdqfork.rpc.exporter;
 
 import cn.bdqfork.common.constant.Const;
-import cn.bdqfork.rpc.consumer.client.ClientPool;
 import cn.bdqfork.rpc.config.ProtocolConfig;
+import cn.bdqfork.rpc.consumer.client.ClientPool;
 import cn.bdqfork.rpc.registry.Notifier;
 import cn.bdqfork.rpc.registry.Registry;
 import cn.bdqfork.rpc.registry.URL;
+import cn.bdqfork.rpc.registry.URLBuilder;
 import cn.bdqfork.rpc.registry.event.NodeEvent;
 import cn.bdqfork.rpc.registry.event.RegistryEvent;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -20,8 +17,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author bdq
  * @date 2019-03-01
  */
-public class Exchanger implements Notifier {
-    private static final Logger log = LoggerFactory.getLogger(Exchanger.class);
+public class Exchanger implements Exporter, Notifier {
     private ProtocolConfig protocolConfig;
 
     private ConcurrentHashMap<String, ClientPool> map = new ConcurrentHashMap<>();
@@ -33,30 +29,32 @@ public class Exchanger implements Notifier {
         this.registry = registry;
     }
 
-    public void register(String group, String serviceName) {
-        Map<String, String> paramterMap = new HashMap<>(8);
-        paramterMap.put(Const.GROUP_KEY, group);
-        paramterMap.put(Const.SIDE_KEY, Const.CONSUMER_SIDE);
-        URL url = new URL("consumer", protocolConfig.getHost(), protocolConfig.getPort(), serviceName, paramterMap);
+    @Override
+    public void export(String applicationName, String group, String serviceName, String refName) {
+        URL url = URLBuilder.consumerUrl(protocolConfig, serviceName)
+                .applicationName(applicationName)
+                .group(group)
+                .refName(refName)
+                .getUrl();
+        register(url);
+        subscribe(url);
+    }
+
+    public void register(URL url) {
+        url.addParameter(Const.SIDE_KEY, Const.CONSUMER_SIDE);
         registry.register(url);
     }
 
-    public void subscribe(String group, String serviceName) {
-        Map<String, String> paramterMap = new HashMap<>(8);
-        paramterMap.put(Const.GROUP_KEY, group);
-        paramterMap.put(Const.SIDE_KEY, Const.PROVIDER_SIDE);
-        URL url = new URL("consumer", protocolConfig.getHost(), protocolConfig.getPort(), serviceName, paramterMap);
+    public void subscribe(URL url) {
+        url.addParameter(Const.SIDE_KEY, Const.PROVIDER_SIDE);
         registry.subscribe(url, this);
         map.putIfAbsent(getKey(url), new ClientPool(() -> refreshRemoteServices(url)));
         refreshRemoteServices(url);
     }
 
     public ClientPool getClientPool(String group, String serviceName) {
-        Map<String, String> paramterMap = new HashMap<>(8);
-        paramterMap.put(Const.GROUP_KEY, group);
-        paramterMap.put(Const.SIDE_KEY, Const.PROVIDER_SIDE);
-        URL url = new URL("consumer", protocolConfig.getHost(), protocolConfig.getPort(), serviceName, paramterMap);
-        return map.get(getKey(url));
+        String key = "/" + group + "/" + serviceName;
+        return map.get(key);
     }
 
     @Override

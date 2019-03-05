@@ -1,16 +1,12 @@
 package cn.bdqfork.rpc.registry.zookeeper;
 
-import cn.bdqfork.rpc.config.RegistryConfig;
-import cn.bdqfork.rpc.registry.AbstractRegistry;
-import cn.bdqfork.rpc.registry.URL;
 import cn.bdqfork.common.constant.Const;
+import cn.bdqfork.rpc.registry.AbstractRegistry;
 import cn.bdqfork.rpc.registry.Notifier;
-import cn.bdqfork.rpc.registry.Registry;
+import cn.bdqfork.rpc.registry.URL;
 import org.apache.curator.RetryPolicy;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
-import org.apache.curator.framework.state.ConnectionState;
-import org.apache.curator.framework.state.ConnectionStateListener;
 import org.apache.curator.retry.RetryNTimes;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.WatchedEvent;
@@ -36,28 +32,45 @@ public class ZkRegistry extends AbstractRegistry {
 
     @Override
     public void init() {
+        if (inited) {
+            return;
+        }
         RetryPolicy retryPolicy = new RetryNTimes(3, 1000);
-        RegistryConfig registryConfig = getRegistryConfig();
+
         client = CuratorFrameworkFactory.builder()
                 .connectString(registryConfig.getUrl())
                 .sessionTimeoutMs(registryConfig.getSessionTimeout())
                 .connectionTimeoutMs(registryConfig.getConnectionTimeout())
                 .retryPolicy(retryPolicy)
                 .build();
-        client.getConnectionStateListenable().addListener(new ConnectionStateListener() {
-            @Override
-            public void stateChanged(CuratorFramework client, ConnectionState newState) {
-                if (!newState.isConnected()) {
-                    try {
-                        client.blockUntilConnected();
-                    } catch (InterruptedException e) {
-                        log.error(e.getMessage(), e);
-                    }
+
+        client.getConnectionStateListenable().addListener((client, newState) -> {
+            if (newState.isConnected()) {
+                running = true;
+            } else {
+                running = false;
+                try {
+                    client.blockUntilConnected();
+                } catch (InterruptedException e) {
+                    log.error(e.getMessage(), e);
                 }
-                recover();
             }
+            recover();
         });
+
         client.start();
+
+        inited = true;
+    }
+
+    @Override
+    public boolean isInited() {
+        return inited;
+    }
+
+    @Override
+    public boolean isRunning() {
+        return running;
     }
 
     @Override
@@ -74,7 +87,7 @@ public class ZkRegistry extends AbstractRegistry {
             }
             cacheNodeMap.putIfAbsent(path, url);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.getMessage(), e);
         }
     }
 
@@ -112,14 +125,16 @@ public class ZkRegistry extends AbstractRegistry {
                 return new HashSet<>(client.getChildren().forPath(path));
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.getMessage(), e);
         }
         return Collections.emptySet();
     }
 
     @Override
     public void close() {
-        client.close();
+        if (running) {
+            client.close();
+        }
     }
 
     private void recover() {

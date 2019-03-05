@@ -10,11 +10,16 @@ import java.util.Set;
  * @date 2019-02-26
  */
 public interface Registry {
+    String REGISTRY_NAME = "registry";
 
     /**
-     * 初始化注册中心
+     * 初始化
      */
     void init();
+
+    boolean isInited();
+
+    boolean isRunning();
 
     /**
      * 注册服务

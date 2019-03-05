@@ -1,6 +1,5 @@
 package cn.bdqfork.provider;
 
-import cn.bdqfork.provider.config.RpcConfigration;
 import cn.bdqfork.rpc.config.annotation.RpcComponentScan;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.ComponentScan;

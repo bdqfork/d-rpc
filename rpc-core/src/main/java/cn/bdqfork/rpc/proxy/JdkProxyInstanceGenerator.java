@@ -1,5 +1,6 @@
 package cn.bdqfork.rpc.proxy;
 
+import cn.bdqfork.rpc.protocol.RpcResponse;
 import cn.bdqfork.rpc.protocol.invoker.Invoker;
 
 import java.lang.reflect.InvocationHandler;
@@ -12,7 +13,7 @@ import java.lang.reflect.Proxy;
  */
 public class JdkProxyInstanceGenerator<T> extends AbstractProxyInstanceGenerator<T> implements InvocationHandler {
 
-    public JdkProxyInstanceGenerator(Invoker<Object> invoker, Class<?> serviceInterface, String refName) {
+    public JdkProxyInstanceGenerator(Invoker<RpcResponse> invoker, Class<?> serviceInterface, String refName) {
         super(invoker, serviceInterface, refName);
     }
 

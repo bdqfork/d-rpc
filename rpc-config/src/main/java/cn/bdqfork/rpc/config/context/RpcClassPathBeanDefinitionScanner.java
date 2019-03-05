@@ -22,9 +22,13 @@ public class RpcClassPathBeanDefinitionScanner extends ClassPathBeanDefinitionSc
     }
 
     public RpcClassPathBeanDefinitionScanner(BeanDefinitionRegistry registry, boolean useDefaultFilters, Environment environment, ResourceLoader resourceLoader) {
+
         super(registry, useDefaultFilters);
+
         setEnvironment(environment);
+
         setResourceLoader(resourceLoader);
+
         registerAnnotationConfigProcessors(registry);
     }
 

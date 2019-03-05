@@ -1,7 +1,7 @@
 package cn.bdqfork.rpc.consumer.client;
 
 import cn.bdqfork.common.exception.RpcException;
-import cn.bdqfork.rpc.consumer.exchanger.RefreshCallback;
+import cn.bdqfork.rpc.exporter.RefreshCallback;
 
 import java.util.ArrayList;
 import java.util.List;

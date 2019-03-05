@@ -18,17 +18,17 @@ public abstract class AbstractProxyInstanceGenerator<T> implements ProxyInstance
     private static final String EQUALS_METHOD = "equals";
     private static final String HASHCODE_METHOD = "hashCode";
 
-    private Invoker<Object> invoker;
+    private Invoker<RpcResponse> invoker;
     private Class<?> serviceInterface;
     private String refName;
 
-    public AbstractProxyInstanceGenerator(Invoker<Object> invoker, Class<?> serviceInterface, String refName) {
+    public AbstractProxyInstanceGenerator(Invoker<RpcResponse> invoker, Class<?> serviceInterface, String refName) {
         this.invoker = invoker;
         this.serviceInterface = serviceInterface;
         this.refName = refName;
     }
 
-    public Invoker<Object> getInvoker() {
+    public Invoker<RpcResponse> getInvoker() {
         return invoker;
     }
 
@@ -50,7 +50,7 @@ public abstract class AbstractProxyInstanceGenerator<T> implements ProxyInstance
 
         Invocation invocation = buildInvocation(method, args);
 
-        RpcResponse rpcResponse = (RpcResponse) getInvoker().invoke(invocation);
+        RpcResponse rpcResponse = getInvoker().invoke(invocation);
         if (rpcResponse.getException() != null) {
             throw new RemoteException(rpcResponse.getMessage(), rpcResponse.getException());
         }

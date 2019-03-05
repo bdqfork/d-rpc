@@ -1,4 +1,4 @@
-package cn.bdqfork.rpc.config;
+package cn.bdqfork.rpc.config.context;
 
 import cn.bdqfork.rpc.config.annotation.Service;
 import cn.bdqfork.common.util.ClassUtils;
