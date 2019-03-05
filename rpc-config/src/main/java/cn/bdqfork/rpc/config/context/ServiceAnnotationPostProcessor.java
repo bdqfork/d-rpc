@@ -1,7 +1,6 @@
 package cn.bdqfork.rpc.config.context;
 
 import cn.bdqfork.rpc.config.ServiceBean;
-import cn.bdqfork.rpc.config.ServiceBeanNameGenerator;
 import cn.bdqfork.rpc.config.annotation.Service;
 import cn.bdqfork.rpc.provider.RpcRemoteInvoker;
 import cn.bdqfork.common.util.ClassUtils;
