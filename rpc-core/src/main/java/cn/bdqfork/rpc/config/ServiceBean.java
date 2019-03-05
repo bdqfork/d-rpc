@@ -3,22 +3,12 @@ package cn.bdqfork.rpc.config;
 import cn.bdqfork.rpc.config.annotation.Service;
 import cn.bdqfork.rpc.protocol.RpcResponse;
 import cn.bdqfork.rpc.protocol.invoker.Invoker;
-import cn.bdqfork.rpc.provider.Exporter;
+import cn.bdqfork.rpc.exporter.ServiceExporter;
 import cn.bdqfork.rpc.provider.RpcRemoteInvoker;
 import cn.bdqfork.rpc.provider.server.NettyServer;
 import cn.bdqfork.rpc.registry.Registry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.BeanClassLoaderAware;
-import org.springframework.beans.factory.DisposableBean;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.NoSuchBeanDefinitionException;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.beans.factory.support.BeanDefinitionBuilder;
-import org.springframework.beans.factory.support.DefaultListableBeanFactory;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -35,7 +25,7 @@ public class ServiceBean extends AbstractRpcBean {
 
     private NettyServer nettyServer;
 
-    private Exporter exporter;
+    private ServiceExporter exporter;
 
     private List<Service> services = new CopyOnWriteArrayList<>();
 
@@ -62,7 +52,7 @@ public class ServiceBean extends AbstractRpcBean {
 
         ProtocolConfig protocolConfig = context.getBean(ProtocolConfig.class);
 
-        exporter = new Exporter(protocolConfig.getHost(), protocolConfig.getPort(), registry);
+        exporter = new ServiceExporter(protocolConfig, registry);
 
         ApplicationConfig applicationConfig = context.getBean(ApplicationConfig.class);
 

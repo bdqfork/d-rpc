@@ -2,6 +2,7 @@ package cn.bdqfork.rpc.registry;
 
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * rpc://10.20.153.10:1234/barService?param=value
@@ -22,14 +23,13 @@ public class URL {
      */
     private String path;
 
-    private Map<String, String> parameterMap;
+    private Map<String, String> parameterMap = new ConcurrentHashMap<>();
 
-    public URL(String protocol, String host, int port, String path, Map<String, String> parameterMap) {
+    public URL(String protocol, String host, int port, String path) {
         this.protocol = protocol;
         this.host = host;
         this.port = port;
         this.path = path;
-        this.parameterMap = parameterMap;
     }
 
     public String toServiceCategory() {
@@ -42,6 +42,10 @@ public class URL {
 
     public String toPath() {
         return toServicePath() + "/" + host + ":" + port;
+    }
+
+    public void addParameter(String key, String value) {
+        parameterMap.put(key, value);
     }
 
     public String getParameter(String key, String defaultValue) {
@@ -93,5 +97,6 @@ public class URL {
     public int hashCode() {
         return Objects.hash(protocol, host, port, path, parameterMap);
     }
+
 }
 

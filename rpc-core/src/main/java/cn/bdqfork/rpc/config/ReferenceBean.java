@@ -3,23 +3,11 @@ package cn.bdqfork.rpc.config;
 import cn.bdqfork.rpc.config.annotation.Reference;
 import cn.bdqfork.rpc.consumer.RpcInvoker;
 import cn.bdqfork.rpc.consumer.client.ClientPool;
-import cn.bdqfork.rpc.consumer.exchanger.Exchanger;
+import cn.bdqfork.rpc.exporter.Exchanger;
 import cn.bdqfork.rpc.registry.Registry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.BeanClassLoaderAware;
-import org.springframework.beans.factory.DisposableBean;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.NoSuchBeanDefinitionException;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.beans.factory.support.BeanDefinitionBuilder;
-import org.springframework.beans.factory.support.DefaultListableBeanFactory;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
-import org.springframework.context.ConfigurableApplicationContext;
 
-import java.lang.reflect.Constructor;
 import java.util.List;
 
 /**
@@ -60,6 +48,8 @@ public class ReferenceBean extends AbstractRpcBean {
 
         ProtocolConfig protocolConfig = context.getBean(ProtocolConfig.class);
 
+        ApplicationConfig applicationConfig = context.getBean(ApplicationConfig.class);
+
         Exchanger exchanger = new Exchanger(protocolConfig, registry);
 
         for (ReferenceConfig referenceConfig : referenceConfigs) {
@@ -67,8 +57,8 @@ public class ReferenceBean extends AbstractRpcBean {
             Reference reference = referenceConfig.getReference();
 
             //注册消费者，以及订阅提供者
-            exchanger.register(reference.group(), reference.serviceInterface().getName());
-            exchanger.subscribe(reference.group(), reference.serviceInterface().getName());
+            exchanger.export(applicationConfig.getApplicationName(), reference.group(),
+                    reference.serviceInterface().getName(), reference.refName());
 
             //设置连接池
             ClientPool clientPool = exchanger.getClientPool(reference.group(), reference.serviceInterface().getName());

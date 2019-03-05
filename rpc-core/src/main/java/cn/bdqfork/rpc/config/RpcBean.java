@@ -11,5 +11,11 @@ import org.springframework.context.ApplicationContextAware;
  * @date 2019-03-05
  */
 public interface RpcBean extends ApplicationContextAware, InitializingBean, DisposableBean, BeanClassLoaderAware {
+    /**
+     * 获取一个Registry，如果不存在，则创建一个
+     *
+     * @return
+     * @throws ClassNotFoundException
+     */
     Registry getOrCreateRegistry() throws ClassNotFoundException;
 }

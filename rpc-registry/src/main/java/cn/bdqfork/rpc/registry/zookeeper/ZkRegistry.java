@@ -87,7 +87,7 @@ public class ZkRegistry extends AbstractRegistry {
             }
             cacheNodeMap.putIfAbsent(path, url);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.getMessage(), e);
         }
     }
 

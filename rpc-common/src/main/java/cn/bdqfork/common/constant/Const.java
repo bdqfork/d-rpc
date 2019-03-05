@@ -13,4 +13,8 @@ public class Const {
     public static final String SIDE_KEY = "side";
     public static final String CONSUMER_SIDE = "consumer";
     public static final String PROVIDER_SIDE = "provider";
+    public static final String APPLICATION_KEY = "application";
+    public static final String REF_NAME_KEY = "refName";
+    public static final String PROTOCOL_CONSUMER = "consumer";
+    public static final String PROTOCOL_PROVIDER = "provider";
 }
