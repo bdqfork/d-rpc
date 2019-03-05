@@ -17,8 +17,6 @@ public interface Registry {
      */
     void init();
 
-    boolean isInited();
-
     boolean isRunning();
 
     /**

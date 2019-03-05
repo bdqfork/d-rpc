@@ -32,7 +32,7 @@ public class ZkRegistry extends AbstractRegistry {
 
     @Override
     public void init() {
-        if (inited) {
+        if (client != null) {
             return;
         }
         RetryPolicy retryPolicy = new RetryNTimes(3, 1000);
@@ -60,12 +60,6 @@ public class ZkRegistry extends AbstractRegistry {
 
         client.start();
 
-        inited = true;
-    }
-
-    @Override
-    public boolean isInited() {
-        return inited;
     }
 
     @Override
