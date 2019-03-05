@@ -1,5 +1,7 @@
 package cn.bdqfork.rpc.registry;
 
+import cn.bdqfork.rpc.config.RegistryConfig;
+
 import java.util.List;
 import java.util.Set;
 
@@ -8,6 +10,16 @@ import java.util.Set;
  * @date 2019-02-26
  */
 public interface Registry {
+    String REGISTRY_NAME = "registry";
+
+    /**
+     * 初始化
+     */
+    void init();
+
+    boolean isInited();
+
+    boolean isRunning();
 
     /**
      * 注册服务
@@ -38,6 +50,8 @@ public interface Registry {
      * @return
      */
     Set<String> getServiceAddress(URL url);
+
+    void setRegistryConfig(RegistryConfig registryConfig);
 
     void close();
 

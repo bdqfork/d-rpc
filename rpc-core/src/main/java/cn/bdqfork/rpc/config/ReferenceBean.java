@@ -11,9 +11,13 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanClassLoaderAware;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
+import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.ConfigurableApplicationContext;
 
 import java.lang.reflect.Constructor;
 import java.util.List;
@@ -22,14 +26,10 @@ import java.util.List;
  * @author bdq
  * @date 2019-03-04
  */
-public class ReferenceBean implements ApplicationContextAware, BeanClassLoaderAware, InitializingBean, DisposableBean {
+public class ReferenceBean extends AbstractRpcBean {
     public static final String REFERENCE_BEAN_NAME = "referenceBean";
 
     private static final Logger log = LoggerFactory.getLogger(ReferenceBean.class);
-
-    private ApplicationContext context;
-
-    private ClassLoader classLoader;
 
     private Registry registry;
 
@@ -54,14 +54,9 @@ public class ReferenceBean implements ApplicationContextAware, BeanClassLoaderAw
             return;
         }
 
-        RegistryConfig registryConfig = context.getBean(RegistryConfig.class);
+        registry = getOrCreateRegistry();
 
-        String client = registryConfig.getClient();
-
-        Class<?> clazz = Class.forName(client, false, classLoader);
-        Constructor<?> constructor = clazz.getConstructor(RegistryConfig.class);
-
-        registry = (Registry) constructor.newInstance(registryConfig);
+        registry.init();
 
         ProtocolConfig protocolConfig = context.getBean(ProtocolConfig.class);
 
@@ -83,16 +78,6 @@ public class ReferenceBean implements ApplicationContextAware, BeanClassLoaderAw
 
         referenceConfigs.clear();
 
-    }
-
-    @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        this.context = applicationContext;
-    }
-
-    @Override
-    public void setBeanClassLoader(ClassLoader classLoader) {
-        this.classLoader = classLoader;
     }
 
     public void setReferenceConfigCallback(ReferenceConfigCallback referenceConfigCallback) {

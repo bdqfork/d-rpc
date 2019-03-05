@@ -13,10 +13,13 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanClassLoaderAware;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.support.BeanDefinitionBuilder;
+import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
-import java.lang.reflect.Constructor;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -24,15 +27,11 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * @author bdq
  * @date 2019-03-03
  */
-public class ServiceBean implements ApplicationContextAware, InitializingBean, DisposableBean, BeanClassLoaderAware {
+public class ServiceBean extends AbstractRpcBean {
     private static final Logger log = LoggerFactory.getLogger(ServiceBean.class);
     public static final String SERVICE_BEAN_NAME = "serviceBean";
 
     private Registry registry;
-
-    private ApplicationContext context;
-
-    private ClassLoader classLoader;
 
     private NettyServer nettyServer;
 
@@ -58,15 +57,8 @@ public class ServiceBean implements ApplicationContextAware, InitializingBean, D
 
     @Override
     public void afterPropertiesSet() throws Exception {
-
-        RegistryConfig registryConfig = context.getBean(RegistryConfig.class);
-
-        String client = registryConfig.getClient();
-
-        Class<?> clazz = Class.forName(client, false, classLoader);
-        Constructor<?> constructor = clazz.getConstructor(RegistryConfig.class);
-
-        registry = (Registry) constructor.newInstance(registryConfig);
+        registry = getOrCreateRegistry();
+        registry.init();
 
         ProtocolConfig protocolConfig = context.getBean(ProtocolConfig.class);
 
@@ -91,13 +83,4 @@ public class ServiceBean implements ApplicationContextAware, InitializingBean, D
         services.clear();
     }
 
-    @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        this.context = applicationContext;
-    }
-
-    @Override
-    public void setBeanClassLoader(ClassLoader classLoader) {
-        this.classLoader = classLoader;
-    }
 }
