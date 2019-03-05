@@ -32,6 +32,31 @@ public class URL {
         this.path = path;
     }
 
+    public URL(String urlString) {
+
+        String[] urlStrings = urlString.split("://");
+
+        protocol = urlStrings[0];
+
+        String[] pathStrings = urlStrings[1].split("/");
+
+        String[] hostPort = pathStrings[0].split(":");
+
+        host = hostPort[0];
+        port = Integer.parseInt(hostPort[1]);
+
+        String[] paramString = pathStrings[1].split("\\?");
+        path = paramString[0];
+
+        String[] params = paramString[1].split("&");
+
+        for (String param : params) {
+            String[] s7 = param.split("=");
+            addParameter(s7[0], s7[1]);
+        }
+
+    }
+
     public String toServiceCategory() {
         return "/" + path;
     }
@@ -54,7 +79,7 @@ public class URL {
     }
 
     public String buildString() {
-        return protocol + "://" + path + buildParameter();
+        return protocol + "://" + host + ":" + port + "/" + path + buildParameter();
     }
 
     private String buildParameter() {
@@ -83,8 +108,12 @@ public class URL {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         URL url = (URL) o;
         return port == url.port &&
                 Objects.equals(protocol, url.protocol) &&
