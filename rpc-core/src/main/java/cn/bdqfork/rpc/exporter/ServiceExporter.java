@@ -7,11 +7,15 @@ import cn.bdqfork.rpc.registry.Registry;
 import cn.bdqfork.rpc.registry.URL;
 import cn.bdqfork.rpc.registry.URLBuilder;
 
+import java.util.LinkedHashSet;
+import java.util.Set;
+
 /**
  * @author bdq
  * @date 2019-03-01
  */
 public class ServiceExporter implements cn.bdqfork.rpc.exporter.Exporter {
+    private Set<URL> localCache = new LinkedHashSet<>();
     private ProtocolConfig protocolConfig;
     private Registry registry;
 
@@ -28,7 +32,11 @@ public class ServiceExporter implements cn.bdqfork.rpc.exporter.Exporter {
                 .refName(refName)
                 .side(Const.PROVIDER_SIDE)
                 .getUrl();
+        localCache.add(url);
         registry.register(url);
     }
 
+    public Set<URL> getLocalCache() {
+        return localCache;
+    }
 }

@@ -10,6 +10,7 @@ import cn.bdqfork.rpc.registry.URLBuilder;
 import cn.bdqfork.rpc.registry.event.NodeEvent;
 import cn.bdqfork.rpc.registry.event.RegistryEvent;
 
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -18,6 +19,8 @@ import java.util.concurrent.ConcurrentHashMap;
  * @date 2019-03-01
  */
 public class Exchanger implements Exporter, Notifier {
+    private Set<URL> localCache = new LinkedHashSet<>();
+
     private ProtocolConfig protocolConfig;
 
     private ConcurrentHashMap<String, ClientPool> map = new ConcurrentHashMap<>();
@@ -42,6 +45,7 @@ public class Exchanger implements Exporter, Notifier {
 
     public void register(URL url) {
         url.addParameter(Const.SIDE_KEY, Const.CONSUMER_SIDE);
+        localCache.add(url);
         registry.register(url);
     }
 
@@ -63,6 +67,10 @@ public class Exchanger implements Exporter, Notifier {
             refreshRemoteServices(url);
             registry.subscribe(url, this);
         }
+    }
+
+    public Set<URL> getLocalCache() {
+        return localCache;
     }
 
     private void refreshRemoteServices(URL url) {
