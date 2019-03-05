@@ -135,6 +135,7 @@ public class ZkRegistry extends AbstractRegistry {
         if (running) {
             client.close();
         }
+        running = false;
     }
 
     private void recover() {
