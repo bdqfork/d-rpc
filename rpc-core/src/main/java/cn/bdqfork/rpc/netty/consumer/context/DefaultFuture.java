@@ -3,11 +3,17 @@ package cn.bdqfork.rpc.netty.consumer.context;
 import cn.bdqfork.common.exception.RpcException;
 import cn.bdqfork.common.exception.TimeoutException;
 
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
+
 /**
  * @author bdq
  * @date 2019-02-22
  */
 public class DefaultFuture<T> implements RpcFuture<T> {
+    private ReentrantLock lock = new ReentrantLock();
+    private Condition done = lock.newCondition();
     private T result;
 
     @Override
@@ -16,25 +22,38 @@ public class DefaultFuture<T> implements RpcFuture<T> {
     }
 
     @Override
-    public synchronized T get(long timeout) throws RpcException {
-        long currentTime = System.currentTimeMillis();
+    public T get(long timeout) throws RpcException {
         if (!isDone()) {
+            long start = System.currentTimeMillis();
+            lock.lock();
             try {
-                wait(timeout);
+                while (!isDone()) {
+                    done.await(timeout, TimeUnit.MILLISECONDS);
+                    if (isDone() || System.currentTimeMillis() - start > timeout) {
+                        break;
+                    }
+                }
             } catch (InterruptedException e) {
                 throw new RpcException(e);
+            } finally {
+                lock.unlock();
             }
-        }
-        if (!isDone() || System.currentTimeMillis() - currentTime > timeout) {
-            throw new TimeoutException("request timeout");
+            if (!isDone() || System.currentTimeMillis() - start > timeout) {
+                throw new TimeoutException("request timeout");
+            }
         }
         return result;
     }
 
     @Override
-    public synchronized void setResult(T result) {
-        this.result = result;
-        notify();
+    public void setResult(T result) {
+        lock.lock();
+        try {
+            this.result = result;
+            done.signal();
+        } finally {
+            lock.unlock();
+        }
     }
 
 }
