@@ -1,17 +1,13 @@
 package cn.bdqfork.rpc.config.context;
 
-import cn.bdqfork.rpc.config.ApplicationConfig;
-import cn.bdqfork.rpc.config.ProtocolConfig;
 import cn.bdqfork.rpc.config.ReferenceBean;
-import cn.bdqfork.rpc.config.ReferenceConfig;
+import cn.bdqfork.rpc.config.ReferenceInfo;
 import cn.bdqfork.rpc.config.annotation.Reference;
 import cn.bdqfork.rpc.netty.consumer.RpcInvoker;
 import cn.bdqfork.rpc.protocol.RpcResponse;
 import cn.bdqfork.rpc.protocol.invoker.Invoker;
 import cn.bdqfork.rpc.proxy.ProxyType;
 import cn.bdqfork.rpc.proxy.RpcProxyFactoryBean;
-import cn.bdqfork.rpc.registry.URL;
-import cn.bdqfork.rpc.registry.URLBuilder;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.PropertyValues;
 import org.springframework.beans.factory.annotation.InjectionMetadata;
@@ -35,8 +31,7 @@ public class ReferenceAnnotationPostProcessor extends InstantiationAwareBeanPost
         BeanDefinitionRegistryPostProcessor {
     public static final String REFERENCE_ANNOTATION_POST_PROCESSOR_NAME = "referenceAnnotationPostProcessor";
 
-    private List<ReferenceConfig> referenceConfigs = new CopyOnWriteArrayList<>();
-    private List<Invoker> invokers = new CopyOnWriteArrayList<>();
+    private List<ReferenceInfo> referenceInfos = new CopyOnWriteArrayList<>();
 
     @Override
     public PropertyValues postProcessProperties(PropertyValues pvs, Object bean, String beanName) throws BeansException {
@@ -52,13 +47,12 @@ public class ReferenceAnnotationPostProcessor extends InstantiationAwareBeanPost
             }
 
             Invoker<RpcResponse> invoker = new RpcInvoker(reference.timeout(), reference.retries());
-            invokers.add(invoker);
-
-            ReferenceConfig referenceConfig = ReferenceConfig.build(reference, invoker);
-            referenceConfigs.add(referenceConfig);
 
             InjectionMetadata.InjectedElement referenceFieldElement = new ReferenceFieldElement(field, reference, invoker);
             referenceFieldElements.add(referenceFieldElement);
+
+            ReferenceInfo referenceInfo = ReferenceInfo.build(reference, invoker);
+            referenceInfos.add(referenceInfo);
         }
         if (referenceFieldElements.size() > 0) {
             InjectionMetadata injectionMetadata = new InjectionMetadata(beanClass, referenceFieldElements);
@@ -76,7 +70,7 @@ public class ReferenceAnnotationPostProcessor extends InstantiationAwareBeanPost
     @Override
     public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) throws BeansException {
         AbstractBeanDefinition beanDefinition = BeanDefinitionBuilder.genericBeanDefinition(ReferenceBean.class)
-                .addPropertyValue("referenceConfigCallback", (ReferenceBean.ReferenceConfigCallback) () -> referenceConfigs)
+                .addPropertyValue("referenceInfos", referenceInfos)
                 .getBeanDefinition();
         registry.registerBeanDefinition(ReferenceBean.REFERENCE_BEAN_NAME, beanDefinition);
     }

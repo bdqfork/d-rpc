@@ -4,9 +4,7 @@ import cn.bdqfork.rpc.config.annotation.Reference;
 import cn.bdqfork.rpc.netty.consumer.RpcInvoker;
 import cn.bdqfork.rpc.netty.client.ClientPool;
 import cn.bdqfork.rpc.exporter.Exchanger;
-import cn.bdqfork.rpc.protocol.invoker.Invoker;
 import cn.bdqfork.rpc.registry.Registry;
-import cn.bdqfork.rpc.registry.URL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,7 +21,7 @@ public class ReferenceBean extends AbstractRpcBean {
 
     private Registry registry;
 
-    private ReferenceConfigCallback referenceConfigCallback;
+    private List<ReferenceInfo> referenceInfos;
 
     @Override
     public void destroy() throws Exception {
@@ -38,9 +36,7 @@ public class ReferenceBean extends AbstractRpcBean {
     @Override
     public void afterPropertiesSet() throws Exception {
 
-        List<ReferenceConfig> referenceConfigs = referenceConfigCallback.getReferenceConfigs();
-
-        if (referenceConfigs == null || referenceConfigs.size() == 0) {
+        if (referenceInfos == null || referenceInfos.size() == 0) {
             return;
         }
 
@@ -52,9 +48,9 @@ public class ReferenceBean extends AbstractRpcBean {
 
         Exchanger exchanger = new Exchanger(protocolConfig, registry);
 
-        for (ReferenceConfig referenceConfig : referenceConfigs) {
+        for (ReferenceInfo referenceInfo : referenceInfos) {
 
-            Reference reference = referenceConfig.getReference();
+            Reference reference = referenceInfo.getReference();
 
             //注册消费者，以及订阅提供者
             exchanger.export(applicationConfig.getApplicationName(), reference.group(),
@@ -62,26 +58,15 @@ public class ReferenceBean extends AbstractRpcBean {
 
             //设置连接池
             ClientPool clientPool = exchanger.getClientPool(reference.group(), reference.serviceInterface().getName());
-            RpcInvoker invoker = (RpcInvoker) referenceConfig.getInvoker();
+            RpcInvoker invoker = (RpcInvoker) referenceInfo.getInvoker();
             invoker.setClientPool(clientPool);
         }
 
-        referenceConfigs.clear();
+        referenceInfos.clear();
 
     }
 
-    public void setReferenceConfigCallback(ReferenceConfigCallback referenceConfigCallback) {
-        this.referenceConfigCallback = referenceConfigCallback;
-    }
-
-    public interface ReferenceConfigCallback {
-
-        /**
-         * 回调获取ReferenceConfig信息
-         *
-         * @return
-         */
-        List<ReferenceConfig> getReferenceConfigs();
-
+    public void setReferenceInfos(List<ReferenceInfo> referenceInfos) {
+        this.referenceInfos = referenceInfos;
     }
 }

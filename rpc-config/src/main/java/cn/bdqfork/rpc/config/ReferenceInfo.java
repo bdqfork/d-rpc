@@ -8,17 +8,17 @@ import cn.bdqfork.rpc.protocol.invoker.Invoker;
  * @author bdq
  * @date 2019-03-04
  */
-public class ReferenceConfig {
+public class ReferenceInfo {
 
     private Reference reference;
 
     private Invoker<RpcResponse> invoker;
 
-    public static ReferenceConfig build(Reference reference, Invoker<RpcResponse> invoker) {
-        ReferenceConfig referenceConfig = new ReferenceConfig();
-        referenceConfig.setReference(reference);
-        referenceConfig.setInvoker(invoker);
-        return referenceConfig;
+    public static ReferenceInfo build(Reference reference, Invoker<RpcResponse> invoker) {
+        ReferenceInfo referenceInfo = new ReferenceInfo();
+        referenceInfo.setReference(reference);
+        referenceInfo.setInvoker(invoker);
+        return referenceInfo;
     }
 
     public Reference getReference() {
