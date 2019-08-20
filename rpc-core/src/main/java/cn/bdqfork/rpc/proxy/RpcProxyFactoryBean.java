@@ -6,7 +6,7 @@ import cn.bdqfork.rpc.protocol.invoker.Invoker;
 
 /**
  * @author bdq
- * @date 2019-03-01
+ * @since 2019-03-01
  */
 public class RpcProxyFactoryBean<T> implements RpcProxyFactory<T> {
     private Invoker<RpcResponse> invoker;

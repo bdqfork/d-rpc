@@ -1,5 +1,7 @@
 package cn.bdqfork.rpc.config.context;
 
+import cn.bdqfork.rpc.config.ApplicationConfig;
+import cn.bdqfork.rpc.config.ProtocolConfig;
 import cn.bdqfork.rpc.config.ReferenceBean;
 import cn.bdqfork.rpc.config.ReferenceConfig;
 import cn.bdqfork.rpc.config.annotation.Reference;
@@ -8,6 +10,8 @@ import cn.bdqfork.rpc.protocol.RpcResponse;
 import cn.bdqfork.rpc.protocol.invoker.Invoker;
 import cn.bdqfork.rpc.proxy.ProxyType;
 import cn.bdqfork.rpc.proxy.RpcProxyFactoryBean;
+import cn.bdqfork.rpc.registry.URL;
+import cn.bdqfork.rpc.registry.URLBuilder;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.PropertyValues;
 import org.springframework.beans.factory.annotation.InjectionMetadata;
@@ -25,19 +29,22 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * @author bdq
- * @date 2019-03-04
+ * @since 2019-03-04
  */
 public class ReferenceAnnotationPostProcessor extends InstantiationAwareBeanPostProcessorAdapter implements
         BeanDefinitionRegistryPostProcessor {
     public static final String REFERENCE_ANNOTATION_POST_PROCESSOR_NAME = "referenceAnnotationPostProcessor";
 
     private List<ReferenceConfig> referenceConfigs = new CopyOnWriteArrayList<>();
+    private List<Invoker> invokers = new CopyOnWriteArrayList<>();
 
     @Override
     public PropertyValues postProcessProperties(PropertyValues pvs, Object bean, String beanName) throws BeansException {
         List<InjectionMetadata.InjectedElement> referenceFieldElements = new LinkedList<>();
+
         Class<?> beanClass = bean.getClass();
         Field[] fields = beanClass.getDeclaredFields();
+
         for (Field field : fields) {
             Reference reference = field.getAnnotation(Reference.class);
             if (reference == null) {
@@ -45,6 +52,7 @@ public class ReferenceAnnotationPostProcessor extends InstantiationAwareBeanPost
             }
 
             Invoker<RpcResponse> invoker = new RpcInvoker(reference.timeout(), reference.retries());
+            invokers.add(invoker);
 
             ReferenceConfig referenceConfig = ReferenceConfig.build(reference, invoker);
             referenceConfigs.add(referenceConfig);

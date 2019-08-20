@@ -12,9 +12,9 @@ import java.util.Set;
 
 /**
  * @author bdq
- * @date 2019-03-01
+ * @since 2019-03-01
  */
-public class ServiceExporter implements cn.bdqfork.rpc.exporter.Exporter {
+public class ServiceExporter implements Exporter {
     private Set<URL> localCache = new LinkedHashSet<>();
     private ProtocolConfig protocolConfig;
     private Registry registry;

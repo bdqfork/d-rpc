@@ -2,7 +2,7 @@ package cn.bdqfork.rpc.registry.event;
 
 /**
  * @author bdq
- * @date 2019-02-28
+ * @since 2019-02-28
  */
 public interface RegistryEvent {
     /**

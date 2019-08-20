@@ -2,7 +2,7 @@ package cn.bdqfork.rpc.registry.event;
 
 /**
  * @author bdq
- * @date 2019-03-01
+ * @since 2019-03-01
  */
 public enum NodeEvent {
     NONE("none"), CHANGED("changed");

@@ -20,8 +20,6 @@ dependencies {
 
     compile "org.slf4j:slf4j-api:${libs.slf4j}"
 
-    compile "org.springframework:spring-context:${libs.spring}"
-
     compile "javassist:javassist:${libs.javassist}"
 
     compile project(':rpc-common')

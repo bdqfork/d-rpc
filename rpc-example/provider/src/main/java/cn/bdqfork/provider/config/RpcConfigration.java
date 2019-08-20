@@ -24,8 +24,7 @@ public class RpcConfigration {
     @Bean
     public RegistryConfig registryConfig() {
         RegistryConfig registryConfig = new RegistryConfig();
-        registryConfig.setClient(ZkRegistry.class.getName());
-        registryConfig.setUrl("127.0.0.1:2181");
+        registryConfig.setUrl("zookeeper://127.0.0.1:2181");
         return registryConfig;
     }
 

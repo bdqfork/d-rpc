@@ -20,5 +20,7 @@ dependencies {
 
     compile "org.slf4j:slf4j-api:${libs.slf4j}"
 
+    compile "org.mousio:etcd4j:${libs.etcd4j}"
+
     compile project(':rpc-core')
 }

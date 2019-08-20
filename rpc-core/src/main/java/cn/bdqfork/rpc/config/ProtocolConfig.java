@@ -2,12 +2,16 @@ package cn.bdqfork.rpc.config;
 
 /**
  * @author bdq
- * @date 2019-02-28
+ * @since 2019-02-28
  */
 public class ProtocolConfig {
-
+    /**
+     * ip地址
+     */
     private String host;
-
+    /**
+     * 端口号
+     */
     private Integer port;
 
     public String getHost() {

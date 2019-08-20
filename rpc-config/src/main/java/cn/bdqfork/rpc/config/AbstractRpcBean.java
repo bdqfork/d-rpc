@@ -1,12 +1,16 @@
 package cn.bdqfork.rpc.config;
 
+import cn.bdqfork.common.extension.ExtensionUtils;
 import cn.bdqfork.rpc.registry.Registry;
+import cn.bdqfork.rpc.registry.RegistryFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.context.ApplicationContext;
+
+import java.security.cert.Extension;
 
 /**
  * @author bdq
@@ -17,39 +21,21 @@ public abstract class AbstractRpcBean implements RpcBean {
 
     protected ClassLoader classLoader;
 
-    @Override
-    public Registry getOrCreateRegistry() throws ClassNotFoundException {
-        Registry registry;
+    private Registry registry;
+
+    protected Registry getOrCreateRegistry() {
         try {
             registry = context.getBean(Registry.class);
         } catch (NoSuchBeanDefinitionException e) {
-            createRegistry();
-            registry = context.getBean(Registry.class);
+            registry = createRegistry();
         }
-        registry.init();
         return registry;
     }
 
-    private void createRegistry() throws ClassNotFoundException {
+    private Registry createRegistry() {
         RegistryConfig registryConfig = context.getBean(RegistryConfig.class);
-        String client = registryConfig.getClient();
-
-        Class<?> clazz = Class.forName(client, false, classLoader);
-
-        DefaultListableBeanFactory defaultListableBeanFactory = (DefaultListableBeanFactory) context.getAutowireCapableBeanFactory();
-
-        BeanDefinition beanDefinition = BeanDefinitionBuilder
-                .rootBeanDefinition(Registry.class)
-                .setAbstract(true)
-                .getBeanDefinition();
-
-        defaultListableBeanFactory.registerBeanDefinition(Registry.REGISTRY_NAME, beanDefinition);
-
-        beanDefinition = BeanDefinitionBuilder.genericBeanDefinition(clazz)
-                .addPropertyValue("registryConfig", registryConfig)
-                .getBeanDefinition();
-
-        defaultListableBeanFactory.registerBeanDefinition(Registry.REGISTRY_NAME, beanDefinition);
+        RegistryFactory registryFactory = ExtensionUtils.getExtension(RegistryFactory.class);
+        return registryFactory.createRegistry(registryConfig);
     }
 
     @Override

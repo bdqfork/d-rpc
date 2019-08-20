@@ -8,16 +8,21 @@ import java.util.concurrent.ConcurrentHashMap;
  * rpc://10.20.153.10:1234/barService?param=value
  *
  * @author bdq
- * @date 2019-02-26
+ * @since 2019-02-26
  */
 public class URL {
-
+    /**
+     * 协议名
+     */
     private String protocol;
-
+    /**
+     * 服务IP
+     */
     private String host;
-
+    /**
+     * 服务端口
+     */
     private int port;
-
     /**
      * 接口名称
      */

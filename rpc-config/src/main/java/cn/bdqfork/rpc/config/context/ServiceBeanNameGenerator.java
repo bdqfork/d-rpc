@@ -12,7 +12,7 @@ import org.springframework.util.StringUtils;
 
 /**
  * @author bdq
- * @date 2019-03-04
+ * @since 2019-03-04
  */
 public class ServiceBeanNameGenerator implements BeanNameGenerator {
     private static final Logger log = LoggerFactory.getLogger(ServiceBeanNameGenerator.class);

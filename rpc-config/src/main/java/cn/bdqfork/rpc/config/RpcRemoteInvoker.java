@@ -1,4 +1,4 @@
-package cn.bdqfork.rpc.netty.provider;
+package cn.bdqfork.rpc.config;
 
 import cn.bdqfork.common.exception.RpcException;
 import cn.bdqfork.rpc.protocol.RpcResponse;
@@ -18,7 +18,7 @@ import java.lang.reflect.Method;
 
 /**
  * @author bdq
- * @date 2019-02-28
+ * @since 2019-02-28
  */
 public class RpcRemoteInvoker implements Invoker<RpcResponse>, BeanClassLoaderAware, ApplicationContextAware {
     private static final Logger log = LoggerFactory.getLogger(RpcRemoteInvoker.class);

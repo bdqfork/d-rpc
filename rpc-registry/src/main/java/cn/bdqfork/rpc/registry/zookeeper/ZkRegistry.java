@@ -1,6 +1,7 @@
 package cn.bdqfork.rpc.registry.zookeeper;
 
 import cn.bdqfork.common.constant.Const;
+import cn.bdqfork.rpc.config.RegistryConfig;
 import cn.bdqfork.rpc.registry.AbstractRegistry;
 import cn.bdqfork.rpc.registry.Notifier;
 import cn.bdqfork.rpc.registry.URL;
@@ -20,25 +21,25 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author bdq
- * @date 2019-02-26
+ * @since 2019-02-26
  */
 public class ZkRegistry extends AbstractRegistry {
     private static final Logger log = LoggerFactory.getLogger(ZkRegistry.class);
 
     private static final String DEFAULT_ROOT = "rpc";
+
     private CuratorFramework client;
+
     private Map<String, URL> cacheNodeMap = new ConcurrentHashMap<>();
+
     private Map<String, CacheWatcher> cacheWatcherMap = new ConcurrentHashMap<>();
 
-    @Override
-    public void init() {
-        if (client != null) {
-            return;
-        }
+    public ZkRegistry(RegistryConfig registryConfig) {
         RetryPolicy retryPolicy = new RetryNTimes(3, 1000);
-
+        
+        String url = registryConfig.getUrl().substring(12);
         client = CuratorFrameworkFactory.builder()
-                .connectString(registryConfig.getUrl())
+                .connectString(url)
                 .sessionTimeoutMs(registryConfig.getSessionTimeout())
                 .connectionTimeoutMs(registryConfig.getConnectionTimeout())
                 .retryPolicy(retryPolicy)
@@ -59,12 +60,6 @@ public class ZkRegistry extends AbstractRegistry {
         });
 
         client.start();
-
-    }
-
-    @Override
-    public boolean isRunning() {
-        return running;
     }
 
     @Override
@@ -137,7 +132,7 @@ public class ZkRegistry extends AbstractRegistry {
         cacheWatcherMap.values().forEach(cacheWatcher -> subscribe(cacheWatcher.url, cacheWatcher.notifier));
     }
 
-    private class CacheWatcher {
+    private static class CacheWatcher {
         private URL url;
         private Notifier notifier;
 

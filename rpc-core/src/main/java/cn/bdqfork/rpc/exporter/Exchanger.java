@@ -2,9 +2,9 @@ package cn.bdqfork.rpc.exporter;
 
 import cn.bdqfork.common.constant.Const;
 import cn.bdqfork.rpc.config.ProtocolConfig;
-import cn.bdqfork.rpc.netty.consumer.ClientContextHandler;
 import cn.bdqfork.rpc.netty.NettyInitializer;
 import cn.bdqfork.rpc.netty.client.ClientPool;
+import cn.bdqfork.rpc.netty.consumer.ClientContextHandler;
 import cn.bdqfork.rpc.protocol.serializer.HessianSerializer;
 import cn.bdqfork.rpc.protocol.serializer.Serializer;
 import cn.bdqfork.rpc.registry.Notifier;
@@ -15,19 +15,20 @@ import cn.bdqfork.rpc.registry.event.NodeEvent;
 import cn.bdqfork.rpc.registry.event.RegistryEvent;
 
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author bdq
- * @date 2019-03-01
+ * @since 2019-03-01
  */
 public class Exchanger implements Exporter, Notifier {
     private Set<URL> localCache = new LinkedHashSet<>();
 
     private ProtocolConfig protocolConfig;
 
-    private ConcurrentHashMap<String, ClientPool> map = new ConcurrentHashMap<>();
+    private Map<String, ClientPool> map = new ConcurrentHashMap<>();
 
     private Registry registry;
 

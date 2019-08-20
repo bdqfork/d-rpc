@@ -7,16 +7,16 @@ import java.util.Set;
 
 /**
  * @author bdq
- * @date 2019-02-26
+ * @since 2019-02-26
  */
 public interface Registry {
     String REGISTRY_NAME = "registry";
 
     /**
-     * 初始化
+     * 是否在运行
+     *
+     * @return boolean
      */
-    void init();
-
     boolean isRunning();
 
     /**
@@ -27,7 +27,7 @@ public interface Registry {
     void register(URL url);
 
     /**
-     * 注册服务
+     * 批量注册服务
      *
      * @param urls
      */
@@ -49,8 +49,9 @@ public interface Registry {
      */
     Set<String> getServiceAddress(URL url);
 
-    void setRegistryConfig(RegistryConfig registryConfig);
-
+    /**
+     * 关闭连接
+     */
     void close();
 
 }

@@ -5,7 +5,7 @@ import cn.bdqfork.rpc.registry.event.RegistryEvent;
 
 /**
  * @author bdq
- * @date 2019-02-27
+ * @since 2019-02-27
  */
 public interface Notifier {
     /**

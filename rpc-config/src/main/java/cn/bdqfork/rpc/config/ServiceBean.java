@@ -5,7 +5,6 @@ import cn.bdqfork.rpc.protocol.RpcResponse;
 import cn.bdqfork.rpc.protocol.invoker.Invoker;
 import cn.bdqfork.rpc.exporter.ServiceExporter;
 import cn.bdqfork.rpc.netty.provider.ProviderServer;
-import cn.bdqfork.rpc.netty.provider.RpcRemoteInvoker;
 import cn.bdqfork.rpc.registry.Registry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

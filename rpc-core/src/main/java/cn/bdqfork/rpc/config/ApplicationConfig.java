@@ -2,10 +2,16 @@ package cn.bdqfork.rpc.config;
 
 /**
  * @author bdq
- * @date 2019-03-02
+ * @since 2019-03-02
  */
 public class ApplicationConfig {
+    /**
+     * 应用名
+     */
     private String applicationName;
+    /**
+     * 全局超时
+     */
     private int globalTimeout;
 
     public String getApplicationName() {

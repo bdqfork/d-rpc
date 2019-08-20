@@ -11,7 +11,7 @@ import java.lang.reflect.Method;
 
 /**
  * @author bdq
- * @date 2019-03-02
+ * @since 2019-03-02
  */
 public abstract class AbstractProxyInstanceGenerator<T> implements ProxyInstanceGenerator<T> {
     private static final String TO_STRING_METHOD = "toString";
