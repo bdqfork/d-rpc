@@ -23,7 +23,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author bdq
  * @since 2019-03-01
  */
-public class Exchanger implements Exporter, Notifier {
+public class ConsumerExporter implements Exporter, Notifier {
     private Set<URL> localCache = new LinkedHashSet<>();
 
     private ProtocolConfig protocolConfig;
@@ -34,11 +34,11 @@ public class Exchanger implements Exporter, Notifier {
 
     private Serializer serializer;
 
-    public Exchanger(ProtocolConfig protocolConfig, Registry registry) {
+    public ConsumerExporter(ProtocolConfig protocolConfig, Registry registry) {
         this(protocolConfig, registry, new HessianSerializer());
     }
 
-    public Exchanger(ProtocolConfig protocolConfig, Registry registry, Serializer serializer) {
+    public ConsumerExporter(ProtocolConfig protocolConfig, Registry registry, Serializer serializer) {
         this.protocolConfig = protocolConfig;
         this.registry = registry;
         this.serializer = serializer;
@@ -46,13 +46,17 @@ public class Exchanger implements Exporter, Notifier {
 
     @Override
     public void export(String applicationName, String group, String serviceName, String refName) {
-        URL url = URLBuilder.consumerUrl(protocolConfig, serviceName)
-                .applicationName(applicationName)
-                .group(group)
-                .refName(refName)
-                .getUrl();
+        URL url = bulidUrl(applicationName, group, serviceName, refName);
         register(url);
         subscribe(url);
+    }
+
+    private URL bulidUrl(String applicationName, String group, String serviceName, String refName) {
+        return URLBuilder.consumerUrl(protocolConfig, serviceName)
+                    .applicationName(applicationName)
+                    .group(group)
+                    .refName(refName)
+                    .getUrl();
     }
 
     public void register(URL url) {

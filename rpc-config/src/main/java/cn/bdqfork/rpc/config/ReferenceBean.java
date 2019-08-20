@@ -3,7 +3,7 @@ package cn.bdqfork.rpc.config;
 import cn.bdqfork.rpc.config.annotation.Reference;
 import cn.bdqfork.rpc.netty.consumer.RpcInvoker;
 import cn.bdqfork.rpc.netty.client.ClientPool;
-import cn.bdqfork.rpc.exporter.Exchanger;
+import cn.bdqfork.rpc.exporter.ConsumerExporter;
 import cn.bdqfork.rpc.registry.Registry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,18 +46,18 @@ public class ReferenceBean extends AbstractRpcBean {
 
         ApplicationConfig applicationConfig = context.getBean(ApplicationConfig.class);
 
-        Exchanger exchanger = new Exchanger(protocolConfig, registry);
+        ConsumerExporter consumerExporter = new ConsumerExporter(protocolConfig, registry);
 
         for (ReferenceInfo referenceInfo : referenceInfos) {
 
             Reference reference = referenceInfo.getReference();
 
             //注册消费者，以及订阅提供者
-            exchanger.export(applicationConfig.getApplicationName(), reference.group(),
+            consumerExporter.export(applicationConfig.getApplicationName(), reference.group(),
                     reference.serviceInterface().getName(), reference.refName());
 
             //设置连接池
-            ClientPool clientPool = exchanger.getClientPool(reference.group(), reference.serviceInterface().getName());
+            ClientPool clientPool = consumerExporter.getClientPool(reference.group(), reference.serviceInterface().getName());
             RpcInvoker invoker = (RpcInvoker) referenceInfo.getInvoker();
             invoker.setClientPool(clientPool);
         }
