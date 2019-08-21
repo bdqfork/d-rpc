@@ -1,6 +1,7 @@
-package cn.bdqfork.rpc.netty.consumer.context;
+package cn.bdqfork.rpc.remote.context;
 
-import cn.bdqfork.rpc.protocol.RpcResponse;
+
+import cn.bdqfork.rpc.remote.RpcResponse;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

@@ -2,17 +2,13 @@ package cn.bdqfork.rpc.exporter;
 
 import cn.bdqfork.common.constant.Const;
 import cn.bdqfork.rpc.config.ProtocolConfig;
-import cn.bdqfork.rpc.netty.NettyInitializer;
-import cn.bdqfork.rpc.netty.client.ClientPool;
-import cn.bdqfork.rpc.netty.consumer.ClientContextHandler;
-import cn.bdqfork.rpc.protocol.serializer.HessianSerializer;
-import cn.bdqfork.rpc.protocol.serializer.Serializer;
 import cn.bdqfork.rpc.registry.Notifier;
 import cn.bdqfork.rpc.registry.Registry;
 import cn.bdqfork.rpc.registry.URL;
 import cn.bdqfork.rpc.registry.URLBuilder;
 import cn.bdqfork.rpc.registry.event.NodeEvent;
 import cn.bdqfork.rpc.registry.event.RegistryEvent;
+import cn.bdqfork.rpc.remote.ClientPool;
 
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -32,16 +28,9 @@ public class ConsumerExporter implements Exporter, Notifier {
 
     private Registry registry;
 
-    private Serializer serializer;
-
     public ConsumerExporter(ProtocolConfig protocolConfig, Registry registry) {
-        this(protocolConfig, registry, new HessianSerializer());
-    }
-
-    public ConsumerExporter(ProtocolConfig protocolConfig, Registry registry, Serializer serializer) {
         this.protocolConfig = protocolConfig;
         this.registry = registry;
-        this.serializer = serializer;
     }
 
     @Override
@@ -53,10 +42,10 @@ public class ConsumerExporter implements Exporter, Notifier {
 
     private URL bulidUrl(String applicationName, String group, String serviceName, String refName) {
         return URLBuilder.consumerUrl(protocolConfig, serviceName)
-                    .applicationName(applicationName)
-                    .group(group)
-                    .refName(refName)
-                    .getUrl();
+                .applicationName(applicationName)
+                .group(group)
+                .refName(refName)
+                .getUrl();
     }
 
     public void register(URL url) {
@@ -69,11 +58,7 @@ public class ConsumerExporter implements Exporter, Notifier {
         url.addParameter(Const.SIDE_KEY, Const.PROVIDER_SIDE);
         registry.subscribe(url, this);
 
-        ClientContextHandler clientContextHandler = new ClientContextHandler();
-        NettyInitializer.ChannelHandlerElement channelHandlerElement = new NettyInitializer.ChannelHandlerElement(clientContextHandler);
-        NettyInitializer nettyInitializer = new NettyInitializer(serializer, channelHandlerElement);
-
-        map.putIfAbsent(getKey(url), new ClientPool(nettyInitializer, () -> refreshRemoteServices(url)));
+        map.putIfAbsent(getKey(url), new ClientPool(protocolConfig.getServer(),protocolConfig.getSerialization(), () -> refreshRemoteServices(url)));
 
         refreshRemoteServices(url);
     }

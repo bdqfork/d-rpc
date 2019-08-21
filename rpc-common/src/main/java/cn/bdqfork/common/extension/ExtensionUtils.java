@@ -1,5 +1,7 @@
 package cn.bdqfork.common.extension;
 
+import cn.bdqfork.common.util.ClassUtils;
+
 import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.concurrent.ConcurrentHashMap;

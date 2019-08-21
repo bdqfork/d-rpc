@@ -1,11 +1,13 @@
 package cn.bdqfork.rpc.config;
 
+import cn.bdqfork.common.extension.ExtensionUtils;
 import cn.bdqfork.rpc.config.annotation.Service;
-import cn.bdqfork.rpc.protocol.RpcResponse;
-import cn.bdqfork.rpc.protocol.invoker.Invoker;
 import cn.bdqfork.rpc.exporter.ServiceExporter;
-import cn.bdqfork.rpc.netty.provider.ProviderServer;
 import cn.bdqfork.rpc.registry.Registry;
+import cn.bdqfork.rpc.remote.ProviderServer;
+import cn.bdqfork.rpc.remote.ProviderServerFactory;
+import cn.bdqfork.rpc.remote.RpcResponse;
+import cn.bdqfork.rpc.remote.invoker.Invoker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,6 +21,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class ServiceBean extends AbstractRpcBean {
     private static final Logger log = LoggerFactory.getLogger(ServiceBean.class);
     public static final String SERVICE_BEAN_NAME = "serviceBean";
+
+    private ProviderServerFactory providerServerFactory = ExtensionUtils.getExtension(ProviderServerFactory.class);
 
     private Registry registry;
 
@@ -60,7 +64,7 @@ public class ServiceBean extends AbstractRpcBean {
 
         Invoker<RpcResponse> invoker = context.getBean(RpcRemoteInvoker.RPC_REMOTE_INVOKER_BEAN_NAME, RpcRemoteInvoker.class);
 
-        providerServer = new ProviderServer(protocolConfig, invoker);
+        providerServer = providerServerFactory.createProviderServer(protocolConfig, invoker);
 
         log.info("starting server");
 

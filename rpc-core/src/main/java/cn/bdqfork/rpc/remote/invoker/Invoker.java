@@ -1,4 +1,4 @@
-package cn.bdqfork.rpc.protocol.invoker;
+package cn.bdqfork.rpc.remote.invoker;
 
 import cn.bdqfork.common.exception.RpcException;
 

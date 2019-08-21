@@ -1,8 +1,8 @@
 package cn.bdqfork.rpc.config;
 
 import cn.bdqfork.rpc.config.annotation.Reference;
-import cn.bdqfork.rpc.protocol.RpcResponse;
-import cn.bdqfork.rpc.protocol.invoker.Invoker;
+import cn.bdqfork.rpc.remote.RpcResponse;
+import cn.bdqfork.rpc.remote.invoker.Invoker;
 
 /**
  * @author bdq

@@ -1,25 +1,26 @@
-package cn.bdqfork.rpc.netty.provider;
+package cn.bdqfork.rpc.protocol.netty.provider;
 
 import cn.bdqfork.rpc.config.ProtocolConfig;
-import cn.bdqfork.rpc.netty.server.NettyServer;
-import cn.bdqfork.rpc.netty.NettyInitializer;
-import cn.bdqfork.rpc.protocol.RpcResponse;
-import cn.bdqfork.rpc.protocol.invoker.Invoker;
+import cn.bdqfork.rpc.protocol.netty.server.NettyServer;
+import cn.bdqfork.rpc.protocol.netty.NettyInitializer;
+import cn.bdqfork.rpc.remote.ProviderServer;
+import cn.bdqfork.rpc.remote.RpcResponse;
+import cn.bdqfork.rpc.remote.invoker.Invoker;
 import cn.bdqfork.rpc.protocol.serializer.HessianSerializer;
-import cn.bdqfork.rpc.protocol.serializer.Serializer;
+import cn.bdqfork.rpc.remote.Serializer;
 
 /**
  * @author bdq
  * @date 2019-03-05
  */
-public class ProviderServer {
+public class NettyProviderServer implements ProviderServer {
     private NettyServer nettyServer;
 
-    public ProviderServer(ProtocolConfig protocolConfig, Invoker<RpcResponse> invoker) {
+    public NettyProviderServer(ProtocolConfig protocolConfig, Invoker<RpcResponse> invoker) {
         this(protocolConfig, invoker, new HessianSerializer());
     }
 
-    public ProviderServer(ProtocolConfig protocolConfig, Invoker<RpcResponse> invoker, Serializer serializer) {
+    public NettyProviderServer(ProtocolConfig protocolConfig, Invoker<RpcResponse> invoker, Serializer serializer) {
         this.nettyServer = initNettyServer(protocolConfig, invoker, serializer);
     }
 

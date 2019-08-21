@@ -1,8 +1,8 @@
-package cn.bdqfork.rpc.netty;
+package cn.bdqfork.rpc.protocol.netty;
 
 import cn.bdqfork.rpc.protocol.DataDecoder;
 import cn.bdqfork.rpc.protocol.DataEncoder;
-import cn.bdqfork.rpc.protocol.serializer.Serializer;
+import cn.bdqfork.rpc.remote.Serializer;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.SocketChannel;

@@ -1,8 +1,8 @@
-package cn.bdqfork.rpc.netty.consumer;
+package cn.bdqfork.rpc.protocol.netty.consumer;
 
-import cn.bdqfork.rpc.netty.consumer.context.RpcContextManager;
+import cn.bdqfork.rpc.remote.context.RpcContextManager;
 import cn.bdqfork.rpc.protocol.NettyChannel;
-import cn.bdqfork.rpc.protocol.RpcResponse;
+import cn.bdqfork.rpc.remote.RpcResponse;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;

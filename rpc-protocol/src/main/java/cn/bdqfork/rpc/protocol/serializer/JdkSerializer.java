@@ -1,6 +1,8 @@
 package cn.bdqfork.rpc.protocol.serializer;
 
 
+import cn.bdqfork.rpc.remote.Serializer;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectInputStream;

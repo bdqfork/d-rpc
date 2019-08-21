@@ -1,8 +1,8 @@
 package cn.bdqfork.rpc.proxy;
 
 import cn.bdqfork.common.exception.RpcException;
-import cn.bdqfork.rpc.protocol.RpcResponse;
-import cn.bdqfork.rpc.protocol.invoker.Invoker;
+import cn.bdqfork.rpc.remote.RpcResponse;
+import cn.bdqfork.rpc.remote.invoker.Invoker;
 
 /**
  * @author bdq

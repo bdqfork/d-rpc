@@ -1,8 +1,8 @@
-package cn.bdqfork.rpc.netty.client;
+package cn.bdqfork.rpc.remote;
 
 import cn.bdqfork.common.exception.RpcException;
+import cn.bdqfork.common.extension.ExtensionUtils;
 import cn.bdqfork.rpc.exporter.RefreshCallback;
-import cn.bdqfork.rpc.netty.NettyInitializer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,13 +16,16 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class ClientPool {
     private static final String ADDRESS_SEPARATOR = ":";
-    private Map<String, NettyClient> clientMap = new ConcurrentHashMap<>();
-    private NettyInitializer nettyInitializer;
+    private RemoteClientFactory remoteClientFactory = ExtensionUtils.getExtension(RemoteClientFactory.class);
+    private Map<String, RemoteClient> clientMap = new ConcurrentHashMap<>();
+    private String server;
+    private String serialization;
     private RefreshCallback callback;
     private int i;
 
-    public ClientPool(NettyInitializer nettyInitializer, RefreshCallback callback) {
-        this.nettyInitializer = nettyInitializer;
+    public ClientPool(String server, String serialization, RefreshCallback callback) {
+        this.server = server;
+        this.serialization = serialization;
         this.callback = callback;
     }
 
@@ -33,8 +36,8 @@ public class ClientPool {
 
         //移除过期的连接
         localAddress.forEach(address -> {
-            NettyClient nettyClient = clientMap.get(address);
-            nettyClient.close();
+            RemoteClient remoteClient = clientMap.get(address);
+            remoteClient.close();
             clientMap.remove(address);
         });
 
@@ -42,20 +45,20 @@ public class ClientPool {
                 .filter(address -> !clientMap.containsKey(address))
                 .forEach(address -> {
                     String[] hostPort = address.split(ADDRESS_SEPARATOR);
-                    NettyClient nettyClient = new NettyClient(hostPort[0], Integer.parseInt(hostPort[1]), nettyInitializer);
-                    nettyClient.open();
-                    clientMap.put(address, nettyClient);
+                    RemoteClient remoteClient = remoteClientFactory.createRemoteClient(server,serialization,
+                            hostPort[0], Integer.parseInt(hostPort[1]));
+                    clientMap.put(address, remoteClient);
                 });
     }
 
-    public NettyClient getNettyClient() throws RpcException {
-        List<NettyClient> nettyClients = new ArrayList<>(clientMap.values());
-        if (nettyClients.size() != 0) {
+    public RemoteClient getRemoteClient() throws RpcException {
+        List<RemoteClient> remoteClients = new ArrayList<>(clientMap.values());
+        if (remoteClients.size() != 0) {
             if (i == Integer.MAX_VALUE) {
                 i = 0;
             }
             //负载均衡
-            return nettyClients.get(i++ % nettyClients.size());
+            return remoteClients.get(i++ % remoteClients.size());
         } else {
             callback.refresh();
             try {
@@ -67,8 +70,8 @@ public class ClientPool {
         }
     }
 
-    public void removeClient(NettyClient nettyClient) {
-        clientMap.remove(nettyClient.getHost() + ":" + nettyClient.getPort());
+    public void removeClient(RemoteClient remoteClient) {
+        clientMap.remove(remoteClient.getHost() + ADDRESS_SEPARATOR + remoteClient.getPort());
     }
 
 }

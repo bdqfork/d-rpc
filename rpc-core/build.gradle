@@ -23,6 +23,4 @@ dependencies {
     compile "javassist:javassist:${libs.javassist}"
 
     compile project(':rpc-common')
-    compile project(':rpc-protocol')
-
 }

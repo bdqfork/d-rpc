@@ -1,8 +1,8 @@
-package cn.bdqfork.rpc.netty.provider;
+package cn.bdqfork.rpc.protocol.netty.provider;
 
-import cn.bdqfork.rpc.protocol.invoker.Invocation;
-import cn.bdqfork.rpc.protocol.invoker.Invoker;
-import cn.bdqfork.rpc.protocol.RpcResponse;
+import cn.bdqfork.rpc.remote.invoker.Invocation;
+import cn.bdqfork.rpc.remote.invoker.Invoker;
+import cn.bdqfork.rpc.remote.RpcResponse;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;

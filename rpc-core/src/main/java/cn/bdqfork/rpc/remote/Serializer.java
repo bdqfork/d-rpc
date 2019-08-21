@@ -1,4 +1,4 @@
-package cn.bdqfork.rpc.protocol.serializer;
+package cn.bdqfork.rpc.remote;
 
 /**
  * @author bdq

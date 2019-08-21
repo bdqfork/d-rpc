@@ -1,8 +1,9 @@
-package cn.bdqfork.rpc.netty.client;
+package cn.bdqfork.rpc.protocol.netty.client;
 
 import cn.bdqfork.common.exception.ConnectionLostException;
-import cn.bdqfork.rpc.netty.NettyInitializer;
+import cn.bdqfork.rpc.protocol.netty.NettyInitializer;
 import cn.bdqfork.rpc.protocol.NettyChannel;
+import cn.bdqfork.rpc.remote.RemoteClient;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -14,9 +15,9 @@ import org.slf4j.LoggerFactory;
 
 /**
  * @author bdq
- * @date 2019-02-20
+ * @since 2019-02-20
  */
-public class NettyClient {
+public class NettyClient implements RemoteClient {
     private Logger log = LoggerFactory.getLogger(NettyClient.class);
 
     private String host;
@@ -28,9 +29,10 @@ public class NettyClient {
         this.host = host;
         this.port = port;
         this.nettyInitializer = nettyInitializer;
+        open();
     }
 
-    public void open() {
+    private void open() {
         group = new NioEventLoopGroup();
         try {
             Bootstrap bootstrap = new Bootstrap();

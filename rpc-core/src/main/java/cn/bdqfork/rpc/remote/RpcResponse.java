@@ -1,4 +1,4 @@
-package cn.bdqfork.rpc.protocol;
+package cn.bdqfork.rpc.remote;
 
 import java.io.Serializable;
 

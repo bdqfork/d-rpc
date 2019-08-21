@@ -13,6 +13,8 @@ public class ProtocolConfig {
      * 端口号
      */
     private Integer port;
+    private String server = "netty";
+    private String serialization;
 
     public String getHost() {
         return host;
@@ -28,5 +30,21 @@ public class ProtocolConfig {
 
     public void setPort(Integer port) {
         this.port = port;
+    }
+
+    public String getServer() {
+        return server;
+    }
+
+    public void setServer(String server) {
+        this.server = server;
+    }
+
+    public String getSerialization() {
+        return serialization;
+    }
+
+    public void setSerialization(String serialization) {
+        this.serialization = serialization;
     }
 }

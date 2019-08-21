@@ -1,15 +1,12 @@
-package cn.bdqfork.rpc.netty.consumer;
+package cn.bdqfork.rpc.remote;
 
 import cn.bdqfork.common.exception.RpcException;
 import cn.bdqfork.common.exception.TimeoutException;
-import cn.bdqfork.rpc.netty.client.ClientPool;
-import cn.bdqfork.rpc.netty.client.NettyClient;
-import cn.bdqfork.rpc.netty.consumer.context.DefaultFuture;
-import cn.bdqfork.rpc.netty.consumer.context.RpcContext;
-import cn.bdqfork.rpc.netty.consumer.context.RpcContextManager;
-import cn.bdqfork.rpc.protocol.RpcResponse;
-import cn.bdqfork.rpc.protocol.invoker.Invocation;
-import cn.bdqfork.rpc.protocol.invoker.Invoker;
+import cn.bdqfork.rpc.remote.context.DefaultFuture;
+import cn.bdqfork.rpc.remote.context.RpcContext;
+import cn.bdqfork.rpc.remote.context.RpcContextManager;
+import cn.bdqfork.rpc.remote.invoker.Invocation;
+import cn.bdqfork.rpc.remote.invoker.Invoker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,7 +35,7 @@ public class RpcInvoker implements Invoker<RpcResponse> {
         int retryCount = 0;
         while (true) {
 
-            NettyClient client = clientPool.getNettyClient();
+            RemoteClient client = clientPool.getRemoteClient();
 
             try {
                 client.send(invocation);

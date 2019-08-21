@@ -1,9 +1,9 @@
 package cn.bdqfork.rpc.config;
 
 import cn.bdqfork.common.exception.RpcException;
-import cn.bdqfork.rpc.protocol.RpcResponse;
-import cn.bdqfork.rpc.protocol.invoker.Invocation;
-import cn.bdqfork.rpc.protocol.invoker.Invoker;
+import cn.bdqfork.rpc.remote.RpcResponse;
+import cn.bdqfork.rpc.remote.invoker.Invocation;
+import cn.bdqfork.rpc.remote.invoker.Invoker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;

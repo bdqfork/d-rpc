@@ -1,6 +1,6 @@
-package cn.bdqfork.rpc.netty.server;
+package cn.bdqfork.rpc.protocol.netty.server;
 
-import cn.bdqfork.rpc.netty.NettyInitializer;
+import cn.bdqfork.rpc.protocol.netty.NettyInitializer;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
