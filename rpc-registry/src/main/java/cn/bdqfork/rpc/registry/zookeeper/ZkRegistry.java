@@ -16,6 +16,8 @@ import org.apache.zookeeper.ZooDefs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -36,7 +38,7 @@ public class ZkRegistry extends AbstractRegistry {
 
     public ZkRegistry(RegistryConfig registryConfig) {
         RetryPolicy retryPolicy = new RetryNTimes(3, 1000);
-        
+
         String url = registryConfig.getUrl().substring(12);
         client = CuratorFrameworkFactory.builder()
                 .connectString(url)
@@ -72,7 +74,7 @@ public class ZkRegistry extends AbstractRegistry {
                         .creatingParentsIfNeeded()
                         .withMode(CreateMode.EPHEMERAL)
                         .withACL(ZooDefs.Ids.OPEN_ACL_UNSAFE)
-                        .forPath(path);
+                        .forPath(path, url.buildString().getBytes(StandardCharsets.UTF_8));
             }
             cacheNodeMap.putIfAbsent(path, url);
         } catch (Exception e) {
@@ -111,7 +113,14 @@ public class ZkRegistry extends AbstractRegistry {
         String path = "/" + group + url.toServicePath();
         try {
             if (client.checkExists().forPath(path) != null) {
-                return new HashSet<>(client.getChildren().forPath(path));
+                Set<String> urls = new HashSet<>();
+                for (String children : client.getChildren().forPath(path)) {
+                    byte[] data = client.getData().forPath(path + "/" + children);
+                    if (data != null) {
+                        urls.add(new String(data, StandardCharsets.UTF_8));
+                    }
+                }
+                return urls;
             }
         } catch (Exception e) {
             log.error(e.getMessage(), e);

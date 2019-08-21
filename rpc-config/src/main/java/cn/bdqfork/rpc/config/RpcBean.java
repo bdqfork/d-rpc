@@ -7,7 +7,7 @@ import org.springframework.context.ApplicationContextAware;
 
 /**
  * @author bdq
- * @date 2019-03-05
+ * @since 2019-03-05
  */
 public interface RpcBean extends ApplicationContextAware, InitializingBean, DisposableBean, BeanClassLoaderAware {
 }

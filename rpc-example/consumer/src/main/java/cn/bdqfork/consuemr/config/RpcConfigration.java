@@ -27,11 +27,4 @@ public class RpcConfigration {
         return registryConfig;
     }
 
-    @Bean
-    public ProtocolConfig protocolConfig() {
-        ProtocolConfig protocolConfig = new ProtocolConfig();
-        protocolConfig.setHost("127.0.0.1");
-        protocolConfig.setPort(8080);
-        return protocolConfig;
-    }
 }

@@ -1,6 +1,8 @@
 package cn.bdqfork.rpc.config;
 
 /**
+ * 服务端配置
+ *
  * @author bdq
  * @since 2019-02-28
  */
@@ -14,7 +16,7 @@ public class ProtocolConfig {
      */
     private Integer port;
     private String server = "netty";
-    private String serialization;
+    private String serialization = "hessian";
 
     public String getHost() {
         return host;

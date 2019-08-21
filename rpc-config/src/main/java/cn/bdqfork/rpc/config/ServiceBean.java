@@ -1,9 +1,11 @@
 package cn.bdqfork.rpc.config;
 
+import cn.bdqfork.common.constant.Const;
 import cn.bdqfork.common.extension.ExtensionUtils;
 import cn.bdqfork.rpc.config.annotation.Service;
 import cn.bdqfork.rpc.exporter.ServiceExporter;
 import cn.bdqfork.rpc.registry.Registry;
+import cn.bdqfork.rpc.registry.URL;
 import cn.bdqfork.rpc.remote.ProviderServer;
 import cn.bdqfork.rpc.remote.ProviderServerFactory;
 import cn.bdqfork.rpc.remote.RpcResponse;
@@ -16,7 +18,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * @author bdq
- * @date 2019-03-03
+ * @since 2019-03-03
  */
 public class ServiceBean extends AbstractRpcBean {
     private static final Logger log = LoggerFactory.getLogger(ServiceBean.class);
@@ -54,13 +56,13 @@ public class ServiceBean extends AbstractRpcBean {
 
         ProtocolConfig protocolConfig = context.getBean(ProtocolConfig.class);
 
-        exporter = new ServiceExporter(protocolConfig, registry);
+        exporter = new ServiceExporter(registry);
 
         ApplicationConfig applicationConfig = context.getBean(ApplicationConfig.class);
 
-        services.forEach(service -> exporter.export(applicationConfig.getApplicationName(), service.group(),
-                service.serviceInterface().getName(),
-                service.refName()));
+        services.stream()
+                .map(service -> buildUrl(protocolConfig, applicationConfig, service))
+                .forEach(url -> exporter.export(url));
 
         Invoker<RpcResponse> invoker = context.getBean(RpcRemoteInvoker.RPC_REMOTE_INVOKER_BEAN_NAME, RpcRemoteInvoker.class);
 
@@ -73,6 +75,19 @@ public class ServiceBean extends AbstractRpcBean {
         log.info("server started");
 
         services.clear();
+    }
+
+    private URL buildUrl(ProtocolConfig protocolConfig, ApplicationConfig applicationConfig, Service service) {
+        URL url = new URL(Const.PROTOCOL_PROVIDER, protocolConfig.getHost(), protocolConfig.getPort(), service.serviceInterface().getName());
+
+        url.addParameter(Const.APPLICATION_KEY, applicationConfig.getApplicationName());
+        url.addParameter(Const.GROUP_KEY, service.group());
+        url.addParameter(Const.SIDE_KEY, Const.PROVIDER_SIDE);
+        url.addParameter(Const.REF_NAME_KEY, service.refName());
+        url.addParameter(Const.SERVER_KEY, protocolConfig.getServer());
+        url.addParameter(Const.SERIALIZATION_KEY, protocolConfig.getSerialization());
+
+        return url;
     }
 
 }

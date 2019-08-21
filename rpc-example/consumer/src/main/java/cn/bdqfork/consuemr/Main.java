@@ -8,7 +8,7 @@ import org.springframework.context.annotation.ComponentScan;
 
 /**
  * @author bdq
- * @date 2019-02-15
+ * @since 2019-02-15
  */
 @ComponentScan
 @RpcComponentScan(basePackages = "cn.bdqfork.consumer.client")

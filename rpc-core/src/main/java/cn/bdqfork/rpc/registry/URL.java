@@ -26,15 +26,15 @@ public class URL {
     /**
      * 接口名称
      */
-    private String path;
+    private String service;
 
     private Map<String, String> parameterMap = new ConcurrentHashMap<>();
 
-    public URL(String protocol, String host, int port, String path) {
+    public URL(String protocol, String host, int port, String service) {
         this.protocol = protocol;
         this.host = host;
         this.port = port;
-        this.path = path;
+        this.service = service;
     }
 
     public URL(String urlString) {
@@ -51,7 +51,7 @@ public class URL {
         port = Integer.parseInt(hostPort[1]);
 
         String[] paramString = pathStrings[1].split("\\?");
-        path = paramString[0];
+        service = paramString[0];
 
         String[] params = paramString[1].split("&");
 
@@ -63,11 +63,11 @@ public class URL {
     }
 
     public String toServiceCategory() {
-        return "/" + path;
+        return "/" + service;
     }
 
     public String toServicePath() {
-        return "/" + path + "/" + parameterMap.get("side");
+        return "/" + service + "/" + parameterMap.get("side");
     }
 
     public String toPath() {
@@ -84,7 +84,7 @@ public class URL {
     }
 
     public String buildString() {
-        return protocol + "://" + host + ":" + port + "/" + path + buildParameter();
+        return protocol + "://" + host + ":" + port + "/" + service + buildParameter();
     }
 
     private String buildParameter() {
@@ -108,7 +108,19 @@ public class URL {
     }
 
     public String getServiceName() {
-        return path;
+        return service;
+    }
+
+    public void setProtocol(String protocol) {
+        this.protocol = protocol;
+    }
+
+    public String getHost() {
+        return host;
+    }
+
+    public int getPort() {
+        return port;
     }
 
     @Override
@@ -123,13 +135,13 @@ public class URL {
         return port == url.port &&
                 Objects.equals(protocol, url.protocol) &&
                 Objects.equals(host, url.host) &&
-                Objects.equals(path, url.path) &&
+                Objects.equals(service, url.service) &&
                 Objects.equals(parameterMap, url.parameterMap);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(protocol, host, port, path, parameterMap);
+        return Objects.hash(protocol, host, port, service, parameterMap);
     }
 
 }

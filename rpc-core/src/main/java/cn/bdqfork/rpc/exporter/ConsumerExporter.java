@@ -1,11 +1,9 @@
 package cn.bdqfork.rpc.exporter;
 
 import cn.bdqfork.common.constant.Const;
-import cn.bdqfork.rpc.config.ProtocolConfig;
 import cn.bdqfork.rpc.registry.Notifier;
 import cn.bdqfork.rpc.registry.Registry;
 import cn.bdqfork.rpc.registry.URL;
-import cn.bdqfork.rpc.registry.URLBuilder;
 import cn.bdqfork.rpc.registry.event.NodeEvent;
 import cn.bdqfork.rpc.registry.event.RegistryEvent;
 import cn.bdqfork.rpc.remote.ClientPool;
@@ -22,43 +20,31 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ConsumerExporter implements Exporter, Notifier {
     private Set<URL> localCache = new LinkedHashSet<>();
 
-    private ProtocolConfig protocolConfig;
-
     private Map<String, ClientPool> map = new ConcurrentHashMap<>();
 
     private Registry registry;
 
-    public ConsumerExporter(ProtocolConfig protocolConfig, Registry registry) {
-        this.protocolConfig = protocolConfig;
+    public ConsumerExporter(Registry registry) {
         this.registry = registry;
     }
 
     @Override
-    public void export(String applicationName, String group, String serviceName, String refName) {
-        URL url = bulidUrl(applicationName, group, serviceName, refName);
+    public void export(URL url) {
         register(url);
         subscribe(url);
     }
 
-    private URL bulidUrl(String applicationName, String group, String serviceName, String refName) {
-        return URLBuilder.consumerUrl(protocolConfig, serviceName)
-                .applicationName(applicationName)
-                .group(group)
-                .refName(refName)
-                .getUrl();
-    }
-
-    public void register(URL url) {
+    private void register(URL url) {
         url.addParameter(Const.SIDE_KEY, Const.CONSUMER_SIDE);
         localCache.add(url);
         registry.register(url);
     }
 
-    public void subscribe(URL url) {
+    private void subscribe(URL url) {
         url.addParameter(Const.SIDE_KEY, Const.PROVIDER_SIDE);
         registry.subscribe(url, this);
 
-        map.putIfAbsent(getKey(url), new ClientPool(protocolConfig.getServer(),protocolConfig.getSerialization(), () -> refreshRemoteServices(url)));
+        map.putIfAbsent(getKey(url), new ClientPool(() -> refreshRemoteServices(url)));
 
         refreshRemoteServices(url);
     }

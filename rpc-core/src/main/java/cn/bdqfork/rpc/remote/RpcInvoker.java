@@ -1,5 +1,6 @@
 package cn.bdqfork.rpc.remote;
 
+import cn.bdqfork.common.exception.ConnectionLostException;
 import cn.bdqfork.common.exception.RpcException;
 import cn.bdqfork.common.exception.TimeoutException;
 import cn.bdqfork.rpc.remote.context.DefaultFuture;
@@ -34,13 +35,15 @@ public class RpcInvoker implements Invoker<RpcResponse> {
 
         int retryCount = 0;
         while (true) {
-
-            RemoteClient client = clientPool.getRemoteClient();
-
+            RemoteClient client = null;
             try {
+                client = clientPool.getRemoteClient();
                 client.send(invocation);
-            } catch (RpcException e) {
+            } catch (ConnectionLostException e) {
+                log.warn(e.getMessage());
                 clientPool.removeClient(client);
+            } catch (RpcException e) {
+                log.warn(e.getMessage());
             }
 
             try {

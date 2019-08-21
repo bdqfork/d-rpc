@@ -5,7 +5,7 @@ import cn.bdqfork.rpc.config.ProtocolConfig;
 
 /**
  * @author bdq
- * @date 2019-03-05
+ * @since 2019-03-05
  */
 public class URLBuilder {
     private URL url;

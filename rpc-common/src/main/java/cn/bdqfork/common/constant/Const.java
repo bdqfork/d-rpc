@@ -17,4 +17,6 @@ public class Const {
     public static final String REF_NAME_KEY = "refName";
     public static final String PROTOCOL_CONSUMER = "consumer";
     public static final String PROTOCOL_PROVIDER = "provider";
+    public static final String SERVER_KEY = "server";
+    public static final String SERIALIZATION_KEY = "serialization";
 }

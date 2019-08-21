@@ -1,14 +1,17 @@
 package cn.bdqfork.rpc.remote;
 
+import cn.bdqfork.common.constant.Const;
 import cn.bdqfork.common.exception.RpcException;
 import cn.bdqfork.common.extension.ExtensionUtils;
 import cn.bdqfork.rpc.exporter.RefreshCallback;
+import cn.bdqfork.rpc.registry.URL;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 /**
  * @author bdq
@@ -18,21 +21,25 @@ public class ClientPool {
     private static final String ADDRESS_SEPARATOR = ":";
     private RemoteClientFactory remoteClientFactory = ExtensionUtils.getExtension(RemoteClientFactory.class);
     private Map<String, RemoteClient> clientMap = new ConcurrentHashMap<>();
-    private String server;
-    private String serialization;
     private RefreshCallback callback;
     private int i;
 
-    public ClientPool(String server, String serialization, RefreshCallback callback) {
-        this.server = server;
-        this.serialization = serialization;
+    public ClientPool(RefreshCallback callback) {
         this.callback = callback;
     }
 
     public void refresh(Set<String> remoteAddress) {
         Set<String> localAddress = clientMap.keySet();
+        Set<URL> urls = remoteAddress.stream()
+                .filter(address -> !clientMap.containsKey(address))
+                .map(URL::new)
+                .collect(Collectors.toSet());
+
+        Set<String> keys = urls.stream()
+                .map(url -> getKey(url.getHost(), url.getPort()))
+                .collect(Collectors.toSet());
         //求差集
-        localAddress.removeAll(remoteAddress);
+        localAddress.removeAll(keys);
 
         //移除过期的连接
         localAddress.forEach(address -> {
@@ -41,14 +48,20 @@ public class ClientPool {
             clientMap.remove(address);
         });
 
-        remoteAddress.stream()
-                .filter(address -> !clientMap.containsKey(address))
-                .forEach(address -> {
-                    String[] hostPort = address.split(ADDRESS_SEPARATOR);
-                    RemoteClient remoteClient = remoteClientFactory.createRemoteClient(server,serialization,
-                            hostPort[0], Integer.parseInt(hostPort[1]));
-                    clientMap.put(address, remoteClient);
-                });
+        urls.forEach(url -> {
+
+            String server = url.getParameter(Const.SERVER_KEY, "netty");
+            String serialization = url.getParameter(Const.SERIALIZATION_KEY, "hessian");
+
+            RemoteClient remoteClient = remoteClientFactory.createRemoteClient(server, serialization,
+                    url.getHost(), url.getPort());
+            
+            addRemoteClient(remoteClient);
+        });
+    }
+
+    private void addRemoteClient(RemoteClient remoteClient) {
+        clientMap.put(getKey(remoteClient.getHost(), remoteClient.getPort()), remoteClient);
     }
 
     public RemoteClient getRemoteClient() throws RpcException {
@@ -71,7 +84,11 @@ public class ClientPool {
     }
 
     public void removeClient(RemoteClient remoteClient) {
-        clientMap.remove(remoteClient.getHost() + ADDRESS_SEPARATOR + remoteClient.getPort());
+        clientMap.remove(getKey(remoteClient.getHost(), remoteClient.getPort()));
+    }
+
+    private String getKey(String host, int port) {
+        return host + ADDRESS_SEPARATOR + port;
     }
 
 }
