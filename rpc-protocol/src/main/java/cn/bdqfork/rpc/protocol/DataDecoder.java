@@ -2,7 +2,7 @@ package cn.bdqfork.rpc.protocol;
 
 import cn.bdqfork.common.constant.Const;
 import cn.bdqfork.rpc.remote.RpcResponse;
-import cn.bdqfork.rpc.remote.invoker.Invocation;
+import cn.bdqfork.rpc.remote.context.RpcContext;
 import cn.bdqfork.rpc.remote.Serializer;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
@@ -28,8 +28,8 @@ public class DataDecoder extends ByteToMessageDecoder {
         byte[] data = new byte[length];
         in.readBytes(data);
         if (Const.REQUEST_FLAGE == type) {
-            Invocation invocation = serializer.deserialize(data, Invocation.class);
-            out.add(invocation);
+            RpcContext.Context context = serializer.deserialize(data, RpcContext.Context.class);
+            out.add(context);
         } else if (Const.RESPOSE_FLAGE == type) {
             RpcResponse rpcResponse = serializer.deserialize(data, RpcResponse.class);
             out.add(rpcResponse);

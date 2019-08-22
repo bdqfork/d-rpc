@@ -5,8 +5,6 @@ import cn.bdqfork.common.exception.RpcException;
 import cn.bdqfork.common.exception.TimeoutException;
 import cn.bdqfork.rpc.remote.context.DefaultFuture;
 import cn.bdqfork.rpc.remote.context.RpcContext;
-import cn.bdqfork.rpc.remote.context.RpcContextManager;
-import cn.bdqfork.rpc.remote.invoker.Invocation;
 import cn.bdqfork.rpc.remote.invoker.Invoker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,38 +24,6 @@ public class RpcInvoker implements Invoker<RpcResponse> {
         this.retries = retries;
     }
 
-    @Override
-    public RpcResponse invoke(Invocation invocation) throws RpcException {
-
-        DefaultFuture<RpcResponse> defaultFuture = new DefaultFuture<>();
-        RpcContext rpcContext = new RpcContext(invocation.getRequestId(), defaultFuture);
-        RpcContextManager.registerContext(rpcContext);
-
-        int retryCount = 0;
-        while (true) {
-            RemoteClient client = null;
-            try {
-                client = clientPool.getRemoteClient();
-                client.send(invocation);
-            } catch (ConnectionLostException e) {
-                log.warn(e.getMessage());
-                clientPool.removeClient(client);
-            } catch (RpcException e) {
-                log.warn(e.getMessage());
-            }
-
-            try {
-                return defaultFuture.get(timeout);
-            } catch (TimeoutException e) {
-                retryCount = retry(retryCount);
-
-                if (retryCount > retries) {
-                    RpcContextManager.removeContext(rpcContext.getRequestId());
-                    throw e;
-                }
-            }
-        }
-    }
 
     private int retry(int retryCount) {
 
@@ -78,5 +44,36 @@ public class RpcInvoker implements Invoker<RpcResponse> {
 
     public void setClientPool(ClientPool clientPool) {
         this.clientPool = clientPool;
+    }
+
+    @Override
+    public RpcResponse invoke(RpcContext.Context context) throws RpcException {
+        DefaultFuture<RpcResponse> defaultFuture = new DefaultFuture<>();
+        RpcContext.registerContext(context.getRequestId(), defaultFuture);
+
+        int retryCount = 0;
+        while (true) {
+            RemoteClient client = null;
+            try {
+                client = clientPool.getRemoteClient();
+                client.send(context);
+            } catch (ConnectionLostException e) {
+                log.warn(e.getMessage());
+                clientPool.removeClient(client);
+            } catch (RpcException e) {
+                log.warn(e.getMessage());
+            }
+
+            try {
+                return defaultFuture.get(timeout);
+            } catch (TimeoutException e) {
+                retryCount = retry(retryCount);
+
+                if (retryCount > retries) {
+                    RpcContext.removeContext(context.getRequestId());
+                    throw e;
+                }
+            }
+        }
     }
 }

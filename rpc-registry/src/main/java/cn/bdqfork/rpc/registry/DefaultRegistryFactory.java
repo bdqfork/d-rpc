@@ -1,7 +1,6 @@
 package cn.bdqfork.rpc.registry;
 
 import cn.bdqfork.rpc.config.RegistryConfig;
-import cn.bdqfork.rpc.registry.etcd.EtcdRegistry;
 import cn.bdqfork.rpc.registry.zookeeper.ZkRegistry;
 
 /**
@@ -14,8 +13,6 @@ public class DefaultRegistryFactory implements RegistryFactory {
         String url = registryConfig.getUrl();
         if (url.startsWith("zookeeper://")) {
             return new ZkRegistry(registryConfig);
-        } else if (url.startsWith("etcd://")) {
-            return new EtcdRegistry(registryConfig);
         }
         return null;
     }

@@ -2,7 +2,7 @@ package cn.bdqfork.rpc.config;
 
 import cn.bdqfork.common.exception.RpcException;
 import cn.bdqfork.rpc.remote.RpcResponse;
-import cn.bdqfork.rpc.remote.invoker.Invocation;
+import cn.bdqfork.rpc.remote.context.RpcContext;
 import cn.bdqfork.rpc.remote.invoker.Invoker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,14 +25,23 @@ public class RpcRemoteInvoker implements Invoker<RpcResponse>, BeanClassLoaderAw
 
     public static final String RPC_REMOTE_INVOKER_BEAN_NAME = "RpcRemoteInvoker";
 
-    private ApplicationContext context;
+    private ApplicationContext applicationContext;
 
     private ClassLoader classLoader;
 
     @Override
-    public RpcResponse invoke(Invocation invocation) throws RpcException {
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
+    }
 
-        String serviceInterface = invocation.getServiceInterface();
+    @Override
+    public void setBeanClassLoader(ClassLoader classLoader) {
+        this.classLoader = classLoader;
+    }
+
+    @Override
+    public RpcResponse invoke(RpcContext.Context context) throws RpcException {
+        String serviceInterface = context.getServiceInterface();
 
         Class<?> clazz;
         try {
@@ -41,43 +50,33 @@ public class RpcRemoteInvoker implements Invoker<RpcResponse>, BeanClassLoaderAw
 
             log.error(e.getMessage(), e);
 
-            return new RpcResponse(invocation.getRequestId(), e.getMessage(), e);
+            return new RpcResponse(context.getRequestId(), e.getMessage(), e);
         }
 
         Object instance;
         try {
-            if (!StringUtils.isEmpty(invocation.getRefName())) {
-                instance = context.getBean(invocation.getRefName(), clazz);
+            if (!StringUtils.isEmpty(context.getRefName())) {
+                instance = applicationContext.getBean(context.getRefName(), clazz);
             } else {
-                instance = context.getBean(clazz);
+                instance = applicationContext.getBean(clazz);
             }
         } catch (NoSuchBeanDefinitionException e) {
             log.error(e.getMessage(), e);
-            return new RpcResponse(invocation.getRequestId(), e.getMessage(), e);
+            return new RpcResponse(context.getRequestId(), e.getMessage(), e);
         }
 
         try {
-            Method method = clazz.getMethod(invocation.getMethodName(), invocation.getParameterTypes());
+            Method method = clazz.getMethod(context.getMethodName(), context.getParameterTypes());
 
-            Object result = method.invoke(instance, invocation.getArguments());
+            Object result = method.invoke(instance, context.getArguments());
 
-            return new RpcResponse(invocation.getRequestId(), result);
+            return new RpcResponse(context.getRequestId(), result);
 
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
 
             log.error(e.getMessage(), e);
 
-            return new RpcResponse(invocation.getRequestId(), e.getMessage(), e);
+            return new RpcResponse(context.getRequestId(), e.getMessage(), e);
         }
-    }
-
-    @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        this.context = applicationContext;
-    }
-
-    @Override
-    public void setBeanClassLoader(ClassLoader classLoader) {
-        this.classLoader = classLoader;
     }
 }

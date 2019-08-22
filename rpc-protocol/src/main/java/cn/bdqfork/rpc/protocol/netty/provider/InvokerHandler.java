@@ -1,6 +1,6 @@
 package cn.bdqfork.rpc.protocol.netty.provider;
 
-import cn.bdqfork.rpc.remote.invoker.Invocation;
+import cn.bdqfork.rpc.remote.context.RpcContext;
 import cn.bdqfork.rpc.remote.invoker.Invoker;
 import cn.bdqfork.rpc.remote.RpcResponse;
 import io.netty.channel.ChannelHandler;
@@ -21,8 +21,7 @@ public class InvokerHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        Invocation request = (Invocation) msg;
-        RpcResponse response = invoker.invoke(request);
+        RpcResponse response = invoker.invoke((RpcContext.Context) msg);
         ctx.writeAndFlush(response);
     }
 

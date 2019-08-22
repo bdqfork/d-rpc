@@ -1,6 +1,7 @@
 package cn.bdqfork.rpc.remote.invoker;
 
 import cn.bdqfork.common.exception.RpcException;
+import cn.bdqfork.rpc.remote.context.RpcContext;
 
 /**
  * @author bdq
@@ -8,6 +9,6 @@ import cn.bdqfork.common.exception.RpcException;
  */
 public interface Invoker<T> {
 
-    T invoke(Invocation invocation) throws RpcException;
+    T invoke(RpcContext.Context context) throws RpcException;
 
 }

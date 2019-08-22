@@ -4,7 +4,7 @@ import cn.bdqfork.common.exception.RemoteException;
 import cn.bdqfork.common.exception.RpcException;
 import cn.bdqfork.common.util.IdUtils;
 import cn.bdqfork.rpc.remote.RpcResponse;
-import cn.bdqfork.rpc.remote.invoker.Invocation;
+import cn.bdqfork.rpc.remote.context.RpcContext;
 import cn.bdqfork.rpc.remote.invoker.Invoker;
 
 import java.lang.reflect.Method;
@@ -48,9 +48,9 @@ public abstract class AbstractProxyInstanceGenerator<T> implements ProxyInstance
             return result;
         }
 
-        Invocation invocation = buildInvocation(method, args);
+        RpcContext rpcContext = buildRpcContext(method, args);
 
-        RpcResponse rpcResponse = getInvoker().invoke(invocation);
+        RpcResponse rpcResponse = getInvoker().invoke(rpcContext.getContext());
         if (rpcResponse.getException() != null) {
             throw new RemoteException(rpcResponse.getMessage(), rpcResponse.getException());
         }
@@ -70,13 +70,21 @@ public abstract class AbstractProxyInstanceGenerator<T> implements ProxyInstance
         return null;
     }
 
-    private Invocation buildInvocation(Method method, Object[] args) {
+    private RpcContext buildRpcContext(Method method, Object[] args) {
+        RpcContext rpcContext = new RpcContext(IdUtils.getUUID());
+
+        RpcContext.Context context = rpcContext.getContext();
         Class<?>[] parameterTypes = method.getParameterTypes();
-        Invocation invocation = new Invocation(IdUtils.getUUID(), serviceInterface.getName(), refName, method.getName());
+
+        context.setServiceInterface(serviceInterface.getName());
+        context.setRefName(refName);
+        context.setMethodName(method.getName());
+
         if (parameterTypes.length != 0) {
-            invocation.setParameterTypes(parameterTypes);
-            invocation.setArguments(args);
+            context.setParameterTypes(parameterTypes);
+            context.setArguments(args);
         }
-        return invocation;
+        return rpcContext;
     }
+
 }
