@@ -13,7 +13,7 @@ import static org.springframework.context.annotation.AnnotationConfigUtils.regis
 
 /**
  * @author bdq
- * @date 2019-03-03
+ * @since 2019-03-03
  */
 public class RpcClassPathBeanDefinitionScanner extends ClassPathBeanDefinitionScanner {
 

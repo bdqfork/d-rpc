@@ -2,7 +2,7 @@ package cn.bdqfork.common.constant;
 
 /**
  * @author bdq
- * @date 2019-02-27
+ * @since 2019-02-27
  */
 public class Const {
     public static final byte REQUEST_FLAGE = 0;
@@ -19,4 +19,5 @@ public class Const {
     public static final String PROTOCOL_PROVIDER = "provider";
     public static final String SERVER_KEY = "server";
     public static final String SERIALIZATION_KEY = "serialization";
+    public static final String TIMEOUT_KEY = "timeout";
 }

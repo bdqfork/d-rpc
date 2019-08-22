@@ -34,10 +34,6 @@ public class ServiceBean extends AbstractRpcBean {
 
     private List<Service> services = new CopyOnWriteArrayList<>();
 
-    public void setServices(List<Service> services) {
-        this.services.addAll(services);
-    }
-
     @Override
     public void destroy() throws Exception {
 
@@ -86,8 +82,12 @@ public class ServiceBean extends AbstractRpcBean {
         url.addParameter(Const.REF_NAME_KEY, service.refName());
         url.addParameter(Const.SERVER_KEY, protocolConfig.getServer());
         url.addParameter(Const.SERIALIZATION_KEY, protocolConfig.getSerialization());
-
+        url.addParameter(Const.TIMEOUT_KEY, String.valueOf(service.timeout()));
         return url;
+    }
+
+    public void setServices(List<Service> services) {
+        this.services.addAll(services);
     }
 
 }

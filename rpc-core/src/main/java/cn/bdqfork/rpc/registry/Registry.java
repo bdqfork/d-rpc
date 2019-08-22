@@ -10,6 +10,7 @@ import java.util.Set;
  * @since 2019-02-26
  */
 public interface Registry {
+    String DEFAULT_ROOT = "rpc";
     String REGISTRY_NAME = "registry";
 
     /**

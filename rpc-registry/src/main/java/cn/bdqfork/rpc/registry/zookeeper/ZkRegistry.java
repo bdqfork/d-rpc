@@ -28,17 +28,11 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ZkRegistry extends AbstractRegistry {
     private static final Logger log = LoggerFactory.getLogger(ZkRegistry.class);
 
-    private static final String DEFAULT_ROOT = "rpc";
-
     private CuratorFramework client;
-
-    private Map<String, URL> cacheNodeMap = new ConcurrentHashMap<>();
-
-    private Map<String, CacheWatcher> cacheWatcherMap = new ConcurrentHashMap<>();
 
     public ZkRegistry(RegistryConfig registryConfig) {
         RetryPolicy retryPolicy = new RetryNTimes(3, 1000);
-
+        //获取zookeeper地址
         String url = registryConfig.getUrl().substring(12);
         client = CuratorFrameworkFactory.builder()
                 .connectString(url)
@@ -62,6 +56,11 @@ public class ZkRegistry extends AbstractRegistry {
         });
 
         client.start();
+    }
+
+    private void recover() {
+        cacheNodeMap.values().forEach(this::register);
+        cacheWatcherMap.values().forEach(cacheWatcher -> subscribe(cacheWatcher.getUrl(), cacheWatcher.getNotifier()));
     }
 
     @Override
@@ -136,19 +135,4 @@ public class ZkRegistry extends AbstractRegistry {
         running = false;
     }
 
-    private void recover() {
-        cacheNodeMap.values().forEach(this::register);
-        cacheWatcherMap.values().forEach(cacheWatcher -> subscribe(cacheWatcher.url, cacheWatcher.notifier));
-    }
-
-    private static class CacheWatcher {
-        private URL url;
-        private Notifier notifier;
-
-        private CacheWatcher(URL url, Notifier notifier) {
-            this.url = url;
-            this.notifier = notifier;
-        }
-
-    }
 }

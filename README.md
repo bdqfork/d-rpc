@@ -7,7 +7,9 @@
 3. 使用Netty实现网络通信
 
 #### todolist:
-1. 添加监控
-2. 测试用例增加
-3. Redis注册中心
+1. etcd注册中心、nacos注册中心
+2. netty通信协议优化
+3. rpc-context重构,添加filter
+4. 添加监控
+5. 测试用例增加
 4. 文档编写
