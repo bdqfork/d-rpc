@@ -4,7 +4,7 @@ import cn.bdqfork.common.exception.RpcException;
 
 /**
  * @author bdq
- * @date 2019-03-01
+ * @since 2019-03-01
  */
 public interface RpcFuture<T> {
     /**

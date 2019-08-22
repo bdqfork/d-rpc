@@ -11,9 +11,9 @@ import java.lang.reflect.Proxy;
  * @author bdq
  * @date 2019-02-15
  */
-public class JdkProxyInstanceGenerator<T> extends AbstractProxyInstanceGenerator<T> implements InvocationHandler {
+public class JdkProxyFactory<T> extends AbstractProxyFactory<T> implements InvocationHandler {
 
-    public JdkProxyInstanceGenerator(Invoker<RpcResponse> invoker, Class<?> serviceInterface, String refName) {
+    public JdkProxyFactory(Invoker<RpcResponse> invoker, Class<?> serviceInterface, String refName) {
         super(invoker, serviceInterface, refName);
     }
 

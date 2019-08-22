@@ -13,9 +13,9 @@ import java.lang.reflect.Method;
  * @author bdq
  * @date 2019-03-02
  */
-public class JavassistProxyInstanceGenerator<T> extends AbstractProxyInstanceGenerator<T> implements MethodHandler {
+public class JavassistProxyFactory<T> extends AbstractProxyFactory<T> implements MethodHandler {
 
-    public JavassistProxyInstanceGenerator(Invoker<RpcResponse> invoker, Class<?> serviceInterface, String refName) {
+    public JavassistProxyFactory(Invoker<RpcResponse> invoker, Class<?> serviceInterface, String refName) {
         super(invoker, serviceInterface, refName);
     }
 

@@ -48,7 +48,6 @@ public class RpcContext implements Serializable {
         private String methodName;
         private Class<?>[] parameterTypes;
         private Object[] arguments;
-        private DefaultFuture<RpcResponse> future;
 
         private Context(String requestId) {
             this.requestId = requestId;
@@ -102,12 +101,5 @@ public class RpcContext implements Serializable {
             this.arguments = arguments;
         }
 
-        public DefaultFuture<RpcResponse> getFuture() {
-            return future;
-        }
-
-        public void setFuture(DefaultFuture<RpcResponse> future) {
-            this.future = future;
-        }
     }
 }

@@ -13,7 +13,7 @@ import java.lang.reflect.Method;
  * @author bdq
  * @since 2019-03-02
  */
-public abstract class AbstractProxyInstanceGenerator<T> implements ProxyInstanceGenerator<T> {
+public abstract class AbstractProxyFactory<T> implements ProxyInstanceGenerator<T> {
     private static final String TO_STRING_METHOD = "toString";
     private static final String EQUALS_METHOD = "equals";
     private static final String HASHCODE_METHOD = "hashCode";
@@ -22,7 +22,7 @@ public abstract class AbstractProxyInstanceGenerator<T> implements ProxyInstance
     private Class<?> serviceInterface;
     private String refName;
 
-    public AbstractProxyInstanceGenerator(Invoker<RpcResponse> invoker, Class<?> serviceInterface, String refName) {
+    public AbstractProxyFactory(Invoker<RpcResponse> invoker, Class<?> serviceInterface, String refName) {
         this.invoker = invoker;
         this.serviceInterface = serviceInterface;
         this.refName = refName;

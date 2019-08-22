@@ -22,9 +22,9 @@ public class RpcProxyFactoryBean<T> implements RpcProxyFactory<T> {
     @Override
     public T getProxy(ProxyType proxyType) throws RpcException {
         if (proxyType == ProxyType.JDK) {
-            return new JdkProxyInstanceGenerator<T>(invoker, serviceInterface, refName).newProxyInstance();
+            return new JdkProxyFactory<T>(invoker, serviceInterface, refName).newProxyInstance();
         } else {
-            return new JavassistProxyInstanceGenerator<T>(invoker, serviceInterface, refName).newProxyInstance();
+            return new JavassistProxyFactory<T>(invoker, serviceInterface, refName).newProxyInstance();
         }
     }
 
