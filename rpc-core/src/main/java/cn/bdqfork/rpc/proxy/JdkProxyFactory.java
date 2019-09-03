@@ -1,30 +1,29 @@
 package cn.bdqfork.rpc.proxy;
 
-import cn.bdqfork.rpc.remote.RpcResponse;
-import cn.bdqfork.rpc.remote.invoker.Invoker;
+import cn.bdqfork.common.exception.RpcException;
+import cn.bdqfork.rpc.Invoker;
+import cn.bdqfork.rpc.ServiceInvoker;
+import cn.bdqfork.rpc.registry.URL;
 
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
 /**
  * @author bdq
- * @date 2019-02-15
+ * @since 2019-02-15
  */
-public class JdkProxyFactory<T> extends AbstractProxyFactory<T> implements InvocationHandler {
-
-    public JdkProxyFactory(Invoker<RpcResponse> invoker, Class<?> serviceInterface, String refName) {
-        super(invoker, serviceInterface, refName);
-    }
+public class JdkProxyFactory implements ProxyFactory {
 
     @SuppressWarnings("unchecked")
     @Override
-    public T newProxyInstance() {
-        return (T) Proxy.newProxyInstance(Thread.currentThread().getContextClassLoader(), new Class[]{getServiceInterface()}, this);
+    public <T> T getProxy(Invoker invoker) throws RpcException {
+        Class<?> clazz = invoker.getInterface();
+        return (T) Proxy.newProxyInstance(Thread.currentThread().getContextClassLoader(),
+                new Class[]{clazz},
+                new InvokerInvocationHandler(invoker));
     }
 
     @Override
-    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        return doInvoke(method, args);
+    public <T> Invoker getInvoker(T proxy, Class<T> type, URL url) throws RpcException {
+        return new ServiceInvoker<>(proxy, type, url);
     }
 }

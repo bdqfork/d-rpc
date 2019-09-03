@@ -2,7 +2,6 @@ package cn.bdqfork.rpc.config.context;
 
 import cn.bdqfork.rpc.config.ServiceBean;
 import cn.bdqfork.rpc.config.annotation.Service;
-import cn.bdqfork.rpc.config.RpcRemoteInvoker;
 import cn.bdqfork.common.util.ClassUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,9 +13,11 @@ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.*;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.context.ResourceLoaderAware;
+import org.springframework.context.annotation.AnnotationBeanNameGenerator;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.type.filter.AnnotationTypeFilter;
+import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -30,9 +31,9 @@ import java.util.Set;
 public class ServiceAnnotationPostProcessor implements BeanDefinitionRegistryPostProcessor,
         EnvironmentAware, ResourceLoaderAware, BeanClassLoaderAware {
     public static final String SERVICE_ANNOTATION_POST_PROCESSOR_NAME = "serviceAnnotationPostProcessor";
-
     private static final Logger log = LoggerFactory.getLogger(ServiceAnnotationPostProcessor.class);
 
+    private BeanNameGenerator beanNameGenerator = new AnnotationBeanNameGenerator();
     private Set<String> packagesToScan;
 
     private ClassLoader classLoader;
@@ -45,7 +46,6 @@ public class ServiceAnnotationPostProcessor implements BeanDefinitionRegistryPos
 
     @Override
     public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) throws BeansException {
-        registerInvoker(registry);
 
         Set<String> resolvedPackages = resolvePackages();
 
@@ -79,6 +79,12 @@ public class ServiceAnnotationPostProcessor implements BeanDefinitionRegistryPos
 
             Service service = clazz.getAnnotation(Service.class);
 
+            String serviceName = service.refName();
+            if (StringUtils.isEmpty(serviceName)) {
+                serviceName = beanNameGenerator.generateBeanName(beanDefinition, registry);
+            }
+            registry.registerBeanDefinition(serviceName, beanDefinition);
+
             services.add(service);
 
         }
@@ -93,16 +99,7 @@ public class ServiceAnnotationPostProcessor implements BeanDefinitionRegistryPos
         AbstractBeanDefinition beanDefinition = BeanDefinitionBuilder.genericBeanDefinition(ServiceBean.class)
                 .addPropertyValue("services", services)
                 .getBeanDefinition();
-        registry.registerBeanDefinition(ServiceBean.SERVICE_BEAN_NAME, beanDefinition);
-    }
-
-    private void registerInvoker(BeanDefinitionRegistry registry) {
-        AbstractBeanDefinition beanDefinition = BeanDefinitionBuilder
-                .rootBeanDefinition(RpcRemoteInvoker.class)
-                .getBeanDefinition();
-        if (!registry.containsBeanDefinition(RpcRemoteInvoker.RPC_REMOTE_INVOKER_BEAN_NAME)) {
-            registry.registerBeanDefinition(RpcRemoteInvoker.RPC_REMOTE_INVOKER_BEAN_NAME, beanDefinition);
-        }
+        registry.registerBeanDefinition(ServiceBean.SERVICE_BEAN, beanDefinition);
     }
 
     private Set<String> resolvePackages() {
@@ -116,7 +113,6 @@ public class ServiceAnnotationPostProcessor implements BeanDefinitionRegistryPos
 
     @Override
     public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
-
     }
 
     private Class<?> getClass(String beanClassName) {

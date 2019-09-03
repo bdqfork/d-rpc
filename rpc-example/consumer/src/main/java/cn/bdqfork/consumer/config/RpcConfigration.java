@@ -1,9 +1,7 @@
-package cn.bdqfork.consuemr.config;
+package cn.bdqfork.consumer.config;
 
 import cn.bdqfork.rpc.config.ApplicationConfig;
-import cn.bdqfork.rpc.config.ProtocolConfig;
 import cn.bdqfork.rpc.config.RegistryConfig;
-import cn.bdqfork.rpc.registry.zookeeper.ZkRegistry;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

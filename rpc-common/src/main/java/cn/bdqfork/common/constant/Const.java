@@ -20,4 +20,9 @@ public class Const {
     public static final String SERVER_KEY = "server";
     public static final String SERIALIZATION_KEY = "serialization";
     public static final String TIMEOUT_KEY = "timeout";
+    public static final String RETRY_KEY = "retry";
+    public static final String INTERFACE_KEY = "interface";
+    public static final String VERSION_KEY = "version";
+    public static final String ENVIRONMENT_KEY = "environment";
+    public static final String CONNECTIONS_KEY = "connections";
 }

@@ -1,17 +1,15 @@
 package cn.bdqfork.rpc.registry;
 
-import cn.bdqfork.rpc.config.RegistryConfig;
+import cn.bdqfork.rpc.Node;
 
 import java.util.List;
-import java.util.Set;
 
 /**
  * @author bdq
  * @since 2019-02-26
  */
-public interface Registry {
+public interface Registry extends Node {
     String DEFAULT_ROOT = "rpc";
-    String REGISTRY_NAME = "registry";
 
     /**
      * 是否在运行
@@ -35,20 +33,19 @@ public interface Registry {
     void register(List<URL> urls);
 
     /**
-     * 订阅服务，同时返回服务节点信息
+     * 订阅服务
      *
      * @param url
-     * @param notifier
      */
     void subscribe(URL url, Notifier notifier);
 
     /**
-     * 获取服务地址
+     * 返回服务节点信息
      *
      * @param url
      * @return
      */
-    Set<String> getServiceAddress(URL url);
+    List<URL> lookup(URL url);
 
     /**
      * 关闭连接

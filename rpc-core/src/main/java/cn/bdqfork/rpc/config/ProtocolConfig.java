@@ -15,7 +15,13 @@ public class ProtocolConfig {
      * 端口号
      */
     private Integer port;
+    /**
+     * transport方式
+     */
     private String server = "netty";
+    /**
+     * 序列化方式
+     */
     private String serialization = "hessian";
 
     public String getHost() {

@@ -1,9 +1,10 @@
 package cn.bdqfork.rpc.protocol;
 
 import cn.bdqfork.common.constant.Const;
+import cn.bdqfork.rpc.RpcInvocation;
 import cn.bdqfork.rpc.remote.RpcResponse;
-import cn.bdqfork.rpc.remote.context.RpcContext;
 import cn.bdqfork.rpc.remote.Serializer;
+import cn.bdqfork.rpc.remote.context.RpcContext;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
@@ -23,7 +24,7 @@ public class DataEncoder extends MessageToByteEncoder<Object> {
     protected void encode(ChannelHandlerContext ctx, Object msg, ByteBuf out) throws Exception {
         byte[] data = serializer.serialize(msg);
         out.writeInt(data.length + 1);
-        if (msg instanceof RpcContext.Context) {
+        if (msg instanceof RpcContext) {
             out.writeByte(Const.REQUEST_FLAGE);
         } else if (msg instanceof RpcResponse) {
             out.writeByte(Const.RESPOSE_FLAGE);

@@ -5,7 +5,7 @@ package cn.bdqfork.rpc.registry.event;
  * @since 2019-03-01
  */
 public enum NodeEvent {
-    NONE("none"), CHANGED("changed");
+    NONE("none"), CREATED("created"),CHANGED("changed"),DELETED("deleted");
     private final String name;
 
     NodeEvent(String name) {

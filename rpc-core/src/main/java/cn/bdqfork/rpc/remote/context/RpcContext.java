@@ -1,105 +1,86 @@
 package cn.bdqfork.rpc.remote.context;
 
 
-import cn.bdqfork.rpc.remote.RpcResponse;
+import cn.bdqfork.rpc.registry.URL;
 
-import java.beans.Transient;
 import java.io.Serializable;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author bdq
  * @since 2019-03-01
  */
 public class RpcContext implements Serializable {
-    private static Map<String, DefaultFuture> futureMap = new ConcurrentHashMap<>();
+    private URL url;
 
-    private Context context;
+    private String requestId;
+
+    private String serviceInterface;
+
+    private String refName;
+
+    private String methodName;
+
+    private Class<?>[] parameterTypes;
+
+    private Object[] arguments;
 
     public RpcContext(String requestId) {
-        this.context = new Context(requestId);
+        this.requestId = requestId;
     }
 
-    public Context getContext() {
-        return context;
+    public URL getUrl() {
+        return url;
     }
 
-    public static void registerContext(String requestId, DefaultFuture future) {
-        futureMap.put(requestId, future);
+    public void setUrl(URL url) {
+        this.url = url;
     }
 
-    public static void doReceived(RpcResponse rpcResponse) {
-        DefaultFuture future = futureMap.get(rpcResponse.getRequestId());
-        if (future != null) {
-            future.setResult(rpcResponse);
-            futureMap.remove(rpcResponse.getRequestId());
-        }
+    public String getRequestId() {
+        return requestId;
     }
 
-    public static void removeContext(String requestId) {
-        futureMap.remove(requestId);
+    public void setRequestId(String requestId) {
+        this.requestId = requestId;
     }
 
-    public class Context implements Serializable {
-        private String requestId;
-        private String serviceInterface;
-        private String refName;
-        private String methodName;
-        private Class<?>[] parameterTypes;
-        private Object[] arguments;
+    public String getServiceInterface() {
+        return serviceInterface;
+    }
 
-        private Context(String requestId) {
-            this.requestId = requestId;
-        }
+    public void setServiceInterface(String serviceInterface) {
+        this.serviceInterface = serviceInterface;
+    }
 
-        public String getRequestId() {
-            return requestId;
-        }
+    public String getRefName() {
+        return refName;
+    }
 
-        public void setRequestId(String requestId) {
-            this.requestId = requestId;
-        }
+    public void setRefName(String refName) {
+        this.refName = refName;
+    }
 
-        public String getServiceInterface() {
-            return serviceInterface;
-        }
+    public String getMethodName() {
+        return methodName;
+    }
 
-        public void setServiceInterface(String serviceInterface) {
-            this.serviceInterface = serviceInterface;
-        }
+    public void setMethodName(String methodName) {
+        this.methodName = methodName;
+    }
 
-        public String getRefName() {
-            return refName;
-        }
+    public Class<?>[] getParameterTypes() {
+        return parameterTypes;
+    }
 
-        public void setRefName(String refName) {
-            this.refName = refName;
-        }
+    public void setParameterTypes(Class<?>[] parameterTypes) {
+        this.parameterTypes = parameterTypes;
+    }
 
-        public String getMethodName() {
-            return methodName;
-        }
+    public Object[] getArguments() {
+        return arguments;
+    }
 
-        public void setMethodName(String methodName) {
-            this.methodName = methodName;
-        }
-
-        public Class<?>[] getParameterTypes() {
-            return parameterTypes;
-        }
-
-        public void setParameterTypes(Class<?>[] parameterTypes) {
-            this.parameterTypes = parameterTypes;
-        }
-
-        public Object[] getArguments() {
-            return arguments;
-        }
-
-        public void setArguments(Object[] arguments) {
-            this.arguments = arguments;
-        }
-
+    public void setArguments(Object[] arguments) {
+        this.arguments = arguments;
     }
 }

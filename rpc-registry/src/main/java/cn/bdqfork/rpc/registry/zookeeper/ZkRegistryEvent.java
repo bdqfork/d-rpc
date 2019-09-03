@@ -19,8 +19,14 @@ public class ZkRegistryEvent implements RegistryEvent {
 
     @Override
     public NodeEvent getEvent() {
-        if (Watcher.Event.EventType.NodeChildrenChanged == watchEvent.getType()) {
+        if (Watcher.Event.EventType.NodeCreated == watchEvent.getType()) {
+            return NodeEvent.CREATED;
+        }
+        if (Watcher.Event.EventType.NodeDataChanged == watchEvent.getType() || Watcher.Event.EventType.NodeChildrenChanged == watchEvent.getType()) {
             return NodeEvent.CHANGED;
+        }
+        if (Watcher.Event.EventType.NodeDeleted == watchEvent.getType()) {
+            return NodeEvent.DELETED;
         }
         return NodeEvent.NONE;
     }

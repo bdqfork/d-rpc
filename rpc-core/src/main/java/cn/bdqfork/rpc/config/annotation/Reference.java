@@ -13,12 +13,14 @@ public @interface Reference {
 
     String group() default "rpc";
 
-    Class<?> serviceInterface();
+    Class<?> serviceInterface() default void.class;
 
     String refName() default "";
 
     long timeout() default 3000;
 
     int retries() default 0;
+
+    int connections() default 1;
 
 }

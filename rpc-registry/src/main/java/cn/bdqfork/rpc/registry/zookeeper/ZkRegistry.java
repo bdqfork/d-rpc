@@ -1,6 +1,7 @@
 package cn.bdqfork.rpc.registry.zookeeper;
 
 import cn.bdqfork.common.constant.Const;
+import cn.bdqfork.common.exception.RpcException;
 import cn.bdqfork.rpc.config.RegistryConfig;
 import cn.bdqfork.rpc.registry.AbstractRegistry;
 import cn.bdqfork.rpc.registry.Notifier;
@@ -16,10 +17,8 @@ import org.apache.zookeeper.ZooDefs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author bdq
@@ -27,7 +26,6 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class ZkRegistry extends AbstractRegistry {
     private static final Logger log = LoggerFactory.getLogger(ZkRegistry.class);
-
     private CuratorFramework client;
 
     public ZkRegistry(RegistryConfig registryConfig) {
@@ -59,8 +57,8 @@ public class ZkRegistry extends AbstractRegistry {
     }
 
     private void recover() {
-        cacheNodeMap.values().forEach(this::register);
-        cacheWatcherMap.values().forEach(cacheWatcher -> subscribe(cacheWatcher.getUrl(), cacheWatcher.getNotifier()));
+        cacheNodes.values().forEach(this::register);
+        cacheWatchers.values().forEach(watcher -> subscribe(watcher.getUrl(), watcher.getNotifier()));
     }
 
     @Override
@@ -68,14 +66,12 @@ public class ZkRegistry extends AbstractRegistry {
         String group = url.getParameter(Const.GROUP_KEY, DEFAULT_ROOT);
         String path = "/" + group + url.toPath();
         try {
-            if (client.checkExists().forPath(path) == null) {
-                client.create()
-                        .creatingParentsIfNeeded()
-                        .withMode(CreateMode.EPHEMERAL)
-                        .withACL(ZooDefs.Ids.OPEN_ACL_UNSAFE)
-                        .forPath(path, url.buildString().getBytes(StandardCharsets.UTF_8));
-            }
-            cacheNodeMap.putIfAbsent(path, url);
+            client.create()
+                    .creatingParentsIfNeeded()
+                    .withMode(CreateMode.EPHEMERAL)
+                    .withACL(ZooDefs.Ids.OPEN_ACL_UNSAFE)
+                    .forPath(path, url.buildString().getBytes(StandardCharsets.UTF_8));
+            cacheNodes.putIfAbsent(path, url);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
@@ -89,34 +85,41 @@ public class ZkRegistry extends AbstractRegistry {
     @Override
     public void subscribe(URL url, Notifier notifier) {
         String group = url.getParameter(Const.GROUP_KEY, DEFAULT_ROOT);
-        String path = "/" + group + url.toServicePath();
+        String path = "/" + group + url.toServiceCategory() + "/" + Const.PROTOCOL_PROVIDER;
         try {
             if (client.checkExists().forPath(path) != null) {
-                client.getChildren().usingWatcher(new Watcher() {
-                    @Override
-                    public void process(WatchedEvent event) {
-                        notifier.notify(url, new ZkRegistryEvent(event));
-                    }
-                }).forPath(path);
-                CacheWatcher cacheWatcher = new CacheWatcher(url, notifier);
-                cacheWatcherMap.putIfAbsent(path, cacheWatcher);
+                client.getChildren()
+                        .usingWatcher(new Watcher() {
+                            @Override
+                            public void process(WatchedEvent event) {
+                                try {
+                                    notifier.notify(url, new ZkRegistryEvent(event) {
+                                    });
+                                } catch (RpcException e) {
+                                    log.error(e.getMessage(), e);
+                                }
+                            }
+                        })
+                        .forPath(path);
+                CacheWatcher watcher = new CacheWatcher(url, notifier);
+                cacheWatchers.putIfAbsent(path, watcher);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.getMessage(), e);
         }
     }
 
     @Override
-    public Set<String> getServiceAddress(URL url) {
+    public List<URL> lookup(URL url) {
         String group = url.getParameter(Const.GROUP_KEY, DEFAULT_ROOT);
-        String path = "/" + group + url.toServicePath();
+        String path = "/" + group + url.toServiceCategory() + "/" + Const.PROTOCOL_PROVIDER;
         try {
             if (client.checkExists().forPath(path) != null) {
-                Set<String> urls = new HashSet<>();
+                List<URL> urls = new LinkedList<>();
                 for (String children : client.getChildren().forPath(path)) {
                     byte[] data = client.getData().forPath(path + "/" + children);
                     if (data != null) {
-                        urls.add(new String(data, StandardCharsets.UTF_8));
+                        urls.add(new URL(new String(data, StandardCharsets.UTF_8)));
                     }
                 }
                 return urls;
@@ -124,7 +127,7 @@ public class ZkRegistry extends AbstractRegistry {
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
-        return Collections.emptySet();
+        return Collections.emptyList();
     }
 
     @Override
@@ -135,4 +138,18 @@ public class ZkRegistry extends AbstractRegistry {
         running = false;
     }
 
+    @Override
+    public URL getUrl() {
+        return null;
+    }
+
+    @Override
+    public Class getInterface() {
+        return null;
+    }
+
+    @Override
+    public boolean isAvailable() {
+        return false;
+    }
 }

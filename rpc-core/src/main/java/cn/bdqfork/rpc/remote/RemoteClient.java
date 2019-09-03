@@ -23,4 +23,6 @@ public interface RemoteClient {
     String getHost();
 
     Integer getPort();
+
+    boolean isRunning();
 }

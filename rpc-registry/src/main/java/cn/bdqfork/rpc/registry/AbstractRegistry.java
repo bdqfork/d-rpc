@@ -8,10 +8,8 @@ import java.util.concurrent.ConcurrentHashMap;
  * @since 2019-03-03
  */
 public abstract class AbstractRegistry implements Registry {
-    protected Map<String, URL> cacheNodeMap = new ConcurrentHashMap<>();
-
-    protected Map<String, CacheWatcher> cacheWatcherMap = new ConcurrentHashMap<>();
-
+    protected Map<String, URL> cacheNodes = new ConcurrentHashMap<>();
+    protected Map<String, CacheWatcher> cacheWatchers = new ConcurrentHashMap<>();
     protected boolean running;
 
     @Override

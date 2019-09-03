@@ -30,7 +30,6 @@ public class TestZookeeper {
 
         registry.register(url);
 
-        registry.getServiceAddress(url).forEach(System.out::println);
     }
 
 }

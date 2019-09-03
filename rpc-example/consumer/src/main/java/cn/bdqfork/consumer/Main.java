@@ -1,7 +1,7 @@
-package cn.bdqfork.consuemr;
+package cn.bdqfork.consumer;
 
 import cn.bdqfork.common.exception.RpcException;
-import cn.bdqfork.consuemr.client.UserServiceManager;
+import cn.bdqfork.consumer.client.UserServiceManager;
 import cn.bdqfork.rpc.config.annotation.RpcComponentScan;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.ComponentScan;

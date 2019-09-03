@@ -1,4 +1,4 @@
-package cn.bdqfork.consuemr.client;
+package cn.bdqfork.consumer.client;
 
 import cn.bdqfork.provider.api.UserService;
 import cn.bdqfork.rpc.config.annotation.Reference;

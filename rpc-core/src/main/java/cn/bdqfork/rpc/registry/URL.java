@@ -1,5 +1,9 @@
 package cn.bdqfork.rpc.registry;
 
+import cn.bdqfork.common.constant.Const;
+import org.apache.commons.lang3.StringUtils;
+
+import java.io.Serializable;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
@@ -10,7 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author bdq
  * @since 2019-02-26
  */
-public class URL {
+public class URL implements Serializable {
     /**
      * 协议名
      */
@@ -35,6 +39,14 @@ public class URL {
         this.host = host;
         this.port = port;
         this.service = service;
+    }
+
+    public URL(URL url) {
+        this.protocol = url.getProtocol();
+        this.host = url.getHost();
+        this.port = url.getPort();
+        this.service = url.getServiceName();
+        this.parameterMap = url.getParameterMap();
     }
 
     public URL(String urlString) {
@@ -66,21 +78,35 @@ public class URL {
         return "/" + service;
     }
 
-    public String toServicePath() {
-        return "/" + service + "/" + parameterMap.get("side");
-    }
-
     public String toPath() {
-        return toServicePath() + "/" + host + ":" + port;
+        return toServiceCategory() + "/" + parameterMap.get(Const.SIDE_KEY) + "/" + host + ":" + port;
     }
 
     public void addParameter(String key, String value) {
-        parameterMap.put(key, value);
+        if (!StringUtils.isEmpty(value)) {
+            parameterMap.put(key, value);
+        }
+    }
+
+    public String getParameter(String key) {
+        return parameterMap.get(key);
     }
 
     public String getParameter(String key, String defaultValue) {
         String value = parameterMap.get(key);
         return value == null ? defaultValue : value;
+    }
+
+    public Map<String, String> getParameterMap() {
+        return parameterMap;
+    }
+
+    public void setParameterMap(Map<String, String> parameterMap) {
+        this.parameterMap.putAll(parameterMap);
+    }
+
+    public void clear() {
+        this.parameterMap.clear();
     }
 
     public String buildString() {
@@ -111,6 +137,10 @@ public class URL {
         return service;
     }
 
+    public String getProtocol() {
+        return protocol;
+    }
+
     public void setProtocol(String protocol) {
         this.protocol = protocol;
     }
@@ -125,12 +155,8 @@ public class URL {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
         URL url = (URL) o;
         return port == url.port &&
                 Objects.equals(protocol, url.protocol) &&
@@ -143,6 +169,5 @@ public class URL {
     public int hashCode() {
         return Objects.hash(protocol, host, port, service, parameterMap);
     }
-
 }
 

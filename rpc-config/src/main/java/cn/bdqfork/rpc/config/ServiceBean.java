@@ -1,38 +1,42 @@
 package cn.bdqfork.rpc.config;
 
 import cn.bdqfork.common.constant.Const;
-import cn.bdqfork.common.extension.ExtensionUtils;
+import cn.bdqfork.common.exception.RpcException;
+import cn.bdqfork.common.extension.ExtensionLoader;
+import cn.bdqfork.rpc.Invoker;
+import cn.bdqfork.rpc.RegistryProtocol;
 import cn.bdqfork.rpc.config.annotation.Service;
-import cn.bdqfork.rpc.exporter.ServiceExporter;
+import cn.bdqfork.rpc.exporter.Exporter;
 import cn.bdqfork.rpc.registry.Registry;
+import cn.bdqfork.rpc.registry.RegistryFactory;
 import cn.bdqfork.rpc.registry.URL;
-import cn.bdqfork.rpc.remote.ProviderServer;
-import cn.bdqfork.rpc.remote.ProviderServerFactory;
-import cn.bdqfork.rpc.remote.RpcResponse;
-import cn.bdqfork.rpc.remote.invoker.Invoker;
+import cn.bdqfork.rpc.remote.RpcServer;
+import cn.bdqfork.rpc.remote.RpcServerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.DisposableBean;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 
+import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.Map;
 
 /**
  * @author bdq
  * @since 2019-03-03
  */
-public class ServiceBean extends AbstractRpcBean {
+public class ServiceBean implements InitializingBean, ApplicationContextAware, DisposableBean {
     private static final Logger log = LoggerFactory.getLogger(ServiceBean.class);
-    public static final String SERVICE_BEAN_NAME = "serviceBean";
-
-    private ProviderServerFactory providerServerFactory = ExtensionUtils.getExtension(ProviderServerFactory.class);
-
+    public static final String SERVICE_BEAN = "serviceBean";
+    private RegistryFactory registryFactory = ExtensionLoader.getExtension(RegistryFactory.class);
+    private ApplicationContext applicationContext;
+    private RpcServerFactory serverFactory = ExtensionLoader.getExtension(RpcServerFactory.class);
     private Registry registry;
-
-    private ProviderServer providerServer;
-
-    private ServiceExporter exporter;
-
-    private List<Service> services = new CopyOnWriteArrayList<>();
+    private RpcServer rpcServer;
+    private List<Service> services;
 
     @Override
     public void destroy() throws Exception {
@@ -40,37 +44,51 @@ public class ServiceBean extends AbstractRpcBean {
         log.info("closing server");
 
         registry.close();
-        providerServer.close();
+        rpcServer.close();
 
         log.info("server closed");
     }
 
-
+    @SuppressWarnings("unchecked")
     @Override
     public void afterPropertiesSet() throws Exception {
-        registry = getOrCreateRegistry();
 
-        ProtocolConfig protocolConfig = context.getBean(ProtocolConfig.class);
+        RegistryConfig registryConfig = applicationContext.getBean(RegistryConfig.class);
 
-        exporter = new ServiceExporter(registry);
+        registry = registryFactory.createRegistry(registryConfig);
 
-        ApplicationConfig applicationConfig = context.getBean(ApplicationConfig.class);
+        RegistryProtocol registryProtocol = new RegistryProtocol(registry);
 
-        services.stream()
-                .map(service -> buildUrl(protocolConfig, applicationConfig, service))
-                .forEach(url -> exporter.export(url));
+        ApplicationConfig applicationConfig = applicationContext.getBean(ApplicationConfig.class);
 
-        Invoker<RpcResponse> invoker = context.getBean(RpcRemoteInvoker.RPC_REMOTE_INVOKER_BEAN_NAME, RpcRemoteInvoker.class);
+        ProtocolConfig protocolConfig = applicationContext.getBean(ProtocolConfig.class);
 
-        providerServer = providerServerFactory.createProviderServer(protocolConfig, invoker);
+        Map<String, Invoker> urlInvokers = new HashMap<>();
+
+        services.forEach(service -> {
+            URL url = buildUrl(protocolConfig, applicationConfig, service);
+            Class type = service.serviceInterface();
+            Object proxy = applicationContext.getBean(type);
+            Invoker invoker = null;
+            try {
+                invoker = registryProtocol.getInvoker(proxy, type, url);
+            } catch (RpcException e) {
+                e.printStackTrace();
+            }
+            urlInvokers.put(url.buildString(), invoker);
+        });
+
+        rpcServer = serverFactory.createProviderServer(protocolConfig, urlInvokers);
 
         log.info("starting server");
-
-        providerServer.start();
-
+        rpcServer.start();
         log.info("server started");
 
-        services.clear();
+        urlInvokers.values().forEach(invoker -> {
+            Exporter exporter = registryProtocol.export(invoker);
+            exporter.doExport();
+        });
+
     }
 
     private URL buildUrl(ProtocolConfig protocolConfig, ApplicationConfig applicationConfig, Service service) {
@@ -83,11 +101,16 @@ public class ServiceBean extends AbstractRpcBean {
         url.addParameter(Const.SERVER_KEY, protocolConfig.getServer());
         url.addParameter(Const.SERIALIZATION_KEY, protocolConfig.getSerialization());
         url.addParameter(Const.TIMEOUT_KEY, String.valueOf(service.timeout()));
+        url.addParameter(Const.RETRY_KEY, String.valueOf(service.retries()));
         return url;
     }
 
     public void setServices(List<Service> services) {
-        this.services.addAll(services);
+        this.services = services;
     }
 
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
+    }
 }

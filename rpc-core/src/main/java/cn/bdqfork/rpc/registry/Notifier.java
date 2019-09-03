@@ -1,6 +1,7 @@
 package cn.bdqfork.rpc.registry;
 
 
+import cn.bdqfork.common.exception.RpcException;
 import cn.bdqfork.rpc.registry.event.RegistryEvent;
 
 /**
@@ -14,5 +15,5 @@ public interface Notifier {
      * @param url
      * @param event
      */
-    void notify(URL url, RegistryEvent event);
+    void notify(URL url, RegistryEvent event) throws RpcException;
 }

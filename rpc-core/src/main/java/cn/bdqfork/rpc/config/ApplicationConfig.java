@@ -10,24 +10,47 @@ public class ApplicationConfig {
      */
     private String applicationName;
     /**
-     * 全局超时
+     * 应用版本
      */
-    private int globalTimeout;
+    private String version;
+    /**
+     * 应用环境，test或者production
+     */
+    private String environment;
+    /**
+     * 代理方式,jdk或者javassist
+     */
+    private String compiler;
 
     public String getApplicationName() {
         return applicationName;
     }
 
-    public ApplicationConfig setApplicationName(String applicationName) {
+    public void setApplicationName(String applicationName) {
         this.applicationName = applicationName;
-        return this;
     }
 
-    public int getGlobalTimeout() {
-        return globalTimeout;
+    public String getVersion() {
+        return version;
     }
 
-    public void setGlobalTimeout(int globalTimeout) {
-        this.globalTimeout = globalTimeout;
+    public void setVersion(String version) {
+        this.version = version;
+    }
+
+    public String getEnvironment() {
+        return environment;
+    }
+
+    public void setEnvironment(String environment) {
+        this.environment = environment;
+    }
+
+    public String getCompiler() {
+        return compiler;
+    }
+
+    public void setCompiler(String compiler) {
+        this.compiler = compiler;
     }
 }
