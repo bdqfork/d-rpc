@@ -9,6 +9,7 @@ import org.apache.curator.RetryPolicy;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.framework.recipes.cache.TreeCache;
+import org.apache.curator.framework.recipes.cache.TreeCacheEvent;
 import org.apache.curator.retry.RetryNTimes;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.ZooDefs;
@@ -87,18 +88,25 @@ public class ZkRegistry extends AbstractRegistry {
             treeCache.start();
             treeCache.getListenable().addListener((curatorFramework, treeCacheEvent) -> {
                 for (String children : client.getChildren().forPath(path)) {
-                    List<URL> urls = new ArrayList<>();
-                    byte[] data = client.getData().forPath(path + "/" + children);
-                    if (data != null) {
-                        urls.add(new URL(new String(data, StandardCharsets.UTF_8)));
+                    if (isMatch(treeCacheEvent)) {
+                        List<URL> urls = new ArrayList<>();
+                        byte[] data = client.getData().forPath(path + "/" + children);
+                        if (data != null) {
+                            urls.add(new URL(new String(data, StandardCharsets.UTF_8)));
+                        }
+                        notifier.notify(urls);
                     }
-                    notifier.notify(urls);
                 }
             });
             cacheWatchers.putIfAbsent(path, new CacheWatcher(url, notifier));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
+    }
+
+    private boolean isMatch(TreeCacheEvent treeCacheEvent) {
+        return treeCacheEvent.getType() == TreeCacheEvent.Type.NODE_ADDED || treeCacheEvent.getType() == TreeCacheEvent.Type.NODE_UPDATED ||
+                treeCacheEvent.getType() == TreeCacheEvent.Type.NODE_REMOVED;
     }
 
     @Override

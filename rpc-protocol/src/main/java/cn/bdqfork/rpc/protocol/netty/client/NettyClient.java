@@ -1,22 +1,17 @@
 package cn.bdqfork.rpc.protocol.netty.client;
 
 import cn.bdqfork.common.exception.RpcException;
-import cn.bdqfork.rpc.protocol.NettyChannel;
 import cn.bdqfork.rpc.protocol.netty.NettyInitializer;
 import cn.bdqfork.rpc.remote.RemoteClient;
 import cn.bdqfork.rpc.remote.Request;
 import cn.bdqfork.rpc.remote.context.DefaultFuture;
 import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelFutureListener;
-import io.netty.channel.EventLoopGroup;
+import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -29,14 +24,20 @@ public class NettyClient implements RemoteClient {
     private String host;
     private Integer port;
     private Channel channel;
-    private boolean isRunning;
-    private NettyInitializer nettyInitializer;
+    private volatile boolean isRunning = true;
     private EventLoopGroup group;
+    private Bootstrap bootstrap;
 
     public NettyClient(String host, Integer port, NettyInitializer nettyInitializer) {
         this.host = host;
         this.port = port;
-        this.nettyInitializer = nettyInitializer;
+        group = new NioEventLoopGroup();
+        bootstrap = new Bootstrap();
+        bootstrap.group(group)
+                .channel(NioSocketChannel.class)
+                .option(ChannelOption.SO_KEEPALIVE, true)
+                .remoteAddress(host, port)
+                .handler(nettyInitializer);
         doConnect();
     }
 
@@ -44,18 +45,26 @@ public class NettyClient implements RemoteClient {
         if (channel != null && channel.isActive()) {
             return;
         }
-        group = new NioEventLoopGroup();
         try {
-            Bootstrap bootstrap = new Bootstrap();
-            bootstrap.group(group)
-                    .channel(NioSocketChannel.class)
-                    .remoteAddress(host, port)
-                    .handler(nettyInitializer);
-            bootstrap.connect().sync();
-            isRunning = true;
+            ChannelFuture channelFuture = bootstrap.connect();
+            channelFuture.addListener(new ChannelFutureListener() {
+                @Override
+                public void operationComplete(ChannelFuture future) throws Exception {
+                    Channel newChannel = future.channel();
+                    if (future.isSuccess()) {
+                        channel = newChannel;
+                    } else {
+                        newChannel.eventLoop().schedule(new Runnable() {
+                            @Override
+                            public void run() {
+                                doConnect();
+                            }
+                        }, 10, TimeUnit.SECONDS);
+                    }
+                }
+            }).sync();
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            close();
         }
     }
 
@@ -75,8 +84,8 @@ public class NettyClient implements RemoteClient {
         try {
             send(request);
         } catch (RpcException e) {
-            defaultFuture.cancle();
             log.error(e.getMessage(), e);
+            defaultFuture.cancle();
         }
 
         return defaultFuture;
@@ -84,7 +93,6 @@ public class NettyClient implements RemoteClient {
 
     private void send(Object data) throws RpcException {
         doConnect();
-        Channel channel = NettyChannel.getChannel(host, port);
         ChannelFuture future = channel.writeAndFlush(data);
         try {
             future.await();
@@ -112,11 +120,7 @@ public class NettyClient implements RemoteClient {
     }
 
     public void close() {
-        try {
-            isRunning = false;
-            group.shutdownGracefully().sync();
-        } catch (InterruptedException e) {
-            log.error(e.getMessage(), e);
-        }
+        isRunning = false;
+        log.debug("client closed");
     }
 }
