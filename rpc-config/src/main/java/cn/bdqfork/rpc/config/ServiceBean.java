@@ -20,6 +20,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,7 +44,7 @@ public class ServiceBean implements InitializingBean, ApplicationContextAware, D
 
         log.info("closing server");
 
-        registry.close();
+        registry.destroy();
         rpcServer.close();
 
         log.info("server closed");
@@ -63,7 +64,7 @@ public class ServiceBean implements InitializingBean, ApplicationContextAware, D
 
         ProtocolConfig protocolConfig = applicationContext.getBean(ProtocolConfig.class);
 
-        Map<String, Invoker> urlInvokers = new HashMap<>();
+        List<Invoker<?>> invokers = new ArrayList<>();
 
         services.forEach(service -> {
             URL url = buildUrl(protocolConfig, applicationConfig, service);
@@ -75,16 +76,16 @@ public class ServiceBean implements InitializingBean, ApplicationContextAware, D
             } catch (RpcException e) {
                 e.printStackTrace();
             }
-            urlInvokers.put(url.buildString(), invoker);
+            invokers.add(invoker);
         });
 
-        rpcServer = serverFactory.createProviderServer(protocolConfig, urlInvokers);
+        rpcServer = serverFactory.createProviderServer(protocolConfig, invokers);
 
         log.info("starting server");
         rpcServer.start();
         log.info("server started");
 
-        urlInvokers.values().forEach(invoker -> {
+        invokers.forEach(invoker -> {
             Exporter exporter = registryProtocol.export(invoker);
             exporter.doExport();
         });

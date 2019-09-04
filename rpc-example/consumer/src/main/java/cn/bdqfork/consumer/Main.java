@@ -13,7 +13,7 @@ import org.springframework.context.annotation.ComponentScan;
 @ComponentScan
 @RpcComponentScan(basePackages = "cn.bdqfork.consumer.client")
 public class Main {
-    public static void main(String[] args) throws RpcException {
+    public static void main(String[] args)  {
 
         AnnotationConfigApplicationContext applicationContext = new AnnotationConfigApplicationContext(Main.class);
 
@@ -25,7 +25,7 @@ public class Main {
             try {
                 userServiceManager.sayHello();
                 Thread.sleep(1000);
-            } catch (Throwable e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }

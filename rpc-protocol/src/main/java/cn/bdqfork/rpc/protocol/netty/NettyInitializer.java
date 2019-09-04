@@ -23,7 +23,7 @@ public class NettyInitializer extends ChannelInitializer<SocketChannel> {
 
     @Override
     protected void initChannel(SocketChannel ch) throws Exception {
-        ch.pipeline().addLast(new LengthFieldBasedFrameDecoder(64 * 1024, 0, 4, 0, 4))
+        ch.pipeline().addLast(new LengthFieldBasedFrameDecoder(64 * 1024, 9, 4, 0, 0))
                 .addLast(new DataDecoder(serializer))
                 .addLast(new DataEncoder(serializer))
                 .addLast(channelHandlerElement.getHandlersToInit());

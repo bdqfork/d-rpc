@@ -27,7 +27,7 @@ public class InvokerInvocationHandler implements InvocationHandler {
         if (result != null) {
             return result;
         }
-        RpcInvocation rpcInvocation = new RpcInvocation(method, args);
+        RpcInvocation rpcInvocation = new RpcInvocation(method.getName(), method.getParameterTypes(), args);
         return invoker.invoke(rpcInvocation).getData();
     }
 

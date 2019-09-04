@@ -2,7 +2,7 @@ package cn.bdqfork.rpc;
 
 import cn.bdqfork.common.exception.RpcException;
 import cn.bdqfork.rpc.registry.URL;
-import cn.bdqfork.rpc.remote.RpcResponse;
+import cn.bdqfork.rpc.remote.Result;
 
 import java.util.List;
 
@@ -11,33 +11,37 @@ import java.util.List;
  * @since 2019-08-28
  */
 public abstract class AbstractClusterInvoker<T> implements Invoker<T> {
-    private Directory<T> directory;
+    private RegistryDirectory<T> registryDirectory;
 
-    public AbstractClusterInvoker(Directory<T> directory) {
-        this.directory = directory;
+    public AbstractClusterInvoker(RegistryDirectory<T> registryDirectory) {
+        this.registryDirectory = registryDirectory;
     }
 
     @Override
-    public RpcResponse invoke(Invocation invocation) throws RpcException {
-        List<Invoker<T>> invokers = directory.list();
+    public Result invoke(Invocation invocation) throws RpcException {
+        List<Invoker<T>> invokers = registryDirectory.list(invocation);
         return doInvoke(invocation, invokers, null);
     }
 
-    protected abstract RpcResponse doInvoke(Invocation invocation, List<Invoker<T>> invokers, LoadBalance loadBalance) throws RpcException;
+    protected abstract Result doInvoke(Invocation invocation, List<Invoker<T>> invokers, LoadBalance loadBalance) throws RpcException;
 
     @Override
     public Class<T> getInterface() {
-        return directory.getServiceInterface();
+        return registryDirectory.getServiceInterface();
     }
 
     @Override
     public URL getUrl() {
-        return directory.getUrl();
+        return registryDirectory.getUrl();
     }
 
     @Override
     public boolean isAvailable() {
-        return directory.isAvailable();
+        return registryDirectory.isAvailable();
     }
 
+    @Override
+    public void destroy() {
+        registryDirectory.destroy();
+    }
 }

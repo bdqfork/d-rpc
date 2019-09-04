@@ -1,19 +1,20 @@
 package cn.bdqfork.rpc.protocol.netty.provider;
 
-import cn.bdqfork.rpc.RpcInvocation;
+import cn.bdqfork.common.constant.Const;
+import cn.bdqfork.rpc.Invocation;
 import cn.bdqfork.rpc.Invoker;
-import cn.bdqfork.rpc.registry.URL;
-import cn.bdqfork.rpc.remote.RpcResponse;
-import cn.bdqfork.rpc.remote.context.RpcContext;
+import cn.bdqfork.rpc.remote.Request;
+import cn.bdqfork.rpc.remote.Response;
+import cn.bdqfork.rpc.remote.Result;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.Method;
-import java.util.Collections;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author bdq
@@ -22,29 +23,27 @@ import java.util.Map;
 @ChannelHandler.Sharable
 public class InvokerHandler extends ChannelInboundHandlerAdapter {
     private static final Logger log = LoggerFactory.getLogger(InvokerHandler.class);
-    private final Map<String, Invoker> urlInvokers;
+    private final Map<String, Invoker> invokers = new ConcurrentHashMap<>();
 
-    public InvokerHandler(Map<String, Invoker> urlInvokers) {
-        this.urlInvokers = Collections.unmodifiableMap(urlInvokers);
+    public InvokerHandler(List<Invoker<?>> invokers) {
+        invokers.forEach(invoker -> this.invokers.put(invoker.getInterface().getName(), invoker));
     }
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        RpcContext rpcContext = (RpcContext) msg;
-        String url = rpcContext.getUrl().buildString();
+        Request request = (Request) msg;
+        Invocation invocation = (Invocation) request.getData();
 
-        Invoker invoker = urlInvokers.get(url);
-
-        Class<?> serviceInterface = invoker.getInterface();
-        Method method = serviceInterface.getMethod(rpcContext.getMethodName(), rpcContext.getParameterTypes());
-        RpcInvocation rpcInvocation = new RpcInvocation(method, rpcContext.getArguments());
-        rpcInvocation.setRpcContext(rpcContext);
-
+        String serviceInterface = invocation.getAttachments().get(Const.INTERFACE_KEY);
+        Invoker<?> invoker = invokers.get(serviceInterface);
         if (invoker != null) {
-            RpcResponse response = invoker.invoke(rpcInvocation);
+            Result result = invoker.invoke(invocation);
+            Response response = new Response();
+            response.setResponseId(request.getId());
+            response.setData(result);
             ctx.writeAndFlush(response);
         } else {
-            log.warn("there is no service : {}", url);
+            log.warn("there is no service for : {}", serviceInterface);
         }
     }
 

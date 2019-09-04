@@ -6,10 +6,13 @@ import cn.bdqfork.rpc.registry.URL;
  * @author bdq
  * @since 2019-09-02
  */
-public interface Node<T> {
+public interface Node {
     URL getUrl();
 
-    Class<T> getInterface();
-
     boolean isAvailable();
+
+    /**
+     * destroy.
+     */
+    void destroy();
 }

@@ -1,9 +1,10 @@
 package cn.bdqfork.rpc.protocol;
 
 import cn.bdqfork.common.constant.Const;
-import cn.bdqfork.rpc.RpcInvocation;
-import cn.bdqfork.rpc.remote.RpcResponse;
-import cn.bdqfork.rpc.remote.context.RpcContext;
+import cn.bdqfork.rpc.Invocation;
+import cn.bdqfork.rpc.remote.Request;
+import cn.bdqfork.rpc.remote.Response;
+import cn.bdqfork.rpc.remote.Result;
 import cn.bdqfork.rpc.remote.Serializer;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
@@ -24,16 +25,31 @@ public class DataDecoder extends ByteToMessageDecoder {
 
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
+        long requestId = in.readLong();
         byte type = in.readByte();
-        int length = in.readableBytes();
-        byte[] data = new byte[length];
-        in.readBytes(data);
+
         if (Const.REQUEST_FLAGE == type) {
-            RpcContext context = serializer.deserialize(data, RpcContext.class);
-            out.add(context);
+            Request request = new Request();
+            request.setId(requestId);
+
+            int length = in.readInt();
+            byte[] data = new byte[length];
+            in.readBytes(data);
+
+            Invocation invocation = serializer.deserialize(data, Invocation.class);
+            request.setData(invocation);
+            out.add(request);
         } else if (Const.RESPOSE_FLAGE == type) {
-            RpcResponse rpcResponse = serializer.deserialize(data, RpcResponse.class);
-            out.add(rpcResponse);
+            Response response = new Response();
+            response.setResponseId(requestId);
+
+            int length = in.readInt();
+            byte[] data = new byte[length];
+            in.readBytes(data);
+
+            Result result = serializer.deserialize(data, Result.class);
+            response.setData(result);
+            out.add(response);
         }
     }
 }

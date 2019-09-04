@@ -5,5 +5,5 @@ package cn.bdqfork.rpc;
  * @since 2019-08-28
  */
 public interface Cluster {
-   <T> Invoker<T> join(Directory<T> directory);
+   <T> Invoker<T> join(RegistryDirectory<T> registryDirectory);
 }

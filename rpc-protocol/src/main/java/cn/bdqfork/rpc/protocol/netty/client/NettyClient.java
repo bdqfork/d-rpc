@@ -1,7 +1,11 @@
 package cn.bdqfork.rpc.protocol.netty.client;
 
+import cn.bdqfork.common.exception.RpcException;
+import cn.bdqfork.rpc.protocol.NettyChannel;
 import cn.bdqfork.rpc.protocol.netty.NettyInitializer;
 import cn.bdqfork.rpc.remote.RemoteClient;
+import cn.bdqfork.rpc.remote.Request;
+import cn.bdqfork.rpc.remote.context.DefaultFuture;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -12,6 +16,7 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -24,6 +29,7 @@ public class NettyClient implements RemoteClient {
     private String host;
     private Integer port;
     private Channel channel;
+    private boolean isRunning;
     private NettyInitializer nettyInitializer;
     private EventLoopGroup group;
 
@@ -45,24 +51,8 @@ public class NettyClient implements RemoteClient {
                     .channel(NioSocketChannel.class)
                     .remoteAddress(host, port)
                     .handler(nettyInitializer);
-            ChannelFuture channelFuture = bootstrap.connect();
-            channelFuture.addListener(new ChannelFutureListener() {
-                @Override
-                public void operationComplete(ChannelFuture future) throws Exception {
-                    if (future.isSuccess()) {
-                        channel = future.channel();
-                        log.info("Connect to server successful !");
-                    } else {
-                        log.info("Failed to connect server !");
-                        future.channel().eventLoop().schedule(new Runnable() {
-                            @Override
-                            public void run() {
-                                doConnect();
-                            }
-                        }, 10, TimeUnit.SECONDS);
-                    }
-                }
-            }).sync();
+            bootstrap.connect().sync();
+            isRunning = true;
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             close();
@@ -73,17 +63,38 @@ public class NettyClient implements RemoteClient {
         doConnect();
     }
 
-    public void send(Object data) {
+    @Override
+    public DefaultFuture send(Object data, long timeout) {
+
+        Request request = new Request();
+        request.setId(Request.newId());
+        request.setData(data);
+
+        DefaultFuture defaultFuture = new DefaultFuture(request, timeout);
+
+        try {
+            send(request);
+        } catch (RpcException e) {
+            defaultFuture.cancle();
+            log.error(e.getMessage(), e);
+        }
+
+        return defaultFuture;
+    }
+
+    private void send(Object data) throws RpcException {
+        doConnect();
+        Channel channel = NettyChannel.getChannel(host, port);
         ChannelFuture future = channel.writeAndFlush(data);
         try {
             future.await();
-            if (future.isSuccess()) {
-                log.debug("send message success !");
-            } else {
-                log.error("failed to send message !", future.cause());
-            }
         } catch (InterruptedException e) {
-            log.error(e.getMessage(), e);
+            throw new RpcException(e);
+        }
+        if (future.isSuccess()) {
+            log.debug("send message success !");
+        } else {
+            throw new RpcException(future.cause());
         }
     }
 
@@ -97,14 +108,12 @@ public class NettyClient implements RemoteClient {
 
     @Override
     public boolean isRunning() {
-        if (channel == null) {
-            return false;
-        }
-        return channel.isActive();
+        return isRunning;
     }
 
     public void close() {
         try {
+            isRunning = false;
             group.shutdownGracefully().sync();
         } catch (InterruptedException e) {
             log.error(e.getMessage(), e);

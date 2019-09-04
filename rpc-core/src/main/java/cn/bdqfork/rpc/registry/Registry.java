@@ -26,13 +26,6 @@ public interface Registry extends Node {
     void register(URL url);
 
     /**
-     * 批量注册服务
-     *
-     * @param urls
-     */
-    void register(List<URL> urls);
-
-    /**
      * 订阅服务
      *
      * @param url
@@ -46,10 +39,5 @@ public interface Registry extends Node {
      * @return
      */
     List<URL> lookup(URL url);
-
-    /**
-     * 关闭连接
-     */
-    void close();
 
 }

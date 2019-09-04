@@ -1,41 +1,66 @@
 package cn.bdqfork.rpc;
 
-import cn.bdqfork.rpc.remote.context.RpcContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.lang.reflect.Method;
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author bdq
  * @since 2019-08-23
  */
-public class RpcInvocation implements Invocation {
-    private static final Logger log = LoggerFactory.getLogger(RpcInvocation.class);
+public class RpcInvocation implements Invocation, Serializable {
 
-    private Method method;
-    private Object[] args;
+    private String methodName;
 
-    private RpcContext rpcContext;
+    private Class<?>[] parameterTypes;
 
-    public RpcInvocation(Method method, Object[] args) {
-        this.method = method;
-        this.args = args;
+    private Object[] arguments;
+
+    private Map<String, String> attachments = new HashMap<>();
+
+    public RpcInvocation(String methodName, Class<?>[] parameterTypes, Object[] arguments) {
+        this.methodName = methodName;
+        this.parameterTypes = parameterTypes;
+        this.arguments = arguments;
     }
 
-    public void setRpcContext(RpcContext rpcContext) {
-        this.rpcContext = rpcContext;
+    public RpcInvocation(String methodName, Class<?>[] parameterTypes, Object[] arguments, Map<String, String> attachments) {
+        this.methodName = methodName;
+        this.parameterTypes = parameterTypes;
+        this.arguments = arguments;
+        this.attachments = attachments;
     }
 
-    public RpcContext getRpcContext() {
-        return rpcContext;
+    public String getMethodName() {
+        return methodName;
     }
 
-    public Method getMethod() {
-        return method;
+    public void setMethodName(String methodName) {
+        this.methodName = methodName;
     }
 
-    public Object[] getArgs() {
-        return args;
+    public Class<?>[] getParameterTypes() {
+        return parameterTypes;
     }
+
+    public void setParameterTypes(Class<?>[] parameterTypes) {
+        this.parameterTypes = parameterTypes;
+    }
+
+    public Object[] getArguments() {
+        return arguments;
+    }
+
+    public void setArguments(Object[] arguments) {
+        this.arguments = arguments;
+    }
+
+    public Map<String, String> getAttachments() {
+        return attachments;
+    }
+
+    public void setAttachments(Map<String, String> attachments) {
+        this.attachments = attachments;
+    }
+
 }

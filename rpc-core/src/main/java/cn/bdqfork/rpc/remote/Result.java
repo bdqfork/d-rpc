@@ -4,27 +4,20 @@ import java.io.Serializable;
 
 /**
  * @author bdq
- * @date 2019-02-20
+ * @since 2019-02-20
  */
-public class RpcResponse implements Serializable {
-    private String requestId;
+public class Result implements Serializable {
     private Object data;
     private String message;
     private Throwable exception;
 
-    public RpcResponse(String requestId, Object data) {
+    public Result(Object data) {
         this.data = data;
-        this.requestId = requestId;
     }
 
-    public RpcResponse(String requestId, String message, Throwable exception) {
+    public Result(String message, Throwable exception) {
         this.exception = exception;
         this.message = message;
-        this.requestId = requestId;
-    }
-
-    public String getRequestId() {
-        return requestId;
     }
 
     public Object getData() {

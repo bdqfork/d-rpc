@@ -1,8 +1,10 @@
 package cn.bdqfork.rpc.protocol;
 
 import cn.bdqfork.common.constant.Const;
-import cn.bdqfork.rpc.RpcInvocation;
-import cn.bdqfork.rpc.remote.RpcResponse;
+import cn.bdqfork.rpc.Invocation;
+import cn.bdqfork.rpc.remote.Request;
+import cn.bdqfork.rpc.remote.Response;
+import cn.bdqfork.rpc.remote.Result;
 import cn.bdqfork.rpc.remote.Serializer;
 import cn.bdqfork.rpc.remote.context.RpcContext;
 import io.netty.buffer.ByteBuf;
@@ -22,13 +24,21 @@ public class DataEncoder extends MessageToByteEncoder<Object> {
 
     @Override
     protected void encode(ChannelHandlerContext ctx, Object msg, ByteBuf out) throws Exception {
-        byte[] data = serializer.serialize(msg);
-        out.writeInt(data.length + 1);
-        if (msg instanceof RpcContext) {
+        if (msg instanceof Request) {
+            Request request = (Request) msg;
+            out.writeLong(request.getId());
             out.writeByte(Const.REQUEST_FLAGE);
-        } else if (msg instanceof RpcResponse) {
+
+            byte[] data = serializer.serialize(request.getData());
+            out.writeInt(data.length);
+            out.writeBytes(data);
+        } else if (msg instanceof Response) {
+            Response response = (Response) msg;
+            out.writeLong(response.getResponseId());
             out.writeByte(Const.RESPOSE_FLAGE);
+            byte[] data = serializer.serialize(response.getData());
+            out.writeInt(data.length);
+            out.writeBytes(data);
         }
-        out.writeBytes(data);
     }
 }

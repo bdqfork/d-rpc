@@ -1,20 +1,17 @@
 package cn.bdqfork.rpc.remote.context;
 
 
+import cn.bdqfork.rpc.Invocation;
 import cn.bdqfork.rpc.registry.URL;
-
-import java.io.Serializable;
 
 /**
  * @author bdq
  * @since 2019-03-01
  */
-public class RpcContext implements Serializable {
+public class RpcContext {
+    private static ThreadLocal<RpcContext> threadLocal = ThreadLocal.withInitial(RpcContext::new);
+
     private URL url;
-
-    private String requestId;
-
-    private String serviceInterface;
 
     private String refName;
 
@@ -24,8 +21,10 @@ public class RpcContext implements Serializable {
 
     private Object[] arguments;
 
-    public RpcContext(String requestId) {
-        this.requestId = requestId;
+    private Invocation invocation;
+
+    public static RpcContext getRpcContext() {
+        return threadLocal.get();
     }
 
     public URL getUrl() {
@@ -34,22 +33,6 @@ public class RpcContext implements Serializable {
 
     public void setUrl(URL url) {
         this.url = url;
-    }
-
-    public String getRequestId() {
-        return requestId;
-    }
-
-    public void setRequestId(String requestId) {
-        this.requestId = requestId;
-    }
-
-    public String getServiceInterface() {
-        return serviceInterface;
-    }
-
-    public void setServiceInterface(String serviceInterface) {
-        this.serviceInterface = serviceInterface;
     }
 
     public String getRefName() {
@@ -82,5 +65,13 @@ public class RpcContext implements Serializable {
 
     public void setArguments(Object[] arguments) {
         this.arguments = arguments;
+    }
+
+    public Invocation getInvocation() {
+        return invocation;
+    }
+
+    public void setInvocation(Invocation invocation) {
+        this.invocation = invocation;
     }
 }

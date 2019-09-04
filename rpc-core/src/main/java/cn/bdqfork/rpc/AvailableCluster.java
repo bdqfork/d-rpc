@@ -6,7 +6,7 @@ package cn.bdqfork.rpc;
  */
 public class AvailableCluster implements Cluster {
     @Override
-    public <T> Invoker<T> join(Directory<T> directory) {
-        return new AvailableClusterInvoker<>(directory);
+    public <T> Invoker<T> join(RegistryDirectory<T> registryDirectory) {
+        return new AvailableClusterInvoker<>(registryDirectory);
     }
 }

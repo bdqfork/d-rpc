@@ -8,6 +8,7 @@ import cn.bdqfork.rpc.protocol.serializer.HessianSerializer;
 import cn.bdqfork.rpc.remote.RpcServer;
 import cn.bdqfork.rpc.remote.Serializer;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -18,16 +19,16 @@ public class NettyRpcServer implements RpcServer {
     private NettyServer nettyServer;
     private boolean isRunning;
 
-    public NettyRpcServer(ProtocolConfig protocolConfig, Map<String, Invoker> invoker) {
-        this(protocolConfig, invoker, new HessianSerializer());
+    public NettyRpcServer(ProtocolConfig protocolConfig, List<Invoker<?>> invokers) {
+        this(protocolConfig, invokers, new HessianSerializer());
     }
 
-    public NettyRpcServer(ProtocolConfig protocolConfig, Map<String, Invoker> invoker, Serializer serializer) {
-        this.nettyServer = initNettyServer(protocolConfig, invoker, serializer);
+    public NettyRpcServer(ProtocolConfig protocolConfig, List<Invoker<?>> invokers, Serializer serializer) {
+        this.nettyServer = initNettyServer(protocolConfig, invokers, serializer);
     }
 
-    private NettyServer initNettyServer(ProtocolConfig protocolConfig, Map<String, Invoker> invoker, Serializer serializer) {
-        InvokerHandler invokerHandler = new InvokerHandler(invoker);
+    private NettyServer initNettyServer(ProtocolConfig protocolConfig, List<Invoker<?>> invokers, Serializer serializer) {
+        InvokerHandler invokerHandler = new InvokerHandler(invokers);
 
         NettyInitializer.ChannelHandlerElement handlerElement = new NettyInitializer.ChannelHandlerElement(invokerHandler);
         NettyInitializer nettyInitializer = new NettyInitializer(serializer, handlerElement);

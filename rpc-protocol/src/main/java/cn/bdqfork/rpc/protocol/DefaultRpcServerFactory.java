@@ -6,6 +6,7 @@ import cn.bdqfork.rpc.protocol.netty.provider.NettyRpcServer;
 import cn.bdqfork.rpc.remote.RpcServer;
 import cn.bdqfork.rpc.remote.RpcServerFactory;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -15,9 +16,9 @@ import java.util.Map;
 public class DefaultRpcServerFactory implements RpcServerFactory {
 
     @Override
-    public RpcServer createProviderServer(ProtocolConfig protocolConfig, Map<String, Invoker> urlInvokers) {
+    public RpcServer createProviderServer(ProtocolConfig protocolConfig, List<Invoker<?>> invokers) {
         if ("netty".equals(protocolConfig.getServer())) {
-            return new NettyRpcServer(protocolConfig, urlInvokers);
+            return new NettyRpcServer(protocolConfig, invokers);
         }
         return null;
     }

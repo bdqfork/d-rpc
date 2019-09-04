@@ -1,7 +1,6 @@
 package cn.bdqfork.rpc.registry.zookeeper;
 
 import cn.bdqfork.common.constant.Const;
-import cn.bdqfork.common.exception.RpcException;
 import cn.bdqfork.rpc.config.RegistryConfig;
 import cn.bdqfork.rpc.registry.AbstractRegistry;
 import cn.bdqfork.rpc.registry.Notifier;
@@ -9,16 +8,18 @@ import cn.bdqfork.rpc.registry.URL;
 import org.apache.curator.RetryPolicy;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
+import org.apache.curator.framework.recipes.cache.TreeCache;
 import org.apache.curator.retry.RetryNTimes;
 import org.apache.zookeeper.CreateMode;
-import org.apache.zookeeper.WatchedEvent;
-import org.apache.zookeeper.Watcher;
 import org.apache.zookeeper.ZooDefs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * @author bdq
@@ -78,32 +79,23 @@ public class ZkRegistry extends AbstractRegistry {
     }
 
     @Override
-    public void register(List<URL> urls) {
-        urls.forEach(this::register);
-    }
-
-    @Override
     public void subscribe(URL url, Notifier notifier) {
         String group = url.getParameter(Const.GROUP_KEY, DEFAULT_ROOT);
         String path = "/" + group + url.toServiceCategory() + "/" + Const.PROTOCOL_PROVIDER;
         try {
-            if (client.checkExists().forPath(path) != null) {
-                client.getChildren()
-                        .usingWatcher(new Watcher() {
-                            @Override
-                            public void process(WatchedEvent event) {
-                                try {
-                                    notifier.notify(url, new ZkRegistryEvent(event) {
-                                    });
-                                } catch (RpcException e) {
-                                    log.error(e.getMessage(), e);
-                                }
-                            }
-                        })
-                        .forPath(path);
-                CacheWatcher watcher = new CacheWatcher(url, notifier);
-                cacheWatchers.putIfAbsent(path, watcher);
-            }
+            TreeCache treeCache = new TreeCache(client, path);
+            treeCache.start();
+            treeCache.getListenable().addListener((curatorFramework, treeCacheEvent) -> {
+                for (String children : client.getChildren().forPath(path)) {
+                    List<URL> urls = new ArrayList<>();
+                    byte[] data = client.getData().forPath(path + "/" + children);
+                    if (data != null) {
+                        urls.add(new URL(new String(data, StandardCharsets.UTF_8)));
+                    }
+                    notifier.notify(urls);
+                }
+            });
+            cacheWatchers.putIfAbsent(path, new CacheWatcher(url, notifier));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
@@ -131,25 +123,20 @@ public class ZkRegistry extends AbstractRegistry {
     }
 
     @Override
-    public void close() {
-        if (running) {
-            client.close();
-        }
-        running = false;
-    }
-
-    @Override
     public URL getUrl() {
-        return null;
-    }
-
-    @Override
-    public Class getInterface() {
         return null;
     }
 
     @Override
     public boolean isAvailable() {
         return false;
+    }
+
+    @Override
+    public void destroy() {
+        if (running) {
+            client.close();
+        }
+        running = false;
     }
 }

@@ -1,8 +1,7 @@
 package cn.bdqfork.rpc.registry;
 
 
-import cn.bdqfork.common.exception.RpcException;
-import cn.bdqfork.rpc.registry.event.RegistryEvent;
+import java.util.List;
 
 /**
  * @author bdq
@@ -10,10 +9,9 @@ import cn.bdqfork.rpc.registry.event.RegistryEvent;
  */
 public interface Notifier {
     /**
-     * 节点变化回调方法
+     * 通知方法
      *
-     * @param url
-     * @param event
+     * @param urls
      */
-    void notify(URL url, RegistryEvent event) throws RpcException;
+    void notify(List<URL> urls);
 }

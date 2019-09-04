@@ -3,6 +3,7 @@ package cn.bdqfork.rpc.remote;
 import cn.bdqfork.rpc.Invoker;
 import cn.bdqfork.rpc.config.ProtocolConfig;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -10,5 +11,5 @@ import java.util.Map;
  * @since 2019-08-21
  */
 public interface RpcServerFactory {
-    RpcServer createProviderServer(ProtocolConfig protocolConfig, Map<String, Invoker> urlInvokers);
+    RpcServer createProviderServer(ProtocolConfig protocolConfig, List<Invoker<?>> invokers);
 }
