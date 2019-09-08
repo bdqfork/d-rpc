@@ -2,15 +2,14 @@ package cn.bdqfork.rpc;
 
 import cn.bdqfork.common.exception.RpcException;
 import cn.bdqfork.common.extension.ExtensionLoader;
+import cn.bdqfork.rpc.cluster.Cluster;
 import cn.bdqfork.rpc.exporter.Exporter;
 import cn.bdqfork.rpc.exporter.RpcExporter;
 import cn.bdqfork.rpc.proxy.ProxyFactory;
 import cn.bdqfork.rpc.registry.Registry;
 import cn.bdqfork.rpc.registry.URL;
-import cn.bdqfork.rpc.remote.Result;
-
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import cn.bdqfork.rpc.remote.Invoker;
+import cn.bdqfork.rpc.remote.Directory;
 
 /**
  * @author bdq
@@ -36,10 +35,10 @@ public class RegistryProtocol {
     }
 
     public <T> Invoker<T> refer(Class<T> type, URL url) throws RpcException {
-        RegistryDirectory<T> registryDirectory = new RegistryDirectory<>(type, url);
-        registryDirectory.setRegistry(registry);
-        registryDirectory.subscribe();
-        return cluster.join(registryDirectory);
+        Directory<T> directory = new Directory<>(type, url);
+        directory.setRegistry(registry);
+        directory.subscribe();
+        return cluster.join(directory);
     }
 
 }

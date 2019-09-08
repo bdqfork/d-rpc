@@ -15,7 +15,7 @@ public class ClientContextHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        DefaultFuture.doReceived((Response) msg);
+        DefaultFuture.received((Response) msg);
     }
 
 }

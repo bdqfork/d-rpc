@@ -1,4 +1,4 @@
-package cn.bdqfork.rpc;
+package cn.bdqfork.rpc.remote;
 
 import java.util.Map;
 

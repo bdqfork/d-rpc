@@ -1,6 +1,6 @@
 package cn.bdqfork.rpc.proxy;
 
-import cn.bdqfork.rpc.Invoker;
+import cn.bdqfork.rpc.remote.Invoker;
 import cn.bdqfork.rpc.RpcInvocation;
 
 import java.lang.reflect.InvocationHandler;
@@ -23,24 +23,22 @@ public class InvokerInvocationHandler implements InvocationHandler {
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        Object result = doObjectMethod(method, args);
-        if (result != null) {
-            return result;
+        String methodName = method.getName();
+        Class<?>[] parameterTypes = method.getParameterTypes();
+        if (method.getDeclaringClass() == Object.class) {
+            return method.invoke(invoker, args);
+        }
+        if ("toString".equals(methodName) && parameterTypes.length == 0) {
+            return invoker.toString();
+        }
+        if ("hashCode".equals(methodName) && parameterTypes.length == 0) {
+            return invoker.hashCode();
+        }
+        if ("equals".equals(methodName) && parameterTypes.length == 1) {
+            return invoker.equals(args[0]);
         }
         RpcInvocation rpcInvocation = new RpcInvocation(method.getName(), method.getParameterTypes(), args);
         return invoker.invoke(rpcInvocation).getData();
     }
 
-    private Object doObjectMethod(Method method, Object[] args) {
-        if (TO_STRING_METHOD.equals(method.getName())) {
-            return invoker.toString();
-        }
-        if (EQUALS_METHOD.equals(method.getName())) {
-            return invoker.equals(args[0]);
-        }
-        if (HASHCODE_METHOD.equals(method.getName())) {
-            return invoker.hashCode();
-        }
-        return null;
-    }
 }

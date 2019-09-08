@@ -1,5 +1,7 @@
 package cn.bdqfork.rpc;
 
+import cn.bdqfork.rpc.remote.Invocation;
+
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;

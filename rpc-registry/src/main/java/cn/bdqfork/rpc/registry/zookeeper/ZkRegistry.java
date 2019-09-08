@@ -8,6 +8,7 @@ import cn.bdqfork.rpc.registry.URL;
 import org.apache.curator.RetryPolicy;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
+import org.apache.curator.framework.recipes.cache.ChildData;
 import org.apache.curator.framework.recipes.cache.TreeCache;
 import org.apache.curator.framework.recipes.cache.TreeCacheEvent;
 import org.apache.curator.retry.RetryNTimes;
@@ -17,10 +18,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author bdq
@@ -87,13 +86,17 @@ public class ZkRegistry extends AbstractRegistry {
             TreeCache treeCache = new TreeCache(client, path);
             treeCache.start();
             treeCache.getListenable().addListener((curatorFramework, treeCacheEvent) -> {
-                for (String children : client.getChildren().forPath(path)) {
-                    if (isMatch(treeCacheEvent)) {
-                        List<URL> urls = new ArrayList<>();
-                        byte[] data = client.getData().forPath(path + "/" + children);
-                        if (data != null) {
-                            urls.add(new URL(new String(data, StandardCharsets.UTF_8)));
-                        }
+                if (isMatch(treeCacheEvent)) {
+
+                    Map<String, ChildData> childDataMap = treeCache.getCurrentChildren(path);
+                    if (childDataMap == null) {
+                        notifier.notify(Collections.emptyList());
+                    } else {
+                        List<URL> urls = childDataMap.values()
+                                .stream()
+                                .map(childData -> new String(childData.getData(), StandardCharsets.UTF_8))
+                                .map(URL::new)
+                                .collect(Collectors.toList());
                         notifier.notify(urls);
                     }
                 }

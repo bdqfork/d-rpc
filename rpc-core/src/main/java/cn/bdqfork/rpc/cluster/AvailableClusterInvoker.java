@@ -1,6 +1,9 @@
-package cn.bdqfork.rpc;
+package cn.bdqfork.rpc.cluster;
 
 import cn.bdqfork.common.exception.RpcException;
+import cn.bdqfork.rpc.remote.Invocation;
+import cn.bdqfork.rpc.remote.Invoker;
+import cn.bdqfork.rpc.remote.Directory;
 import cn.bdqfork.rpc.remote.Result;
 
 import java.util.List;
@@ -10,8 +13,8 @@ import java.util.List;
  * @since 2019-08-28
  */
 public class AvailableClusterInvoker<T> extends AbstractClusterInvoker<T> {
-    public AvailableClusterInvoker(RegistryDirectory<T> registryDirectory) {
-        super(registryDirectory);
+    public AvailableClusterInvoker(Directory<T> directory) {
+        super(directory);
     }
 
     @Override

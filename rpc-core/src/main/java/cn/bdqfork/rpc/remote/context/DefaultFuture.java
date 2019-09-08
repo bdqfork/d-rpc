@@ -1,12 +1,17 @@
 package cn.bdqfork.rpc.remote.context;
 
-import cn.bdqfork.common.exception.RpcException;
+import cn.bdqfork.common.exception.RemoteException;
 import cn.bdqfork.common.exception.TimeoutException;
 import cn.bdqfork.rpc.remote.Request;
 import cn.bdqfork.rpc.remote.Response;
 import cn.bdqfork.rpc.remote.Result;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
@@ -16,75 +21,107 @@ import java.util.concurrent.locks.ReentrantLock;
  * @author bdq
  * @since 2019-02-22
  */
-public class DefaultFuture implements RpcFuture<Result> {
+public class DefaultFuture extends CompletableFuture<Object> {
+    private static Logger log = LoggerFactory.getLogger(DefaultFuture.class);
+    private static Map<Long, DefaultFuture> FUTURES = new ConcurrentHashMap<>();
 
-    private static Map<Long, DefaultFuture> futureMap = new ConcurrentHashMap<>();
-
-    private ReentrantLock lock = new ReentrantLock();
-    private Condition done = lock.newCondition();
     private long id;
     private long timeout;
     private Request request;
-    private Result result;
+    private Timer timer;
 
-    public DefaultFuture(Request request, long timeout) {
+    private DefaultFuture(Request request, long timeout) {
         this.request = request;
         this.id = request.getId();
         this.timeout = timeout;
-        futureMap.put(id, this);
+        FUTURES.put(id, this);
     }
 
-    public static void doReceived(Response response) {
-        DefaultFuture future = futureMap.get(response.getResponseId());
-        if (future != null) {
-            future.setResult((Result) response.getData());
-            futureMap.remove(response.getResponseId());
-        }
+    public static DefaultFuture newFuture(Request request, long timeout) {
+        DefaultFuture future = new DefaultFuture(request, timeout);
+        doTimeoutCheck(future);
+        return future;
     }
 
-    @Override
-    public boolean isDone() {
-        return result != null;
+    private static void doTimeoutCheck(DefaultFuture future) {
+        TimeoutCheckTask task = new TimeoutCheckTask(future.getId());
+        Timer timer = new Timer("timeout", true);
+        timer.schedule(task, future.timeout);
+        future.timer = timer;
     }
 
-    @Override
-    public Result get() throws RpcException {
-        if (!isDone()) {
-            long start = System.currentTimeMillis();
-            lock.lock();
-            try {
-                while (!isDone()) {
-                    done.await(timeout, TimeUnit.MILLISECONDS);
-                    if (isDone() || System.currentTimeMillis() - start > timeout) {
-                        break;
-                    }
-                }
-            } catch (InterruptedException e) {
-                throw new RpcException(e);
-            } finally {
-                lock.unlock();
-            }
-            if (!isDone() || System.currentTimeMillis() - start > timeout) {
-                throw new TimeoutException("request timeout");
-            }
-        }
-        return result;
+    public static void received(Response response) {
+        received(response, true);
     }
 
-    @Override
-    public void setResult(Result result) {
-        lock.lock();
+    public static void received(Response response, boolean timeout) {
         try {
-            this.result = result;
-            done.signal();
+            DefaultFuture future = FUTURES.remove(response.getId());
+            if (future != null) {
+                if (!timeout) {
+                    Timer timer = future.timer;
+                    timer.cancel();
+                }
+                future.doReceived(response);
+            } else {
+                log.warn("The timeout request returned !");
+            }
         } finally {
-            lock.unlock();
+            FUTURES.remove(response.getId());
+        }
+    }
+
+    private void doReceived(Response response) {
+        if (response.getStatus() == Response.OK) {
+            super.complete(response.getData());
+        } else if (response.getStatus() == Response.TIMEOUT) {
+            super.completeExceptionally(new TimeoutException(response.getMessage()));
+        } else {
+            super.completeExceptionally(new RemoteException(response.getMessage()));
         }
     }
 
     @Override
-    public void cancle() {
-        futureMap.remove(id);
+    public boolean cancel(boolean mayInterruptIfRunning) {
+        Response errorResult = new Response(id);
+        errorResult.setStatus(Response.CLIENT_ERROR);
+        errorResult.setMessage("request future has been canceled.");
+        doReceived(errorResult);
+        FUTURES.remove(id);
+        return super.cancel(mayInterruptIfRunning);
+    }
+
+    public void cancel() {
+        this.cancel(true);
+    }
+
+    private static class TimeoutCheckTask extends TimerTask {
+        private final Long requestID;
+
+        TimeoutCheckTask(Long requestID) {
+            this.requestID = requestID;
+        }
+
+        @Override
+        public void run() {
+            DefaultFuture future = DefaultFuture.getFuture(requestID);
+            if (future == null || future.isDone()) {
+                return;
+            }
+            Response response = new Response(future.getId());
+            response.setStatus(Response.TIMEOUT);
+            response.setMessage("The request is timeout");
+
+            DefaultFuture.received(response, true);
+        }
+    }
+
+    private long getId() {
+        return id;
+    }
+
+    public static DefaultFuture getFuture(long id) {
+        return FUTURES.get(id);
     }
 
 }

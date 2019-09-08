@@ -1,6 +1,6 @@
 package cn.bdqfork.rpc.exporter;
 
-import cn.bdqfork.rpc.Invoker;
+import cn.bdqfork.rpc.remote.Invoker;
 import cn.bdqfork.rpc.registry.Registry;
 import cn.bdqfork.rpc.registry.URL;
 

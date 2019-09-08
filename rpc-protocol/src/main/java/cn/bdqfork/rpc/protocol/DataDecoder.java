@@ -1,7 +1,7 @@
 package cn.bdqfork.rpc.protocol;
 
 import cn.bdqfork.common.constant.Const;
-import cn.bdqfork.rpc.Invocation;
+import cn.bdqfork.rpc.remote.Invocation;
 import cn.bdqfork.rpc.remote.Request;
 import cn.bdqfork.rpc.remote.Response;
 import cn.bdqfork.rpc.remote.Result;
@@ -41,7 +41,7 @@ public class DataDecoder extends ByteToMessageDecoder {
             out.add(request);
         } else if (Const.RESPOSE_FLAGE == type) {
             Response response = new Response();
-            response.setResponseId(requestId);
+            response.setId(requestId);
 
             int length = in.readInt();
             byte[] data = new byte[length];

@@ -1,8 +1,8 @@
 package cn.bdqfork.rpc.protocol.netty.provider;
 
 import cn.bdqfork.common.constant.Const;
-import cn.bdqfork.rpc.Invocation;
-import cn.bdqfork.rpc.Invoker;
+import cn.bdqfork.rpc.remote.Invocation;
+import cn.bdqfork.rpc.remote.Invoker;
 import cn.bdqfork.rpc.remote.Request;
 import cn.bdqfork.rpc.remote.Response;
 import cn.bdqfork.rpc.remote.Result;
@@ -39,7 +39,7 @@ public class InvokerHandler extends ChannelInboundHandlerAdapter {
         if (invoker != null) {
             Result result = invoker.invoke(invocation);
             Response response = new Response();
-            response.setResponseId(request.getId());
+            response.setId(request.getId());
             response.setData(result);
             ctx.writeAndFlush(response);
         } else {

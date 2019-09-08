@@ -3,7 +3,7 @@ package cn.bdqfork.rpc.config;
 import cn.bdqfork.common.constant.Const;
 import cn.bdqfork.common.exception.RpcException;
 import cn.bdqfork.common.extension.ExtensionLoader;
-import cn.bdqfork.rpc.Invoker;
+import cn.bdqfork.rpc.remote.Invoker;
 import cn.bdqfork.rpc.RegistryProtocol;
 import cn.bdqfork.rpc.config.annotation.Service;
 import cn.bdqfork.rpc.exporter.Exporter;
@@ -21,9 +21,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author bdq

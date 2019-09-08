@@ -2,13 +2,14 @@ package cn.bdqfork.rpc;
 
 import cn.bdqfork.common.constant.Const;
 import cn.bdqfork.common.exception.RpcException;
-import cn.bdqfork.common.exception.TimeoutException;
 import cn.bdqfork.rpc.registry.URL;
+import cn.bdqfork.rpc.remote.Invocation;
 import cn.bdqfork.rpc.remote.RemoteClient;
 import cn.bdqfork.rpc.remote.Result;
-import cn.bdqfork.rpc.remote.context.RpcContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.concurrent.ExecutionException;
 
 /**
  * @author bdq
@@ -36,20 +37,10 @@ public class RpcInvoker<T> extends AbstractInvoker<T> {
         //超时重试
         RemoteClient client = remoteClients[count++ % remoteClients.length];
         try {
-            return client.send(invocation, timeout).get();
-        } catch (TimeoutException e) {
-            return new Result(e.getMessage(), e);
+            return (Result) client.send(invocation, timeout).get();
+        } catch (InterruptedException | ExecutionException e) {
+            throw new RpcException(e);
         }
-    }
-
-    @Override
-    public boolean isAvailable() {
-        for (RemoteClient remoteClient : remoteClients) {
-            if (remoteClient.isRunning()) {
-                return true;
-            }
-        }
-        return false;
     }
 
     @Override

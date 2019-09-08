@@ -3,7 +3,7 @@ package cn.bdqfork.rpc.config;
 import cn.bdqfork.common.constant.Const;
 import cn.bdqfork.common.extension.ExtensionLoader;
 import cn.bdqfork.common.util.NetUtils;
-import cn.bdqfork.rpc.Invoker;
+import cn.bdqfork.rpc.remote.Invoker;
 import cn.bdqfork.rpc.RegistryProtocol;
 import cn.bdqfork.rpc.config.annotation.Reference;
 import cn.bdqfork.rpc.exporter.Exporter;

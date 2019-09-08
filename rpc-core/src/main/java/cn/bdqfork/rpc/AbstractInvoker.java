@@ -2,7 +2,10 @@ package cn.bdqfork.rpc;
 
 import cn.bdqfork.common.exception.RpcException;
 import cn.bdqfork.common.extension.ExtensionLoader;
+import cn.bdqfork.rpc.filter.Filter;
 import cn.bdqfork.rpc.registry.URL;
+import cn.bdqfork.rpc.remote.Invocation;
+import cn.bdqfork.rpc.remote.Invoker;
 import cn.bdqfork.rpc.remote.Result;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +24,7 @@ public abstract class AbstractInvoker<T> implements Invoker<T> {
     protected T proxy;
     protected Class<T> type;
     protected URL url;
-    protected boolean isAvailable;
+    private boolean isAvailable = true;
 
     public AbstractInvoker(T proxy, Class<T> type, URL url) {
         this.proxy = proxy;
@@ -38,6 +41,7 @@ public abstract class AbstractInvoker<T> implements Invoker<T> {
     @Override
     public Result invoke(Invocation invocation) throws RpcException {
         log.debug("filter entry ...");
+
         filters.forEach(filter -> filter.invoke(this, invocation));
         return doInvoke(invocation);
     }

@@ -1,6 +1,6 @@
 package cn.bdqfork.rpc.protocol.netty.provider;
 
-import cn.bdqfork.rpc.Invoker;
+import cn.bdqfork.rpc.remote.Invoker;
 import cn.bdqfork.rpc.config.ProtocolConfig;
 import cn.bdqfork.rpc.protocol.netty.NettyInitializer;
 import cn.bdqfork.rpc.protocol.netty.server.NettyServer;
@@ -9,7 +9,6 @@ import cn.bdqfork.rpc.remote.RpcServer;
 import cn.bdqfork.rpc.remote.Serializer;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author bdq

@@ -1,7 +1,7 @@
 package cn.bdqfork.rpc.remote.context;
 
 
-import cn.bdqfork.rpc.Invocation;
+import cn.bdqfork.rpc.remote.Invocation;
 import cn.bdqfork.rpc.registry.URL;
 
 /**

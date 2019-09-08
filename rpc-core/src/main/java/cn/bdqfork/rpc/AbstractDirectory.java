@@ -4,12 +4,15 @@ import cn.bdqfork.common.constant.Const;
 import cn.bdqfork.common.exception.RpcException;
 import cn.bdqfork.common.extension.ExtensionLoader;
 import cn.bdqfork.rpc.registry.URL;
+import cn.bdqfork.rpc.remote.Invocation;
+import cn.bdqfork.rpc.remote.Invoker;
 import cn.bdqfork.rpc.remote.RemoteClient;
 import cn.bdqfork.rpc.remote.RemoteClientFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -22,12 +25,15 @@ public abstract class AbstractDirectory<T> implements Directory<T> {
     private static final Logger log = LoggerFactory.getLogger(AbstractDirectory.class);
     private RemoteClientFactory remoteClientFactory = ExtensionLoader.getExtension(RemoteClientFactory.class);
     protected Map<String, Invoker<T>> invokers = new ConcurrentHashMap<>();
+    protected volatile boolean isAvailable;
     protected Class<T> serviceInterface;
     protected URL url;
+    protected List<URL> urls;
 
     public AbstractDirectory(Class<T> serviceInterface, URL url) {
         this.serviceInterface = serviceInterface;
         this.url = url;
+        this.urls = Collections.emptyList();
     }
 
     @Override
@@ -47,11 +53,6 @@ public abstract class AbstractDirectory<T> implements Directory<T> {
     protected abstract List<Invoker<T>> doList(Invocation invocation);
 
     protected abstract void refresh();
-
-    protected void removeOldInvoker(URL url) {
-        invokers.get(url.buildString()).destroy();
-        invokers.remove(url.buildString());
-    }
 
     protected void addRpcInvoker(URL url) {
         int connections = Integer.parseInt(this.url.getParameter(Const.CONNECTIONS_KEY));
@@ -75,11 +76,12 @@ public abstract class AbstractDirectory<T> implements Directory<T> {
 
     @Override
     public boolean isAvailable() {
-        return invokers.size() > 0;
+        return isAvailable;
     }
 
     @Override
     public void destroy() {
         invokers.values().forEach(Node::destroy);
+        isAvailable = false;
     }
 }
