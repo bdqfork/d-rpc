@@ -28,7 +28,6 @@ public class ReferenceBean<T> implements FactoryBean<Object>, InitializingBean {
     private RegistryFactory registryFactory = ExtensionLoader.getExtension(RegistryFactory.class);
     private Reference reference;
     private Class<T> serviceInterface;
-    private Invoker<T> invoker;
     private ApplicationConfig applicationConfig;
     private RegistryConfig registryConfig;
 
@@ -50,7 +49,7 @@ public class ReferenceBean<T> implements FactoryBean<Object>, InitializingBean {
 
         URL url = buildUrl(applicationConfig);
 
-        invoker = registryProtocol.refer(serviceInterface, url);
+        Invoker<T> invoker = registryProtocol.refer(serviceInterface, url);
 
         Exporter exporter = registryProtocol.export(invoker);
 
@@ -73,6 +72,7 @@ public class ReferenceBean<T> implements FactoryBean<Object>, InitializingBean {
         url.addParameter(Const.TIMEOUT_KEY, String.valueOf(reference.timeout()));
         url.addParameter(Const.CONNECTIONS_KEY, String.valueOf(reference.connections()));
         url.addParameter(Const.SIDE_KEY, Const.CONSUMER_SIDE);
+        url.addParameter(Const.LOADBALANCE_KEY,reference.loadBalance());
         return url;
     }
 

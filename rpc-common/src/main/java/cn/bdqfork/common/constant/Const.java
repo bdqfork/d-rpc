@@ -25,4 +25,5 @@ public class Const {
     public static final String VERSION_KEY = "version";
     public static final String ENVIRONMENT_KEY = "environment";
     public static final String CONNECTIONS_KEY = "connections";
+    public static final String LOADBALANCE_KEY = "loadBalance";
 }

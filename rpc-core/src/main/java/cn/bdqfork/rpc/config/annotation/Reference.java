@@ -17,6 +17,8 @@ public @interface Reference {
 
     String refName() default "";
 
+    String loadBalance() default "random";
+
     long timeout() default 1000;
 
     int retries() default 2;

@@ -26,7 +26,7 @@ public class FailoverClusterInvoker<T> extends AbstractClusterInvoker<T> {
     @Override
     protected Result doInvoke(Invocation invocation, List<Invoker<T>> invokers, LoadBalance loadBalance) throws RpcException {
         List<Invoker<T>> copyInvokers = new ArrayList<>(invokers);
-        int reties = Integer.parseInt(this.getUrl().getParameter("retries", "2"));
+        int reties = Integer.parseInt(this.getUrl().getParameter("retries"));
         int count = 0;
         while (count++ < reties) {
             try {
