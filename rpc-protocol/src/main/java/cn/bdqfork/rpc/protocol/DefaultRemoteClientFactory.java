@@ -19,13 +19,20 @@ import cn.bdqfork.rpc.remote.Serializer;
 public class DefaultRemoteClientFactory implements RemoteClientFactory {
 
     @Override
-    public RemoteClient createRemoteClient(URL url) throws RpcException {
+    public RemoteClient[] createRemoteClients(URL url) throws RpcException {
         String serialization = url.getParameter(Const.SERIALIZATION_KEY, "jdk");
         Serializer serializer = getSerializer(serialization);
         if (serializer == null) {
             throw new RpcException("no serializer !");
         }
-        return getRemoteClient(url, serializer);
+
+        int connections = Integer.parseInt(url.getParameter(Const.CONNECTIONS_KEY, "1"));
+
+        RemoteClient[] remoteClients = new RemoteClient[connections];
+        for (int i = 0; i < connections; i++) {
+            remoteClients[i] = getRemoteClient(url, serializer);
+        }
+        return remoteClients;
     }
 
     private Serializer getSerializer(String serialization) {
@@ -44,7 +51,10 @@ public class DefaultRemoteClientFactory implements RemoteClientFactory {
             ClientContextHandler handler = new ClientContextHandler();
             NettyInitializer.ChannelHandlerElement channelHandlerElement = new NettyInitializer.ChannelHandlerElement(handler);
             NettyInitializer nettyInitializer = new NettyInitializer(serializer, channelHandlerElement);
-            return new NettyClient(url.getHost(), url.getPort(), nettyInitializer);
+            NettyClient nettyClient = new NettyClient(url.getHost(), url.getPort(), nettyInitializer);
+            long timeout = Long.parseLong(url.getParameter(Const.TIMEOUT_KEY));
+            nettyClient.setTimeout(timeout);
+            return nettyClient;
         }
         return null;
     }

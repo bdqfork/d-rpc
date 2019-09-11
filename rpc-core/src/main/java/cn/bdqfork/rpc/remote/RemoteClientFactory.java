@@ -8,5 +8,5 @@ import cn.bdqfork.rpc.registry.URL;
  * @since 2019-08-21
  */
 public interface RemoteClientFactory {
-    RemoteClient createRemoteClient(URL url) throws RpcException;
+    RemoteClient[] createRemoteClients(URL url) throws RpcException;
 }

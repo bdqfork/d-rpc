@@ -12,8 +12,6 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class ExtensionLoader {
 
-    private static final Map<String, Object> cache = new ConcurrentHashMap<>();
-
     /**
      * 使用SPI获取扩展
      *
@@ -21,18 +19,13 @@ public class ExtensionLoader {
      * @param <T>       类型
      * @return T
      */
-    public static <T> T getExtension(Class<T> extension) {
-        String extensionName = extension.getName();
-        if (cache.containsKey(extensionName)) {
-            return (T) cache.get(extensionName);
-        }
+    public synchronized static <T> T getExtension(Class<T> extension) {
         ServiceLoader<T> serviceLoader = ServiceLoader.load(extension);
         T instance = null;
         for (T t : serviceLoader) {
             instance = t;
             break;
         }
-        cache.put(extensionName, instance);
         return instance;
     }
 
@@ -43,17 +36,12 @@ public class ExtensionLoader {
      * @param <T>       类型
      * @return T
      */
-    public static <T> List<T> getExtensions(Class<T> extension) {
-        String extensionName = extension.getName();
-        if (cache.containsKey(extensionName)) {
-            return (List<T>) cache.get(extensionName);
-        }
+    public synchronized static <T> List<T> getExtensions(Class<T> extension) {
         List<T> extensions = new LinkedList<>();
         ServiceLoader<T> serviceLoader = ServiceLoader.load(extension);
         for (T t : serviceLoader) {
             extensions.add(t);
         }
-        cache.put(extensionName, extensions);
         return extensions;
     }
 

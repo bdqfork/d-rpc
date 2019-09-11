@@ -17,9 +17,9 @@ public @interface Reference {
 
     String refName() default "";
 
-    long timeout() default 3000;
+    long timeout() default 1000;
 
-    int retries() default 0;
+    int retries() default 2;
 
     int connections() default 1;
 

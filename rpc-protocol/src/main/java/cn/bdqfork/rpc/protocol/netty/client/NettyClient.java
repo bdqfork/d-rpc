@@ -25,7 +25,7 @@ public class NettyClient implements RemoteClient {
 
     private String host;
     private Integer port;
-    private Channel channel;
+    private volatile Channel channel;
     private volatile boolean isRunning = true;
     private Bootstrap bootstrap;
     private long timeout = 3000;
@@ -46,31 +46,30 @@ public class NettyClient implements RemoteClient {
         if (channel != null && channel.isActive()) {
             return;
         }
-        ChannelFuture channelFuture = bootstrap.connect();
-        boolean ret = channelFuture.awaitUninterruptibly(timeout);
-        if (ret && channelFuture.isSuccess()) {
-            Channel oldChannel = channel;
-            channel = channelFuture.channel();
-            if (oldChannel != null) {
-                oldChannel.close();
+        synchronized (NettyClient.class) {
+            if (channel != null && channel.isActive()) {
+                return;
             }
-            if (!isRunning) {
-                channel.close();
+            ChannelFuture channelFuture = bootstrap.connect();
+            boolean ret = channelFuture.awaitUninterruptibly(timeout);
+            if (ret && channelFuture.isSuccess()) {
+                Channel oldChannel = channel;
+                channel = channelFuture.channel();
+                if (oldChannel != null) {
+                    oldChannel.close();
+                }
+                if (!isRunning) {
+                    channel.close();
+                }
+            } else {
+                throw new RemoteException(channelFuture.cause().getMessage());
             }
-        } else {
-            throw new RemoteException(channelFuture.cause().getMessage());
         }
-    }
-
-    public void reConnect() throws RemoteException {
-        doConnect();
     }
 
     @Override
-    public DefaultFuture send(Object data, long timeout) throws RpcException {
-        if (!isRunning) {
-            throw new RemoteException("Failed to send request " + data + ", cause: The channel " + this + " is closed!");
-        }
+    public DefaultFuture send(Object data) throws RpcException {
+
         Request request = new Request();
         request.setId(Request.newId());
         request.setData(data);
@@ -78,7 +77,7 @@ public class NettyClient implements RemoteClient {
         DefaultFuture defaultFuture = DefaultFuture.newFuture(request, timeout);
 
         try {
-            send(request);
+            doSend(request);
         } catch (RpcException e) {
             defaultFuture.cancel();
             throw e;
@@ -87,8 +86,13 @@ public class NettyClient implements RemoteClient {
         return defaultFuture;
     }
 
-    private void send(Object data) throws RpcException {
+    private void doSend(Object data) throws RpcException {
         doConnect();
+
+        if (!isRunning) {
+            throw new RemoteException("Failed to send request " + data + ", cause: The channel " + this + " is closed!");
+        }
+
         ChannelFuture future = channel.writeAndFlush(data);
         boolean ret = future.awaitUninterruptibly(timeout);
         if (ret && future.isSuccess()) {
@@ -96,14 +100,6 @@ public class NettyClient implements RemoteClient {
         } else {
             throw new RpcException(future.cause().getMessage());
         }
-    }
-
-    public String getHost() {
-        return host;
-    }
-
-    public Integer getPort() {
-        return port;
     }
 
     @Override
@@ -115,4 +111,27 @@ public class NettyClient implements RemoteClient {
         isRunning = false;
         log.debug("client closed");
     }
+
+    @Override
+    public void setHost(String host) {
+        this.host = host;
+    }
+
+    @Override
+    public void setPort(int port) {
+        this.port = port;
+    }
+
+    @Override
+    public String toString() {
+        return "NettyClient{" +
+                "host='" + host + '\'' +
+                ", port=" + port +
+                '}';
+    }
+
+    public void setTimeout(long timeout) {
+        this.timeout = timeout;
+    }
+
 }

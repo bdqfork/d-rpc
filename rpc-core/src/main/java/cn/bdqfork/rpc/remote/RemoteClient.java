@@ -1,6 +1,5 @@
 package cn.bdqfork.rpc.remote;
 
-import cn.bdqfork.common.exception.ConnectionLostException;
 import cn.bdqfork.common.exception.RpcException;
 import cn.bdqfork.rpc.remote.context.DefaultFuture;
 
@@ -14,16 +13,18 @@ public interface RemoteClient {
      *
      * @param data
      */
-    DefaultFuture send(Object data, long timeout) throws RpcException;
+    DefaultFuture send(Object data) throws RpcException;
 
     /**
      * 关闭连接
      */
     void close();
 
-    String getHost();
+    void setHost(String host);
 
-    Integer getPort();
+    void setPort(int port);
+
+    void setTimeout(long timeout);
 
     boolean isRunning();
 }
