@@ -99,8 +99,6 @@ public class ServiceBean implements InitializingBean, ApplicationContextAware, D
         url.addParameter(Const.REF_NAME_KEY, service.refName());
         url.addParameter(Const.SERVER_KEY, protocolConfig.getServer());
         url.addParameter(Const.SERIALIZATION_KEY, protocolConfig.getSerialization());
-        url.addParameter(Const.TIMEOUT_KEY, String.valueOf(service.timeout()));
-        url.addParameter(Const.RETRY_KEY, String.valueOf(service.retries()));
         return url;
     }
 

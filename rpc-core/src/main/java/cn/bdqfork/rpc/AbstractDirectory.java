@@ -55,6 +55,7 @@ public abstract class AbstractDirectory<T> implements Directory<T> {
     protected abstract void refresh();
 
     protected void addRpcInvoker(URL url) {
+        mergeUrl(url);
         RemoteClient[] remoteClients = new RemoteClient[0];
         try {
             remoteClients = remoteClientFactory.createRemoteClients(url);
@@ -66,16 +67,13 @@ public abstract class AbstractDirectory<T> implements Directory<T> {
         invokers.put(url.buildString(), invoker);
     }
 
-    private URL mergeUrl(URL url) {
+    private void mergeUrl(URL url) {
         String timeout = this.url.getParameter(Const.TIMEOUT_KEY);
-        if (Integer.parseInt(timeout) > 0) {
-            url.addParameter(Const.TIMEOUT_KEY, timeout);
-        }
+        url.addParameter(Const.TIMEOUT_KEY, timeout);
         String retries = this.url.getParameter(Const.RETRY_KEY);
-        if (Integer.parseInt(retries) > 0) {
-
-        }
-        return null;
+        url.addParameter(Const.RETRY_KEY, retries);
+        String connections = this.url.getParameter(Const.CONNECTIONS_KEY);
+        url.addParameter(Const.CONNECTIONS_KEY, connections);
     }
 
     @Override

@@ -15,10 +15,6 @@ public @interface Service {
 
     Class<?> serviceInterface() default void.class;
 
-    long timeout() default 1000;
-
-    int retries() default 2;
-
     String refName() default "";
 
 }
