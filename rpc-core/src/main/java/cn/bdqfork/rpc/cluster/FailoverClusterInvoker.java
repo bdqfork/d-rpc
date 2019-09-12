@@ -1,5 +1,6 @@
 package cn.bdqfork.rpc.cluster;
 
+import cn.bdqfork.common.constant.Const;
 import cn.bdqfork.common.exception.RpcException;
 import cn.bdqfork.rpc.remote.Directory;
 import cn.bdqfork.rpc.remote.Invocation;
@@ -26,7 +27,7 @@ public class FailoverClusterInvoker<T> extends AbstractClusterInvoker<T> {
     @Override
     protected Result doInvoke(Invocation invocation, List<Invoker<T>> invokers, LoadBalance loadBalance) throws RpcException {
         List<Invoker<T>> copyInvokers = new ArrayList<>(invokers);
-        int reties = Integer.parseInt(this.getUrl().getParameter("retries"));
+        int reties = Integer.parseInt(this.getUrl().getParameter(Const.RETRY_KEY));
         int count = 0;
         while (count++ < reties) {
             try {

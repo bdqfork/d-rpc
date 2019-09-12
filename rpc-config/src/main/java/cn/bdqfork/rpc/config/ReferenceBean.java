@@ -22,14 +22,11 @@ import org.springframework.beans.factory.InitializingBean;
  */
 public class ReferenceBean<T> implements FactoryBean<Object>, InitializingBean {
 
-    private static final Logger log = LoggerFactory.getLogger(ReferenceBean.class);
-
     private ProxyFactory proxyFactory = ExtensionLoader.getExtension(ProxyFactory.class);
-    private RegistryFactory registryFactory = ExtensionLoader.getExtension(RegistryFactory.class);
     private Reference reference;
     private Class<T> serviceInterface;
     private ApplicationConfig applicationConfig;
-    private RegistryConfig registryConfig;
+    private Registry registry;
 
     public ReferenceBean(Reference reference) {
         this.reference = reference;
@@ -42,8 +39,6 @@ public class ReferenceBean<T> implements FactoryBean<Object>, InitializingBean {
 
     @Override
     public Object getObject() throws Exception {
-
-        Registry registry = registryFactory.createRegistry(registryConfig);
 
         RegistryProtocol registryProtocol = new RegistryProtocol(registry);
 
@@ -72,7 +67,7 @@ public class ReferenceBean<T> implements FactoryBean<Object>, InitializingBean {
         url.addParameter(Const.TIMEOUT_KEY, String.valueOf(reference.timeout()));
         url.addParameter(Const.CONNECTIONS_KEY, String.valueOf(reference.connections()));
         url.addParameter(Const.SIDE_KEY, Const.CONSUMER_SIDE);
-        url.addParameter(Const.LOADBALANCE_KEY,reference.loadBalance());
+        url.addParameter(Const.LOADBALANCE_KEY, reference.loadBalance());
         return url;
     }
 
@@ -85,8 +80,8 @@ public class ReferenceBean<T> implements FactoryBean<Object>, InitializingBean {
         this.applicationConfig = applicationConfig;
     }
 
-    public void setRegistryConfig(RegistryConfig registryConfig) {
-        this.registryConfig = registryConfig;
+    public void setRegistry(Registry registry) {
+        this.registry = registry;
     }
 
     public void setServiceInterface(Class<T> serviceInterface) {

@@ -1,9 +1,12 @@
 package cn.bdqfork.rpc.config.context;
 
+import cn.bdqfork.common.extension.ExtensionLoader;
 import cn.bdqfork.rpc.config.ApplicationConfig;
 import cn.bdqfork.rpc.config.ReferenceBean;
 import cn.bdqfork.rpc.config.RegistryConfig;
 import cn.bdqfork.rpc.config.annotation.Reference;
+import cn.bdqfork.rpc.registry.Registry;
+import cn.bdqfork.rpc.registry.RegistryFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.PropertyValues;
@@ -28,10 +31,11 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ReferenceAnnotationPostProcessor extends InstantiationAwareBeanPostProcessorAdapter implements
         MergedBeanDefinitionPostProcessor, ApplicationContextAware, BeanClassLoaderAware {
     public static final String REFERENCE_ANNOTATION_POST_PROCESSOR_NAME = "referenceAnnotationPostProcessor";
-
+    private RegistryFactory registryFactory = ExtensionLoader.getExtension(RegistryFactory.class);
     private final transient Map<String, InjectionMetadata> injectionMetadataCache = new ConcurrentHashMap<>(256);
     private ApplicationContext applicationContext;
     private ClassLoader classLoader;
+    private Registry registry;
 
     @Override
     public PropertyValues postProcessProperties(PropertyValues pvs, Object bean, String beanName) throws BeansException {
@@ -153,6 +157,8 @@ public class ReferenceAnnotationPostProcessor extends InstantiationAwareBeanPost
         @Override
         protected void inject(Object target, String requestingBeanName, PropertyValues pvs) throws Throwable {
             Method method = (Method) member;
+            ReferenceBean referenceBean = buildReferenceBean(method.getParameterTypes()[0], reference);
+            bean = createProxy(method.getParameterTypes()[0], referenceBean);
             ReflectionUtils.makeAccessible(method);
             method.invoke(target, bean);
         }
@@ -184,9 +190,17 @@ public class ReferenceAnnotationPostProcessor extends InstantiationAwareBeanPost
         ApplicationConfig applicationConfig = applicationContext.getBean(ApplicationConfig.class);
         RegistryConfig registryConfig = applicationContext.getBean(RegistryConfig.class);
         referenceBean.setApplicationConfig(applicationConfig);
-        referenceBean.setRegistryConfig(registryConfig);
+        Registry registry = getOrCreateRegistry(registryConfig);
+        referenceBean.setRegistry(registry);
         referenceBean.afterPropertiesSet();
         return referenceBean;
+    }
+
+    private Registry getOrCreateRegistry(RegistryConfig registryConfig) {
+        if (registry == null) {
+            registry = registryFactory.createRegistry(registryConfig);
+        }
+        return registry;
     }
 
 

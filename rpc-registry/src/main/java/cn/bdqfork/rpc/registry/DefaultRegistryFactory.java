@@ -8,6 +8,7 @@ import cn.bdqfork.rpc.registry.zookeeper.ZkRegistry;
  * @since 2019-08-20
  */
 public class DefaultRegistryFactory implements RegistryFactory {
+
     @Override
     public Registry createRegistry(RegistryConfig registryConfig) {
         String url = registryConfig.getUrl();
