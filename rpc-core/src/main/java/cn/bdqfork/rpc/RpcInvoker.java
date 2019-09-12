@@ -1,6 +1,5 @@
 package cn.bdqfork.rpc;
 
-import cn.bdqfork.common.constant.Const;
 import cn.bdqfork.common.exception.RpcException;
 import cn.bdqfork.rpc.registry.URL;
 import cn.bdqfork.rpc.remote.Invocation;
@@ -17,18 +16,11 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @since 2019-02-28
  */
 public class RpcInvoker<T> extends AbstractInvoker<T> {
-    private static final Logger log = LoggerFactory.getLogger(RpcInvoker.class);
     private RemoteClient[] remoteClients;
-    private long timeout;
     private AtomicInteger count = new AtomicInteger(0);
 
     public RpcInvoker(Class<T> type, URL url) {
         super(null, type, url);
-        init();
-    }
-
-    private void init() {
-        timeout = Long.parseLong(url.getParameter(Const.TIMEOUT_KEY, "1000"));
     }
 
     @Override
@@ -36,7 +28,7 @@ public class RpcInvoker<T> extends AbstractInvoker<T> {
         RemoteClient client = remoteClients[count.getAndIncrement() % remoteClients.length];
         try {
             return (Result) client.send(invocation).get();
-        } catch (InterruptedException | ExecutionException e) {
+        } catch (InterruptedException | ExecutionException | RpcException e) {
             throw new RpcException("Invoke remote method error !", e.getCause());
         }
     }

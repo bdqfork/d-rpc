@@ -97,6 +97,7 @@ public class ServiceBean implements InitializingBean, ApplicationContextAware, D
         url.addParameter(Const.GROUP_KEY, service.group());
         url.addParameter(Const.SIDE_KEY, Const.PROVIDER_SIDE);
         url.addParameter(Const.REF_NAME_KEY, service.refName());
+        url.addParameter(Const.INTERFACE_KEY, service.serviceInterface().getName());
         url.addParameter(Const.SERVER_KEY, protocolConfig.getServer());
         url.addParameter(Const.SERIALIZATION_KEY, protocolConfig.getSerialization());
         return url;

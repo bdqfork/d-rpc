@@ -62,7 +62,7 @@ public class NettyClient implements RemoteClient {
                     channel.close();
                 }
             } else {
-                throw new RemoteException(channelFuture.cause().getMessage());
+                throw new RemoteException(channelFuture.cause());
             }
         }
     }
