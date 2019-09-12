@@ -5,6 +5,7 @@ package cn.bdqfork.common.constant;
  * @since 2019-02-27
  */
 public class Const {
+    public static final byte MAGIC = 0x66;
     public static final byte REQUEST_FLAGE = 0;
     public static final byte RESPOSE_FLAGE = 1;
 

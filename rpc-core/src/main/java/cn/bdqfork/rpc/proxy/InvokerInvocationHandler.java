@@ -1,7 +1,7 @@
 package cn.bdqfork.rpc.proxy;
 
-import cn.bdqfork.rpc.remote.Invoker;
 import cn.bdqfork.rpc.RpcInvocation;
+import cn.bdqfork.rpc.remote.Invoker;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -11,9 +11,6 @@ import java.lang.reflect.Method;
  * @since 2019-08-26
  */
 public class InvokerInvocationHandler implements InvocationHandler {
-    private static final String TO_STRING_METHOD = "toString";
-    private static final String EQUALS_METHOD = "equals";
-    private static final String HASHCODE_METHOD = "hashCode";
 
     private Invoker invoker;
 

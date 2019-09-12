@@ -1,6 +1,7 @@
 package cn.bdqfork.rpc.protocol;
 
 import cn.bdqfork.common.constant.Const;
+import cn.bdqfork.common.exception.RpcException;
 import cn.bdqfork.rpc.remote.Invocation;
 import cn.bdqfork.rpc.remote.Request;
 import cn.bdqfork.rpc.remote.Response;
@@ -25,12 +26,20 @@ public class DataDecoder extends ByteToMessageDecoder {
 
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
-        long requestId = in.readLong();
-        byte type = in.readByte();
+        byte magic = in.readByte();
+        if (Const.MAGIC != magic) {
+            throw new RpcException("Unkown packet !");
+        }
+        byte flage = in.readByte();
 
-        if (Const.REQUEST_FLAGE == type) {
+        long id = in.readLong();
+
+        if (Const.REQUEST_FLAGE == flage) {
             Request request = new Request();
-            request.setId(requestId);
+            request.setId(id);
+
+            //skip status
+            in.skipBytes(4);
 
             int length = in.readInt();
             byte[] data = new byte[length];
@@ -38,10 +47,14 @@ public class DataDecoder extends ByteToMessageDecoder {
 
             Invocation invocation = serializer.deserialize(data, Invocation.class);
             request.setData(invocation);
+
             out.add(request);
-        } else if (Const.RESPOSE_FLAGE == type) {
+        } else if (Const.RESPOSE_FLAGE == flage) {
             Response response = new Response();
-            response.setId(requestId);
+            response.setId(id);
+
+            int status = in.readInt();
+            response.setStatus(status);
 
             int length = in.readInt();
             byte[] data = new byte[length];
@@ -49,6 +62,8 @@ public class DataDecoder extends ByteToMessageDecoder {
 
             Result result = serializer.deserialize(data, Result.class);
             response.setData(result);
+            response.setMessage(result.getMessage());
+
             out.add(response);
         }
     }

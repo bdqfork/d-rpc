@@ -37,7 +37,7 @@ public class RpcInvoker<T> extends AbstractInvoker<T> {
         try {
             return (Result) client.send(invocation).get();
         } catch (InterruptedException | ExecutionException e) {
-            throw new RpcException(e);
+            throw new RpcException("Invoke remote method error !", e.getCause());
         }
     }
 

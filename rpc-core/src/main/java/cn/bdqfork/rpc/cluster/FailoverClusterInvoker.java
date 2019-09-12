@@ -29,6 +29,7 @@ public class FailoverClusterInvoker<T> extends AbstractClusterInvoker<T> {
         List<Invoker<T>> copyInvokers = new ArrayList<>(invokers);
         int reties = Integer.parseInt(this.getUrl().getParameter(Const.RETRY_KEY));
         int count = 0;
+        RpcException lastException = null;
         while (count++ < reties) {
             try {
                 Invoker<T> invoker = loadBalance.select(copyInvokers);
@@ -47,9 +48,11 @@ public class FailoverClusterInvoker<T> extends AbstractClusterInvoker<T> {
                     throw new RpcException(ex);
                 }
                 copyInvokers = new ArrayList<>(this.list(invocation));
+                lastException = e;
             }
         }
-        throw new RpcException(String.format("Although retry to invoke %s method %d times, it's failed finally! ",
-                invocation.getMethodName(), count));
+        throw lastException != null ? lastException :
+                new RpcException(String.format("Although retry to invoke %s method %d times, it's failed finally! ",
+                        invocation.getMethodName(), count));
     }
 }

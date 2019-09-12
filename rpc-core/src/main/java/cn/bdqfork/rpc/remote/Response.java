@@ -6,10 +6,11 @@ package cn.bdqfork.rpc.remote;
  */
 public class Response {
     public static final int CLIENT_ERROR = 100;
+    public static final int SERVER_ERROR = 101;
     public static final int TIMEOUT = 90;
     public static final int OK = 200;
     private long id;
-    private int Status = OK;
+    private int status = OK;
     private String message;
     private Object data;
 
@@ -29,19 +30,11 @@ public class Response {
     }
 
     public int getStatus() {
-        return Status;
+        return status;
     }
 
     public void setStatus(int status) {
-        Status = status;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
+        this.status = status;
     }
 
     public Object getData() {
@@ -50,5 +43,13 @@ public class Response {
 
     public void setData(Object data) {
         this.data = data;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public String getMessage() {
+        return message;
     }
 }

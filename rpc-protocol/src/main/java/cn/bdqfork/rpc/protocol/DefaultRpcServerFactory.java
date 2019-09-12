@@ -1,8 +1,8 @@
 package cn.bdqfork.rpc.protocol;
 
-import cn.bdqfork.rpc.remote.Invoker;
 import cn.bdqfork.rpc.config.ProtocolConfig;
 import cn.bdqfork.rpc.protocol.netty.provider.NettyRpcServer;
+import cn.bdqfork.rpc.remote.Invoker;
 import cn.bdqfork.rpc.remote.RpcServer;
 import cn.bdqfork.rpc.remote.RpcServerFactory;
 

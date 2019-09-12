@@ -1,11 +1,9 @@
 package cn.bdqfork.rpc.protocol.netty.provider;
 
 import cn.bdqfork.common.constant.Const;
-import cn.bdqfork.rpc.remote.Invocation;
-import cn.bdqfork.rpc.remote.Invoker;
-import cn.bdqfork.rpc.remote.Request;
-import cn.bdqfork.rpc.remote.Response;
-import cn.bdqfork.rpc.remote.Result;
+import cn.bdqfork.common.exception.RpcException;
+import cn.bdqfork.rpc.registry.URL;
+import cn.bdqfork.rpc.remote.*;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
@@ -26,7 +24,16 @@ public class InvokerHandler extends ChannelInboundHandlerAdapter {
     private final Map<String, Invoker> invokers = new ConcurrentHashMap<>();
 
     public InvokerHandler(List<Invoker<?>> invokers) {
-        invokers.forEach(invoker -> this.invokers.put(invoker.getInterface().getName(), invoker));
+        init(invokers);
+    }
+
+    private void init(List<Invoker<?>> invokers) {
+        invokers.forEach(invoker -> {
+            URL url = invoker.getUrl();
+            String refName = url.getParameter(Const.REF_NAME_KEY, "");
+            String serviceInterface = url.getParameter(Const.INTERFACE_KEY);
+            this.invokers.put(serviceInterface + refName, invoker);
+        });
     }
 
     @Override
@@ -34,21 +41,35 @@ public class InvokerHandler extends ChannelInboundHandlerAdapter {
         Request request = (Request) msg;
         Invocation invocation = (Invocation) request.getData();
 
-        String serviceInterface = invocation.getAttachments().get(Const.INTERFACE_KEY);
-        Invoker<?> invoker = invokers.get(serviceInterface);
+        Map<String, String> attachments = invocation.getAttachments();
+        String serviceInterface = attachments.get(Const.INTERFACE_KEY);
+        String refName = attachments.get(Const.REF_NAME_KEY);
+
+        Invoker<?> invoker = invokers.get(serviceInterface + refName);
+
+        Response response = new Response();
+        response.setId(request.getId());
         if (invoker != null) {
+
             Result result = invoker.invoke(invocation);
-            Response response = new Response();
-            response.setId(request.getId());
+
+            if (result.getException() != null) {
+                response.setStatus(Response.SERVER_ERROR);
+                response.setMessage(result.getMessage());
+            }
+
             response.setData(result);
             ctx.writeAndFlush(response);
         } else {
-            log.warn("there is no service for : {}", serviceInterface);
+            response.setStatus(Response.SERVER_ERROR);
+            RpcException rpcException = new RpcException(String.format("There is no service for Interface %s and refName %s",
+                    serviceInterface, refName));
+            response.setMessage(rpcException.getMessage());
+
+            response.setData(new Result(rpcException.getMessage(), rpcException));
+            ctx.writeAndFlush(response);
+            throw rpcException;
         }
     }
 
-    @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        super.exceptionCaught(ctx, cause);
-    }
 }

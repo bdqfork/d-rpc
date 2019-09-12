@@ -1,10 +1,9 @@
 package cn.bdqfork.rpc.remote.context;
 
-import cn.bdqfork.common.exception.RemoteException;
+import cn.bdqfork.common.exception.RpcException;
 import cn.bdqfork.common.exception.TimeoutException;
 import cn.bdqfork.rpc.remote.Request;
 import cn.bdqfork.rpc.remote.Response;
-import cn.bdqfork.rpc.remote.Result;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,9 +12,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * @author bdq
@@ -51,7 +47,7 @@ public class DefaultFuture extends CompletableFuture<Object> {
     }
 
     public static void received(Response response) {
-        received(response, true);
+        received(response, false);
     }
 
     public static void received(Response response, boolean timeout) {
@@ -76,8 +72,8 @@ public class DefaultFuture extends CompletableFuture<Object> {
             super.complete(response.getData());
         } else if (response.getStatus() == Response.TIMEOUT) {
             super.completeExceptionally(new TimeoutException(response.getMessage()));
-        } else {
-            super.completeExceptionally(new RemoteException(response.getMessage()));
+        } else if (response.getStatus() == Response.SERVER_ERROR || response.getStatus() == Response.CLIENT_ERROR) {
+            super.completeExceptionally(new RpcException(response.getMessage()));
         }
     }
 
