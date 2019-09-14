@@ -67,11 +67,12 @@ public class RegistryProtocol implements Protocol {
     }
 
     @Override
-    public <T> Invoker<T> getInvoker(T proxy, Class<T> type, URL url) throws RpcException {
+    public <T> Invoker<T> getInvoker(T proxy, Class<T> type, URL url) {
         return proxyFactory.getInvoker(proxy, type, url);
     }
 
-    public <T> Invoker<T> refer(Class<T> type, URL url) throws RpcException {
+    @Override
+    public <T> Invoker<T> refer(Class<T> type, URL url) {
         Directory<T> directory = new Directory<>(type, url);
         directory.setRegistries(registries);
         directory.subscribe();

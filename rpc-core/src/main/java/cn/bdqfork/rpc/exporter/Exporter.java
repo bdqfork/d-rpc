@@ -14,5 +14,7 @@ public interface Exporter<T> {
      */
     void doExport();
 
+    void unexport();
+
     Invoker<T> getInvoker();
 }

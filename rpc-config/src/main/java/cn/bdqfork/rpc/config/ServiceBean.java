@@ -34,10 +34,10 @@ import java.util.stream.Collectors;
  * @since 2019-03-03
  */
 public class ServiceBean implements InitializingBean, DisposableBean, ApplicationListener<ContextRefreshedEvent>, ApplicationContextAware {
-    public static final String SERVICE_BEAN = "serviceBean";
     private RegistryFactory registryFactory = ExtensionLoader.getExtension(RegistryFactory.class);
     private ApplicationContext applicationContext;
     private Service service;
+    private List<Exporter> exporters;
 
     @SuppressWarnings("unchecked")
     @Override
@@ -66,15 +66,15 @@ public class ServiceBean implements InitializingBean, DisposableBean, Applicatio
 
         }
 
-        export(invokers, registryProtocol);
+        exporters = invokers.stream()
+                .map(registryProtocol::export)
+                .collect(Collectors.toList());
 
+        export();
     }
 
-    private void export(List<Invoker<?>> invokers, RegistryProtocol registryProtocol) {
-        invokers.forEach(invoker -> {
-            Exporter exporter = registryProtocol.export(invoker);
-            exporter.doExport();
-        });
+    private void export() {
+        exporters.forEach(Exporter::doExport);
     }
 
     private List<ProtocolConfig> getProtocolConfigs() {
@@ -148,7 +148,7 @@ public class ServiceBean implements InitializingBean, DisposableBean, Applicatio
 
     @Override
     public void destroy() throws Exception {
-
+        exporters.forEach(Exporter::unexport);
     }
 
     @Override

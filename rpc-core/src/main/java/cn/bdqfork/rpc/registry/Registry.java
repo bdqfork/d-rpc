@@ -18,6 +18,13 @@ public interface Registry extends Node {
     void register(URL url);
 
     /**
+     * 注销服务
+     *
+     * @param url
+     */
+    void unregister(URL url);
+
+    /**
      * 订阅服务
      *
      * @param url

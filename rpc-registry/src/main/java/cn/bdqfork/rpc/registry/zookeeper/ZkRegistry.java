@@ -82,6 +82,17 @@ public class ZkRegistry extends AbstractRegistry {
     }
 
     @Override
+    public void unregister(URL url) {
+        String group = url.getParameter(Const.GROUP_KEY, DEFAULT_ROOT);
+        String path = "/" + group + url.toPath();
+        try {
+            client.delete().forPath(path);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+    }
+
+    @Override
     public void subscribe(URL url, Notifier notifier) {
         String group = url.getParameter(Const.GROUP_KEY, DEFAULT_ROOT);
         String path = "/" + group + url.toServiceCategory() + "/" + Const.PROTOCOL_PROVIDER;
