@@ -1,12 +1,9 @@
 package cn.bdqfork.rpc.config.context;
 
-import cn.bdqfork.common.extension.ExtensionLoader;
 import cn.bdqfork.rpc.config.ApplicationConfig;
 import cn.bdqfork.rpc.config.ReferenceBean;
 import cn.bdqfork.rpc.config.RegistryConfig;
 import cn.bdqfork.rpc.config.annotation.Reference;
-import cn.bdqfork.rpc.registry.Registry;
-import cn.bdqfork.rpc.registry.RegistryFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.PropertyValues;
@@ -14,14 +11,18 @@ import org.springframework.beans.factory.BeanClassLoaderAware;
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.annotation.InjectionMetadata;
 import org.springframework.beans.factory.config.InstantiationAwareBeanPostProcessorAdapter;
-import org.springframework.beans.factory.support.*;
+import org.springframework.beans.factory.support.MergedBeanDefinitionPostProcessor;
+import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.util.ReflectionUtils;
 
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -31,11 +32,10 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ReferenceAnnotationPostProcessor extends InstantiationAwareBeanPostProcessorAdapter implements
         MergedBeanDefinitionPostProcessor, ApplicationContextAware, BeanClassLoaderAware {
     public static final String REFERENCE_ANNOTATION_POST_PROCESSOR_NAME = "referenceAnnotationPostProcessor";
-    private RegistryFactory registryFactory = ExtensionLoader.getExtension(RegistryFactory.class);
     private final transient Map<String, InjectionMetadata> injectionMetadataCache = new ConcurrentHashMap<>(256);
+    private Map<String, RegistryConfig> registryConfigs;
     private ApplicationContext applicationContext;
     private ClassLoader classLoader;
-    private Registry registry;
 
     @Override
     public PropertyValues postProcessProperties(PropertyValues pvs, Object bean, String beanName) throws BeansException {
@@ -151,7 +151,6 @@ public class ReferenceAnnotationPostProcessor extends InstantiationAwareBeanPost
         private ReferenceMethodElementReference(Member member, PropertyDescriptor pd, Reference reference) {
             super(member, pd);
             this.reference = reference;
-            this.reference = reference;
         }
 
         @Override
@@ -188,20 +187,27 @@ public class ReferenceAnnotationPostProcessor extends InstantiationAwareBeanPost
         ReferenceBean<T> referenceBean = new ReferenceBean<>(reference);
         referenceBean.setServiceInterface(serviceInterface);
         ApplicationConfig applicationConfig = applicationContext.getBean(ApplicationConfig.class);
-        RegistryConfig registryConfig = applicationContext.getBean(RegistryConfig.class);
+        List<RegistryConfig> registryConfigs = getRegistryConfigs(reference);
         referenceBean.setApplicationConfig(applicationConfig);
-        Registry registry = getOrCreateRegistry(registryConfig);
-        referenceBean.setRegistry(registry);
+        referenceBean.setRegistryConfigs(registryConfigs);
         referenceBean.afterPropertiesSet();
         return referenceBean;
     }
 
-    private Registry getOrCreateRegistry(RegistryConfig registryConfig) {
-        if (registry == null) {
-            registry = registryFactory.createRegistry(registryConfig);
+    private List<RegistryConfig> getRegistryConfigs(Reference reference) {
+        if (registryConfigs == null) {
+            this.registryConfigs = applicationContext.getBeansOfType(RegistryConfig.class);
         }
-        return registry;
+        List<RegistryConfig> registryConfigs = new ArrayList<>();
+        if (reference.registry().length > 0) {
+            for (String registryConfigBeanName : reference.registry()) {
+                RegistryConfig registryConfig = this.registryConfigs.get(registryConfigBeanName);
+                registryConfigs.add(registryConfig);
+            }
+        } else {
+            registryConfigs.addAll(this.registryConfigs.values());
+        }
+        return registryConfigs;
     }
-
 
 }

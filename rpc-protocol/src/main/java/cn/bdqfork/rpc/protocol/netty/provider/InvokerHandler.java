@@ -23,17 +23,11 @@ public class InvokerHandler extends ChannelInboundHandlerAdapter {
     private static final Logger log = LoggerFactory.getLogger(InvokerHandler.class);
     private final Map<String, Invoker> invokers = new ConcurrentHashMap<>();
 
-    public InvokerHandler(List<Invoker<?>> invokers) {
-        init(invokers);
-    }
-
-    private void init(List<Invoker<?>> invokers) {
-        invokers.forEach(invoker -> {
-            URL url = invoker.getUrl();
-            String refName = url.getParameter(Const.REF_NAME_KEY, "");
-            String serviceInterface = url.getParameter(Const.INTERFACE_KEY);
-            this.invokers.put(serviceInterface + refName, invoker);
-        });
+    public void addInvoker(Invoker<?> invoker) {
+        URL url = invoker.getUrl();
+        String refName = url.getParameter(Const.REF_NAME_KEY, "");
+        String serviceInterface = url.getParameter(Const.INTERFACE_KEY);
+        this.invokers.put(serviceInterface + refName, invoker);
     }
 
     @Override

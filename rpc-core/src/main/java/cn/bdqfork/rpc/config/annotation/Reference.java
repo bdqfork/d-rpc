@@ -25,4 +25,8 @@ public @interface Reference {
 
     int connections() default 1;
 
+    String[] registry() default {};
+
+    String[] protocol() default {};
+
 }

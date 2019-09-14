@@ -9,8 +9,12 @@ import cn.bdqfork.rpc.remote.Invocation;
 import cn.bdqfork.rpc.remote.Invoker;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author bdq
@@ -18,7 +22,7 @@ import java.util.List;
  */
 public class Directory<T> extends AbstractDirectory<T> implements Notifier {
 
-    private Registry registry;
+    private List<Registry> registries;
 
     public Directory(Class<T> serviceInterface, URL url) {
         super(serviceInterface, url);
@@ -35,25 +39,20 @@ public class Directory<T> extends AbstractDirectory<T> implements Notifier {
     }
 
     public void subscribe() {
-        registry.subscribe(url, this);
+        registries.forEach(registry -> registry.subscribe(url, this));
     }
 
     @Override
     protected void refresh() {
-        List<URL> urls = registry.lookup(url);
+        List<URL> urls = registries.stream()
+                .map(registry -> registry.lookup(url))
+                .flatMap(Collection::stream)
+                .collect(Collectors.toList());
         notify(urls);
-    }
-
-    public void setRegistry(Registry registry) {
-        this.registry = registry;
     }
 
     public Class<T> getServiceInterface() {
         return serviceInterface;
-    }
-
-    public void setServiceInterface(Class<T> serviceInterface) {
-        this.serviceInterface = serviceInterface;
     }
 
     @Override
@@ -75,6 +74,10 @@ public class Directory<T> extends AbstractDirectory<T> implements Notifier {
             isAvailable = true;
         }
         this.urls = urls;
+    }
+
+    public void setRegistries(List<Registry> registries) {
+        this.registries = registries;
     }
 
 }

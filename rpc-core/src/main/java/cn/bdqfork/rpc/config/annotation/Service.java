@@ -17,4 +17,8 @@ public @interface Service {
 
     String refName() default "";
 
+    String[] registry() default {};
+
+    String[] protocol() default {};
+
 }

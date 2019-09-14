@@ -1,12 +1,10 @@
 package cn.bdqfork.rpc.protocol;
 
-import cn.bdqfork.rpc.config.ProtocolConfig;
-import cn.bdqfork.rpc.protocol.netty.provider.NettyRpcServer;
-import cn.bdqfork.rpc.remote.Invoker;
+import cn.bdqfork.common.constant.Const;
+import cn.bdqfork.rpc.protocol.netty.server.NettyServer;
+import cn.bdqfork.rpc.registry.URL;
 import cn.bdqfork.rpc.remote.RpcServer;
 import cn.bdqfork.rpc.remote.RpcServerFactory;
-
-import java.util.List;
 
 /**
  * @author bdq
@@ -15,9 +13,10 @@ import java.util.List;
 public class DefaultRpcServerFactory implements RpcServerFactory {
 
     @Override
-    public RpcServer createProviderServer(ProtocolConfig protocolConfig, List<Invoker<?>> invokers) {
-        if ("netty".equals(protocolConfig.getServer())) {
-            return new NettyRpcServer(protocolConfig, invokers);
+    public RpcServer getServer(URL url) {
+        String server = url.getProtocol();
+        if ("netty".equals(server)) {
+            return new NettyServer(url);
         }
         return null;
     }

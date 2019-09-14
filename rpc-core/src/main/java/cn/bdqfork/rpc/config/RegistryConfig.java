@@ -8,11 +8,11 @@ public class RegistryConfig {
     /**
      * 注册url
      */
-    private String url;
+    private String address;
     /**
-     * 是否需要鉴权
+     *注册中心类型，zookeeper
      */
-    private boolean auth;
+    private String protocol;
     /**
      * 用户名
      */
@@ -30,21 +30,22 @@ public class RegistryConfig {
      */
     private int connectionTimeout = 3000;
 
-    public String getUrl() {
-        return url;
+    public String getAddress() {
+        return address;
     }
 
-    public void setUrl(String url) {
-        this.url = url;
+    public void setAddress(String address) {
+        this.address = address;
     }
 
-    public boolean isAuth() {
-        return auth;
+    public String getProtocol() {
+        return protocol;
     }
 
-    public void setAuth(boolean auth) {
-        this.auth = auth;
+    public void setProtocol(String protocol) {
+        this.protocol = protocol;
     }
+
 
     public String getUsername() {
         return username;

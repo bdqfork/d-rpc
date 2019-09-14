@@ -6,11 +6,11 @@ import org.springframework.stereotype.Component;
 
 /**
  * @author bdq
- * @date 2019-03-04
+ * @since 2019-03-04
  */
 @Component
 public class UserServiceManager {
-    @Reference(group = "rpc-test", serviceInterface = UserService.class, retries = 3)
+    @Reference(group = "rpc-test")
     private UserService userService;
 
     public void sayHello() {

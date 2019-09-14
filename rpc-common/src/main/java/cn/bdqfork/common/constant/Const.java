@@ -27,4 +27,10 @@ public class Const {
     public static final String ENVIRONMENT_KEY = "environment";
     public static final String CONNECTIONS_KEY = "connections";
     public static final String LOADBALANCE_KEY = "loadBalance";
+    public static final String REGISTRY_KEY = "registryUrl";
+    public static final String SEESION_TIMEOUT_KEY = "sessionTimeout";
+    public static final String CONNECTION_TIMEOUT_KEY = "connectionTimeout";
+    public static final String USERNAME_KEY = "username";
+    public static final String PASSWORD_KEY = "password";
+    public static final String PROTOCOL_KEY = "protocol";
 }

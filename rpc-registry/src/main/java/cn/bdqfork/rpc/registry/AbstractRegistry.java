@@ -8,13 +8,33 @@ import java.util.concurrent.ConcurrentHashMap;
  * @since 2019-03-03
  */
 public abstract class AbstractRegistry implements Registry {
+    public static final String DEFAULT_ROOT = "rpc";
     protected Map<String, URL> cacheNodes = new ConcurrentHashMap<>();
     protected Map<String, CacheWatcher> cacheWatchers = new ConcurrentHashMap<>();
-    protected boolean running;
+    private URL url;
+    protected volatile boolean running;
+
+    public AbstractRegistry(URL url) {
+        this.url = url;
+    }
 
     @Override
-    public boolean isRunning() {
+    public boolean isAvailable() {
         return running;
+    }
+
+    @Override
+    public void destroy() {
+        running = false;
+        doDestroy();
+    }
+
+    protected abstract void doDestroy();
+
+
+    @Override
+    public URL getUrl() {
+        return url;
     }
 
     protected class CacheWatcher {

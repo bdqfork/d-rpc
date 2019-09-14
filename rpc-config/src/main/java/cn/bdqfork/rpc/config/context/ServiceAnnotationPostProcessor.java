@@ -1,8 +1,9 @@
 package cn.bdqfork.rpc.config.context;
 
+import cn.bdqfork.common.util.ClassUtils;
+import cn.bdqfork.rpc.config.RegistryConfig;
 import cn.bdqfork.rpc.config.ServiceBean;
 import cn.bdqfork.rpc.config.annotation.Service;
-import cn.bdqfork.common.util.ClassUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -11,9 +12,9 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.*;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.context.ResourceLoaderAware;
-import org.springframework.context.annotation.AnnotationBeanNameGenerator;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.type.filter.AnnotationTypeFilter;
@@ -33,9 +34,7 @@ public class ServiceAnnotationPostProcessor implements BeanDefinitionRegistryPos
     public static final String SERVICE_ANNOTATION_POST_PROCESSOR_NAME = "serviceAnnotationPostProcessor";
     private static final Logger log = LoggerFactory.getLogger(ServiceAnnotationPostProcessor.class);
 
-    private BeanNameGenerator beanNameGenerator = new AnnotationBeanNameGenerator();
     private Set<String> packagesToScan;
-
     private ClassLoader classLoader;
     private Environment environment;
     private ResourceLoader resourceLoader;
@@ -67,8 +66,6 @@ public class ServiceAnnotationPostProcessor implements BeanDefinitionRegistryPos
 
         Set<BeanDefinitionHolder> beanDefinitionHolders = scanner.doScan(resolvedPackages.toArray(new String[]{}));
 
-        List<Service> services = new ArrayList<>();
-
         for (BeanDefinitionHolder beanDefinitionHolder : beanDefinitionHolders) {
 
             BeanDefinition beanDefinition = beanDefinitionHolder.getBeanDefinition();
@@ -85,21 +82,18 @@ public class ServiceAnnotationPostProcessor implements BeanDefinitionRegistryPos
             }
             registry.registerBeanDefinition(serviceName, beanDefinition);
 
-            services.add(service);
+            registerServiceBean(beanNameGenerator, registry, service);
 
-        }
-
-        if (services.size() != 0) {
-            registerServiceBean(registry, services);
         }
 
     }
 
-    private void registerServiceBean(BeanDefinitionRegistry registry, List<Service> services) {
+    private void registerServiceBean(BeanNameGenerator beanNameGenerator, BeanDefinitionRegistry registry, Service service) {
         AbstractBeanDefinition beanDefinition = BeanDefinitionBuilder.genericBeanDefinition(ServiceBean.class)
-                .addPropertyValue("services", services)
+                .addPropertyValue("service", service)
                 .getBeanDefinition();
-        registry.registerBeanDefinition(ServiceBean.SERVICE_BEAN, beanDefinition);
+        String serviceBeanName = beanNameGenerator.generateBeanName(beanDefinition, registry);
+        registry.registerBeanDefinition(serviceBeanName, beanDefinition);
     }
 
     private Set<String> resolvePackages() {
@@ -140,4 +134,5 @@ public class ServiceAnnotationPostProcessor implements BeanDefinitionRegistryPos
     public void setResourceLoader(ResourceLoader resourceLoader) {
         this.resourceLoader = resourceLoader;
     }
+
 }

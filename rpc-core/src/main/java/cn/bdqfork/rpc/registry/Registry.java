@@ -9,14 +9,6 @@ import java.util.List;
  * @since 2019-02-26
  */
 public interface Registry extends Node {
-    String DEFAULT_ROOT = "rpc";
-
-    /**
-     * 是否在运行
-     *
-     * @return boolean
-     */
-    boolean isRunning();
 
     /**
      * 注册服务

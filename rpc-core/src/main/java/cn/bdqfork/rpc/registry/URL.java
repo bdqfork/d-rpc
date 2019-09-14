@@ -32,7 +32,7 @@ public class URL implements Serializable {
      */
     private String service;
 
-    private Map<String, String> parameterMap = new ConcurrentHashMap<>();
+    private Map<String, Object> parameterMap = new ConcurrentHashMap<>();
 
     public URL(String protocol, String host, int port, String service) {
         this.protocol = protocol;
@@ -82,22 +82,24 @@ public class URL implements Serializable {
         return toServiceCategory() + "/" + parameterMap.get(Const.SIDE_KEY) + "/" + host + ":" + port;
     }
 
-    public void addParameter(String key, String value) {
-        if (!StringUtils.isEmpty(value)) {
+    public <T> void addParameter(String key, T value) {
+        if (value != null) {
             parameterMap.put(key, value);
         }
     }
 
-    public String getParameter(String key) {
-        return parameterMap.get(key);
+    @SuppressWarnings("unchecked")
+    public <T> T getParameter(String key) {
+        return (T) parameterMap.get(key);
     }
 
-    public String getParameter(String key, String defaultValue) {
-        String value = parameterMap.get(key);
+    @SuppressWarnings("unchecked")
+    public <T> T getParameter(String key, T defaultValue) {
+        T value = (T) parameterMap.get(key);
         return value == null ? defaultValue : value;
     }
 
-    public Map<String, String> getParameterMap() {
+    public Map<String, Object> getParameterMap() {
         return parameterMap;
     }
 
@@ -119,7 +121,7 @@ public class URL implements Serializable {
         }
         StringBuilder builder = new StringBuilder();
         boolean first = true;
-        for (Map.Entry<String, String> entry : parameterMap.entrySet()) {
+        for (Map.Entry<String, Object> entry : parameterMap.entrySet()) {
             if (first) {
                 builder.append("?");
                 first = false;

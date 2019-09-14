@@ -3,6 +3,7 @@ package cn.bdqfork.rpc.config;
 import cn.bdqfork.common.constant.Const;
 import cn.bdqfork.common.exception.RpcException;
 import cn.bdqfork.common.extension.ExtensionLoader;
+import cn.bdqfork.common.util.NetUtils;
 import cn.bdqfork.rpc.remote.Invoker;
 import cn.bdqfork.rpc.RegistryProtocol;
 import cn.bdqfork.rpc.config.annotation.Service;
@@ -19,75 +20,75 @@ import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.ApplicationEvent;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.ContextRefreshedEvent;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @author bdq
  * @since 2019-03-03
  */
-public class ServiceBean implements InitializingBean, ApplicationContextAware, DisposableBean {
-    private static final Logger log = LoggerFactory.getLogger(ServiceBean.class);
+public class ServiceBean implements InitializingBean, DisposableBean, ApplicationListener<ContextRefreshedEvent>, ApplicationContextAware {
     public static final String SERVICE_BEAN = "serviceBean";
     private RegistryFactory registryFactory = ExtensionLoader.getExtension(RegistryFactory.class);
     private ApplicationContext applicationContext;
-    private RpcServerFactory serverFactory = ExtensionLoader.getExtension(RpcServerFactory.class);
-    private Registry registry;
-    private RpcServer rpcServer;
-    private List<Service> services;
-
-    @Override
-    public void destroy() throws Exception {
-
-        log.info("closing server");
-
-        registry.destroy();
-        rpcServer.close();
-
-        log.info("server closed");
-    }
+    private Service service;
 
     @SuppressWarnings("unchecked")
     @Override
     public void afterPropertiesSet() throws Exception {
 
-        RegistryConfig registryConfig = applicationContext.getBean(RegistryConfig.class);
-
-        registry = registryFactory.createRegistry(registryConfig);
-
-        RegistryProtocol registryProtocol = new RegistryProtocol(registry);
-
         ApplicationConfig applicationConfig = applicationContext.getBean(ApplicationConfig.class);
-
-        ProtocolConfig protocolConfig = applicationContext.getBean(ProtocolConfig.class);
 
         List<Invoker<?>> invokers = new ArrayList<>();
 
-        services.forEach(service -> {
+        List<Registry> registries = getRegistries();
+
+        List<ProtocolConfig> protocolConfigs = getProtocolConfigs();
+
+        RegistryProtocol registryProtocol = new RegistryProtocol(registries);
+
+        for (ProtocolConfig protocolConfig : protocolConfigs) {
             URL url = buildUrl(protocolConfig, applicationConfig, service);
+
             Class type = service.serviceInterface();
+
             Object proxy = applicationContext.getBean(type);
-            Invoker invoker = null;
-            try {
-                invoker = registryProtocol.getInvoker(proxy, type, url);
-            } catch (RpcException e) {
-                e.printStackTrace();
-            }
+
+            Invoker<?> invoker = registryProtocol.getInvoker(proxy, type, url);
+
             invokers.add(invoker);
-        });
 
-        rpcServer = serverFactory.createProviderServer(protocolConfig, invokers);
+        }
 
-        log.info("starting server");
-        rpcServer.start();
-        log.info("server started");
+        export(invokers, registryProtocol);
 
+    }
+
+    private void export(List<Invoker<?>> invokers, RegistryProtocol registryProtocol) {
         invokers.forEach(invoker -> {
             Exporter exporter = registryProtocol.export(invoker);
             exporter.doExport();
         });
+    }
 
+    private List<ProtocolConfig> getProtocolConfigs() {
+        String[] protocols = service.protocol();
+        List<ProtocolConfig> protocolConfigs = new ArrayList<>();
+        if (protocols.length > 0) {
+            for (String protocol : protocols) {
+                ProtocolConfig protocolConfig = applicationContext.getBean(protocol, ProtocolConfig.class);
+                protocolConfigs.add(protocolConfig);
+            }
+        } else {
+            protocolConfigs.addAll(applicationContext.getBeansOfType(ProtocolConfig.class).values());
+        }
+        return protocolConfigs;
     }
 
     private URL buildUrl(ProtocolConfig protocolConfig, ApplicationConfig applicationConfig, Service service) {
@@ -103,12 +104,55 @@ public class ServiceBean implements InitializingBean, ApplicationContextAware, D
         return url;
     }
 
-    public void setServices(List<Service> services) {
-        this.services = services;
+    public void setService(Service service) {
+        this.service = service;
     }
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;
+    }
+
+    private List<Registry> getRegistries() {
+        String ip = NetUtils.getIp();
+        List<RegistryConfig> registryConfigs = getRegistryConfigs();
+        return registryConfigs.stream()
+                .map(registryConfig -> {
+                    URL url = new URL(registryConfig.getProtocol(), ip, 0, "");
+                    url.addParameter(Const.REGISTRY_KEY, registryConfig.getAddress());
+                    url.addParameter(Const.SEESION_TIMEOUT_KEY, registryConfig.getSessionTimeout());
+                    url.addParameter(Const.CONNECTION_TIMEOUT_KEY, registryConfig.getConnectionTimeout());
+                    url.addParameter(Const.USERNAME_KEY, registryConfig.getUsername());
+                    url.addParameter(Const.PASSWORD_KEY, registryConfig.getPassword());
+                    return url;
+                })
+                .map(url -> {
+                    return registryFactory.getRegistry(url);
+                })
+                .collect(Collectors.toList());
+    }
+
+
+    private List<RegistryConfig> getRegistryConfigs() {
+        List<RegistryConfig> registryConfigs = new ArrayList<>();
+        if (service.registry().length > 0) {
+            for (String registryConfigBeanName : service.registry()) {
+                RegistryConfig registryConfig = applicationContext.getBean(registryConfigBeanName, RegistryConfig.class);
+                registryConfigs.add(registryConfig);
+            }
+        } else {
+            registryConfigs.addAll(applicationContext.getBeansOfType(RegistryConfig.class).values());
+        }
+        return registryConfigs;
+    }
+
+    @Override
+    public void destroy() throws Exception {
+
+    }
+
+    @Override
+    public void onApplicationEvent(ContextRefreshedEvent event) {
+
     }
 }

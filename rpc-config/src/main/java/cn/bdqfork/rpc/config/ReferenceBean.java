@@ -3,7 +3,6 @@ package cn.bdqfork.rpc.config;
 import cn.bdqfork.common.constant.Const;
 import cn.bdqfork.common.extension.ExtensionLoader;
 import cn.bdqfork.common.util.NetUtils;
-import cn.bdqfork.rpc.remote.Invoker;
 import cn.bdqfork.rpc.RegistryProtocol;
 import cn.bdqfork.rpc.config.annotation.Reference;
 import cn.bdqfork.rpc.exporter.Exporter;
@@ -11,22 +10,24 @@ import cn.bdqfork.rpc.proxy.ProxyFactory;
 import cn.bdqfork.rpc.registry.Registry;
 import cn.bdqfork.rpc.registry.RegistryFactory;
 import cn.bdqfork.rpc.registry.URL;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import cn.bdqfork.rpc.remote.Invoker;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author bdq
  * @since 2019-03-04
  */
 public class ReferenceBean<T> implements FactoryBean<Object>, InitializingBean {
-
+    private RegistryFactory registryFactory = ExtensionLoader.getExtension(RegistryFactory.class);
     private ProxyFactory proxyFactory = ExtensionLoader.getExtension(ProxyFactory.class);
     private Reference reference;
     private Class<T> serviceInterface;
     private ApplicationConfig applicationConfig;
-    private Registry registry;
+    private List<RegistryConfig> registryConfigs;
 
     public ReferenceBean(Reference reference) {
         this.reference = reference;
@@ -39,8 +40,8 @@ public class ReferenceBean<T> implements FactoryBean<Object>, InitializingBean {
 
     @Override
     public Object getObject() throws Exception {
-
-        RegistryProtocol registryProtocol = new RegistryProtocol(registry);
+        List<Registry> registries = getRegistries();
+        RegistryProtocol registryProtocol = new RegistryProtocol(registries);
 
         URL url = buildUrl(applicationConfig);
 
@@ -60,7 +61,6 @@ public class ReferenceBean<T> implements FactoryBean<Object>, InitializingBean {
         url.addParameter(Const.VERSION_KEY, applicationConfig.getVersion());
         url.addParameter(Const.ENVIRONMENT_KEY, applicationConfig.getEnvironment());
         url.addParameter(Const.GROUP_KEY, reference.group());
-        url.addParameter(Const.REF_NAME_KEY, reference.refName());
         url.addParameter(Const.INTERFACE_KEY, serviceInterface.getName());
         url.addParameter(Const.REF_NAME_KEY, reference.refName());
         url.addParameter(Const.RETRY_KEY, String.valueOf(reference.retries()));
@@ -69,6 +69,24 @@ public class ReferenceBean<T> implements FactoryBean<Object>, InitializingBean {
         url.addParameter(Const.SIDE_KEY, Const.CONSUMER_SIDE);
         url.addParameter(Const.LOADBALANCE_KEY, reference.loadBalance());
         return url;
+    }
+
+    private List<Registry> getRegistries() {
+        String ip = NetUtils.getIp();
+        return registryConfigs.stream()
+                .map(registryConfig -> {
+                    URL url = new URL(registryConfig.getProtocol(), ip, 0, "");
+                    url.addParameter(Const.REGISTRY_KEY, registryConfig.getAddress());
+                    url.addParameter(Const.SEESION_TIMEOUT_KEY, registryConfig.getSessionTimeout());
+                    url.addParameter(Const.CONNECTION_TIMEOUT_KEY, registryConfig.getConnectionTimeout());
+                    url.addParameter(Const.USERNAME_KEY, registryConfig.getUsername());
+                    url.addParameter(Const.PASSWORD_KEY, registryConfig.getPassword());
+                    return url;
+                })
+                .map(url -> {
+                    return registryFactory.getRegistry(url);
+                })
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -80,12 +98,12 @@ public class ReferenceBean<T> implements FactoryBean<Object>, InitializingBean {
         this.applicationConfig = applicationConfig;
     }
 
-    public void setRegistry(Registry registry) {
-        this.registry = registry;
-    }
-
     public void setServiceInterface(Class<T> serviceInterface) {
         this.serviceInterface = serviceInterface;
+    }
+
+    public void setRegistryConfigs(List<RegistryConfig> registryConfigs) {
+        this.registryConfigs = registryConfigs;
     }
 
 }

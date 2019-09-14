@@ -1,7 +1,6 @@
 package cn.bdqfork.rpc.registry.zookeeper;
 
 import cn.bdqfork.common.constant.Const;
-import cn.bdqfork.rpc.config.RegistryConfig;
 import cn.bdqfork.rpc.registry.AbstractRegistry;
 import cn.bdqfork.rpc.registry.Notifier;
 import cn.bdqfork.rpc.registry.URL;
@@ -29,14 +28,18 @@ public class ZkRegistry extends AbstractRegistry {
     private static final Logger log = LoggerFactory.getLogger(ZkRegistry.class);
     private CuratorFramework client;
 
-    public ZkRegistry(RegistryConfig registryConfig) {
+    public ZkRegistry(URL url) {
+        super(url);
         RetryPolicy retryPolicy = new RetryNTimes(3, 1000);
         //获取zookeeper地址
-        String url = registryConfig.getUrl().substring(12);
+        String hostUrl = url.getParameter(Const.REGISTRY_KEY);
+        int seesionTimeout = url.getParameter(Const.SEESION_TIMEOUT_KEY);
+        int connectionTimeout = url.getParameter(Const.CONNECTION_TIMEOUT_KEY);
+
         client = CuratorFrameworkFactory.builder()
-                .connectString(url)
-                .sessionTimeoutMs(registryConfig.getSessionTimeout())
-                .connectionTimeoutMs(registryConfig.getConnectionTimeout())
+                .connectString(hostUrl)
+                .sessionTimeoutMs(seesionTimeout)
+                .connectionTimeoutMs(connectionTimeout)
                 .retryPolicy(retryPolicy)
                 .build();
 
@@ -139,15 +142,7 @@ public class ZkRegistry extends AbstractRegistry {
     }
 
     @Override
-    public boolean isAvailable() {
-        return false;
-    }
-
-    @Override
-    public void destroy() {
-        if (running) {
-            client.close();
-        }
-        running = false;
+    protected void doDestroy() {
+        client.close();
     }
 }

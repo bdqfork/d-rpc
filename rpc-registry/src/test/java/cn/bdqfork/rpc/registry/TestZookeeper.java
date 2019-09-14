@@ -16,8 +16,9 @@ public class TestZookeeper {
     @Test
     public void register() {
         RegistryConfig registryConfig = new RegistryConfig();
-        registryConfig.setUrl("zookeeper://127.0.0.1:2181");
-        Registry registry = new ZkRegistry(registryConfig);
+        registryConfig.setAddress("127.0.0.1:2181");
+        registryConfig.setProtocol("zookeeper");
+//        Registry registry = new ZkRegistry(registryConfig);
 
         URL url = new URL(Const.PROTOCOL_PROVIDER, "127.0.0.1", 9000, "cn.registry.test");
 
@@ -28,7 +29,7 @@ public class TestZookeeper {
         url.addParameter(Const.SERVER_KEY, "netty");
         url.addParameter(Const.SERIALIZATION_KEY, "jdk");
 
-        registry.register(url);
+//        registry.register(url);
 
     }
 

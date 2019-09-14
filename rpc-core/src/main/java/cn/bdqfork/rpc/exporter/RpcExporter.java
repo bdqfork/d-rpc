@@ -1,8 +1,10 @@
 package cn.bdqfork.rpc.exporter;
 
-import cn.bdqfork.rpc.remote.Invoker;
 import cn.bdqfork.rpc.registry.Registry;
 import cn.bdqfork.rpc.registry.URL;
+import cn.bdqfork.rpc.remote.Invoker;
+
+import java.util.List;
 
 /**
  * @author bdq
@@ -10,7 +12,7 @@ import cn.bdqfork.rpc.registry.URL;
  */
 public class RpcExporter implements Exporter {
     private Invoker invoker;
-    private Registry registry;
+    private List<Registry> registries;
 
     public RpcExporter(Invoker invoker) {
         this.invoker = invoker;
@@ -19,11 +21,15 @@ public class RpcExporter implements Exporter {
     @Override
     public void doExport() {
         URL url = invoker.getUrl();
-        registry.register(url);
+        registries.forEach(registry -> registry.register(url));
     }
 
-    public void setRegistry(Registry registry) {
-        this.registry = registry;
+    @Override
+    public Invoker getInvoker() {
+        return null;
     }
 
+    public void setRegistries(List<Registry> registries) {
+        this.registries = registries;
+    }
 }
