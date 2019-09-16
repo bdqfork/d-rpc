@@ -15,8 +15,6 @@ public @interface Service {
 
     Class<?> serviceInterface() default void.class;
 
-    String refName() default "";
-
     String[] registry() default {};
 
     String[] protocol() default {};

@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 /**
@@ -21,10 +22,11 @@ import java.util.stream.Collectors;
 public abstract class AbstractInvoker<T> implements Invoker<T> {
     private static Logger log = LoggerFactory.getLogger(AbstractInvoker.class);
     private List<Filter> filters = ExtensionLoader.getExtensions(Filter.class);
+    private boolean isAvailable = true;
+    private AtomicBoolean destroyed = new AtomicBoolean(false);
     protected T proxy;
     protected Class<T> type;
     protected URL url;
-    private boolean isAvailable = true;
 
     public AbstractInvoker(T proxy, Class<T> type, URL url) {
         this.proxy = proxy;
@@ -60,7 +62,9 @@ public abstract class AbstractInvoker<T> implements Invoker<T> {
 
     @Override
     public void destroy() {
-        isAvailable = false;
+        if (destroyed.compareAndSet(false, true)) {
+            isAvailable = false;
+        }
     }
 
     private void sortFilters() {

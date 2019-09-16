@@ -22,7 +22,7 @@ public interface Registry extends Node {
      *
      * @param url
      */
-    void unregister(URL url);
+    void undoRegister(URL url);
 
     /**
      * 订阅服务

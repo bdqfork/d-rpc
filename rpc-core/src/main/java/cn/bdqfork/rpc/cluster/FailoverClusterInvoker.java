@@ -2,7 +2,7 @@ package cn.bdqfork.rpc.cluster;
 
 import cn.bdqfork.common.constant.Const;
 import cn.bdqfork.common.exception.RpcException;
-import cn.bdqfork.rpc.remote.Directory;
+import cn.bdqfork.rpc.Directory;
 import cn.bdqfork.rpc.remote.Invocation;
 import cn.bdqfork.rpc.remote.Invoker;
 import cn.bdqfork.rpc.remote.Result;

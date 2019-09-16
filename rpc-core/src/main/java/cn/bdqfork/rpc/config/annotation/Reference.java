@@ -15,8 +15,6 @@ public @interface Reference {
 
     Class<?> serviceInterface() default void.class;
 
-    String refName() default "";
-
     String loadBalance() default "random";
 
     long timeout() default 1000;
@@ -28,5 +26,7 @@ public @interface Reference {
     String[] registry() default {};
 
     String[] protocol() default {};
+
+    boolean isLazy() default false;
 
 }

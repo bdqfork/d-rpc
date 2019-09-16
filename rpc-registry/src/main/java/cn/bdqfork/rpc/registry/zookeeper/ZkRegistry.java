@@ -17,7 +17,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 /**
@@ -26,10 +30,16 @@ import java.util.stream.Collectors;
  */
 public class ZkRegistry extends AbstractRegistry {
     private static final Logger log = LoggerFactory.getLogger(ZkRegistry.class);
+    private Map<String, URL> cacheNodes = new ConcurrentHashMap<>();
+    private Map<String, CacheWatcher> cacheWatchers = new ConcurrentHashMap<>();
     private CuratorFramework client;
 
     public ZkRegistry(URL url) {
         super(url);
+    }
+
+    @Override
+    protected void doConnect() {
         RetryPolicy retryPolicy = new RetryNTimes(3, 1000);
         //获取zookeeper地址
         String hostUrl = url.getParameter(Const.REGISTRY_KEY);
@@ -45,16 +55,16 @@ public class ZkRegistry extends AbstractRegistry {
 
         client.getConnectionStateListenable().addListener((client, newState) -> {
             if (newState.isConnected()) {
-                running = true;
-            } else {
-                running = false;
+                isAvailable = true;
+                recover();
+            } else if (!destroyed.get()) {
+                isAvailable = false;
                 try {
                     client.blockUntilConnected();
                 } catch (InterruptedException e) {
                     log.error(e.getMessage(), e);
                 }
             }
-            recover();
         });
 
         client.start();
@@ -82,7 +92,7 @@ public class ZkRegistry extends AbstractRegistry {
     }
 
     @Override
-    public void unregister(URL url) {
+    public void undoRegister(URL url) {
         String group = url.getParameter(Const.GROUP_KEY, DEFAULT_ROOT);
         String path = "/" + group + url.toPath();
         try {
@@ -122,6 +132,7 @@ public class ZkRegistry extends AbstractRegistry {
     }
 
     private boolean isMatch(TreeCacheEvent treeCacheEvent) {
+        log.debug("zookeeper notify event: {} !",treeCacheEvent.getType());
         return treeCacheEvent.getType() == TreeCacheEvent.Type.NODE_ADDED || treeCacheEvent.getType() == TreeCacheEvent.Type.NODE_UPDATED ||
                 treeCacheEvent.getType() == TreeCacheEvent.Type.NODE_REMOVED;
     }
@@ -148,12 +159,25 @@ public class ZkRegistry extends AbstractRegistry {
     }
 
     @Override
-    public URL getUrl() {
-        return null;
-    }
-
-    @Override
     protected void doDestroy() {
         client.close();
+    }
+
+    class CacheWatcher {
+        private URL url;
+        private Notifier notifier;
+
+        CacheWatcher(URL url, Notifier notifier) {
+            this.url = url;
+            this.notifier = notifier;
+        }
+
+        URL getUrl() {
+            return url;
+        }
+
+        Notifier getNotifier() {
+            return notifier;
+        }
     }
 }

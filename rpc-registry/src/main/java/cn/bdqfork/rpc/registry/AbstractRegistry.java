@@ -1,7 +1,6 @@
 package cn.bdqfork.rpc.registry;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * @author bdq
@@ -9,24 +8,28 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public abstract class AbstractRegistry implements Registry {
     public static final String DEFAULT_ROOT = "rpc";
-    protected Map<String, URL> cacheNodes = new ConcurrentHashMap<>();
-    protected Map<String, CacheWatcher> cacheWatchers = new ConcurrentHashMap<>();
-    private URL url;
-    protected volatile boolean running;
+    protected URL url;
+    protected volatile boolean isAvailable;
+    protected AtomicBoolean destroyed = new AtomicBoolean(false);
 
     public AbstractRegistry(URL url) {
         this.url = url;
+        doConnect();
     }
+
+    protected abstract void doConnect();
 
     @Override
     public boolean isAvailable() {
-        return running;
+        return isAvailable;
     }
 
     @Override
     public void destroy() {
-        running = false;
-        doDestroy();
+        if (destroyed.compareAndSet(false, true)) {
+            isAvailable = false;
+            doDestroy();
+        }
     }
 
     protected abstract void doDestroy();
@@ -35,24 +38,6 @@ public abstract class AbstractRegistry implements Registry {
     @Override
     public URL getUrl() {
         return url;
-    }
-
-    protected class CacheWatcher {
-        private URL url;
-        private Notifier notifier;
-
-        public CacheWatcher(URL url, Notifier notifier) {
-            this.url = url;
-            this.notifier = notifier;
-        }
-
-        public URL getUrl() {
-            return url;
-        }
-
-        public Notifier getNotifier() {
-            return notifier;
-        }
     }
 
 }

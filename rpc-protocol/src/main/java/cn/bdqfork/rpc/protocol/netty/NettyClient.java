@@ -1,18 +1,17 @@
-package cn.bdqfork.rpc.protocol.netty.client;
+package cn.bdqfork.rpc.protocol.netty;
 
 import cn.bdqfork.common.exception.RemoteException;
 import cn.bdqfork.common.exception.RpcException;
-import cn.bdqfork.rpc.protocol.netty.NettyInitializer;
 import cn.bdqfork.rpc.remote.RemoteClient;
 import cn.bdqfork.rpc.remote.Request;
+import cn.bdqfork.rpc.remote.Serializer;
 import cn.bdqfork.rpc.remote.context.DefaultFuture;
 import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelOption;
-import io.netty.channel.EventLoopGroup;
+import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,7 +29,7 @@ public class NettyClient implements RemoteClient {
     private Bootstrap bootstrap;
     private long timeout = 3000;
 
-    public NettyClient(String host, Integer port, NettyInitializer nettyInitializer) {
+    public NettyClient(String host, Integer port, Serializer serializer) {
         this.host = host;
         this.port = port;
         EventLoopGroup group = new NioEventLoopGroup();
@@ -38,8 +37,18 @@ public class NettyClient implements RemoteClient {
         bootstrap.group(group)
                 .channel(NioSocketChannel.class)
                 .option(ChannelOption.SO_KEEPALIVE, true)
+                .option(ChannelOption.SO_SNDBUF, 32 * 1024)
                 .remoteAddress(host, port)
-                .handler(nettyInitializer);
+                .handler(new ChannelInitializer<SocketChannel>() {
+                    @Override
+                    protected void initChannel(SocketChannel ch) throws Exception {
+                        ch.pipeline()
+                                .addLast(new LengthFieldBasedFrameDecoder(64 * 1024, 14, 4, 0, 0))
+                                .addLast(new DataDecoder(serializer))
+                                .addLast(new DataEncoder(serializer))
+                                .addLast(new ClientContextHandler());
+                    }
+                });
     }
 
     private void doConnect() throws RemoteException {

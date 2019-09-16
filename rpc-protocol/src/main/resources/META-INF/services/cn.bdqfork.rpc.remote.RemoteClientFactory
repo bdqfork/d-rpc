@@ -1,1 +1,1 @@
-cn.bdqfork.rpc.protocol.DefaultRemoteClientFactory
+cn.bdqfork.rpc.protocol.serializer.DefaultRemoteClientFactory

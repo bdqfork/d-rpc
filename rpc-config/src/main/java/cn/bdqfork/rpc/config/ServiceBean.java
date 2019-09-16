@@ -1,7 +1,6 @@
 package cn.bdqfork.rpc.config;
 
 import cn.bdqfork.common.constant.Const;
-import cn.bdqfork.common.exception.RpcException;
 import cn.bdqfork.common.extension.ExtensionLoader;
 import cn.bdqfork.common.util.NetUtils;
 import cn.bdqfork.rpc.remote.Invoker;
@@ -11,22 +10,16 @@ import cn.bdqfork.rpc.exporter.Exporter;
 import cn.bdqfork.rpc.registry.Registry;
 import cn.bdqfork.rpc.registry.RegistryFactory;
 import cn.bdqfork.rpc.registry.URL;
-import cn.bdqfork.rpc.remote.RpcServer;
-import cn.bdqfork.rpc.remote.RpcServerFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -38,6 +31,7 @@ public class ServiceBean implements InitializingBean, DisposableBean, Applicatio
     private ApplicationContext applicationContext;
     private Service service;
     private List<Exporter> exporters;
+    private boolean inited = false;
 
     @SuppressWarnings("unchecked")
     @Override
@@ -70,7 +64,6 @@ public class ServiceBean implements InitializingBean, DisposableBean, Applicatio
                 .map(registryProtocol::export)
                 .collect(Collectors.toList());
 
-        export();
     }
 
     private void export() {
@@ -97,7 +90,6 @@ public class ServiceBean implements InitializingBean, DisposableBean, Applicatio
         url.addParameter(Const.APPLICATION_KEY, applicationConfig.getApplicationName());
         url.addParameter(Const.GROUP_KEY, service.group());
         url.addParameter(Const.SIDE_KEY, Const.PROVIDER_SIDE);
-        url.addParameter(Const.REF_NAME_KEY, service.refName());
         url.addParameter(Const.INTERFACE_KEY, service.serviceInterface().getName());
         url.addParameter(Const.SERVER_KEY, protocolConfig.getServer());
         url.addParameter(Const.SERIALIZATION_KEY, protocolConfig.getSerialization());
@@ -126,9 +118,7 @@ public class ServiceBean implements InitializingBean, DisposableBean, Applicatio
                     url.addParameter(Const.PASSWORD_KEY, registryConfig.getPassword());
                     return url;
                 })
-                .map(url -> {
-                    return registryFactory.getRegistry(url);
-                })
+                .map(url -> registryFactory.getRegistry(url))
                 .collect(Collectors.toList());
     }
 
@@ -148,11 +138,14 @@ public class ServiceBean implements InitializingBean, DisposableBean, Applicatio
 
     @Override
     public void destroy() throws Exception {
-        exporters.forEach(Exporter::unexport);
+        exporters.forEach(Exporter::undoExport);
     }
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
-
+        if (!inited) {
+            inited = true;
+            export();
+        }
     }
 }

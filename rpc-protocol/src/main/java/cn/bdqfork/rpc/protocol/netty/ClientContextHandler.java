@@ -1,4 +1,4 @@
-package cn.bdqfork.rpc.protocol.netty.consumer;
+package cn.bdqfork.rpc.protocol.netty;
 
 import cn.bdqfork.rpc.remote.Response;
 import cn.bdqfork.rpc.remote.context.DefaultFuture;

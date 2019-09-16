@@ -28,6 +28,7 @@ public class ReferenceBean<T> implements FactoryBean<Object>, InitializingBean {
     private Class<T> serviceInterface;
     private ApplicationConfig applicationConfig;
     private List<RegistryConfig> registryConfigs;
+    private T bean;
 
     public ReferenceBean(Reference reference) {
         this.reference = reference;
@@ -35,11 +36,16 @@ public class ReferenceBean<T> implements FactoryBean<Object>, InitializingBean {
 
     @Override
     public void afterPropertiesSet() throws Exception {
-//        getObject();
+        if (bean == null && !reference.isLazy()) {
+            getObject();
+        }
     }
 
     @Override
     public Object getObject() throws Exception {
+        if (bean != null) {
+            return bean;
+        }
         List<Registry> registries = getRegistries();
         RegistryProtocol registryProtocol = new RegistryProtocol(registries);
 
@@ -51,7 +57,9 @@ public class ReferenceBean<T> implements FactoryBean<Object>, InitializingBean {
 
         exporter.doExport();
 
-        return proxyFactory.getProxy(invoker);
+        bean = proxyFactory.getProxy(invoker);
+
+        return bean;
     }
 
     private URL buildUrl(ApplicationConfig applicationConfig) {
@@ -62,7 +70,6 @@ public class ReferenceBean<T> implements FactoryBean<Object>, InitializingBean {
         url.addParameter(Const.ENVIRONMENT_KEY, applicationConfig.getEnvironment());
         url.addParameter(Const.GROUP_KEY, reference.group());
         url.addParameter(Const.INTERFACE_KEY, serviceInterface.getName());
-        url.addParameter(Const.REF_NAME_KEY, reference.refName());
         url.addParameter(Const.RETRY_KEY, String.valueOf(reference.retries()));
         url.addParameter(Const.TIMEOUT_KEY, String.valueOf(reference.timeout()));
         url.addParameter(Const.CONNECTIONS_KEY, String.valueOf(reference.connections()));
@@ -83,9 +90,7 @@ public class ReferenceBean<T> implements FactoryBean<Object>, InitializingBean {
                     url.addParameter(Const.PASSWORD_KEY, registryConfig.getPassword());
                     return url;
                 })
-                .map(url -> {
-                    return registryFactory.getRegistry(url);
-                })
+                .map(url -> registryFactory.getRegistry(url))
                 .collect(Collectors.toList());
     }
 

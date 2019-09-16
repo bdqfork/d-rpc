@@ -26,11 +26,7 @@ public class RpcContextFilter implements Filter {
 
         rpcContext.setArguments(invocation.getArguments());
 
-        String refName = url.getParameter(Const.REF_NAME_KEY);
-        rpcContext.setRefName(refName);
-
         Map<String, String> attachments = new HashMap<>();
-        attachments.put(Const.REF_NAME_KEY, refName);
         attachments.put(Const.INTERFACE_KEY, invoker.getInterface().getName());
 
         invocation.setAttachments(attachments);

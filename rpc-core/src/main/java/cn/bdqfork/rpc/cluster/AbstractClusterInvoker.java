@@ -1,12 +1,10 @@
 package cn.bdqfork.rpc.cluster;
 
-import cn.bdqfork.common.constant.Const;
 import cn.bdqfork.common.exception.RpcException;
-import cn.bdqfork.common.extension.ExtensionLoader;
+import cn.bdqfork.rpc.Directory;
 import cn.bdqfork.rpc.registry.URL;
 import cn.bdqfork.rpc.remote.Invocation;
 import cn.bdqfork.rpc.remote.Invoker;
-import cn.bdqfork.rpc.remote.Directory;
 import cn.bdqfork.rpc.remote.Result;
 
 import java.util.List;
@@ -37,7 +35,7 @@ public abstract class AbstractClusterInvoker<T> implements Invoker<T> {
 
     @Override
     public Class<T> getInterface() {
-        return directory.getServiceInterface();
+        return directory.getInterface();
     }
 
     @Override

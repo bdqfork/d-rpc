@@ -1,4 +1,4 @@
-package cn.bdqfork.rpc.protocol.netty.provider;
+package cn.bdqfork.rpc.protocol.netty;
 
 import cn.bdqfork.common.constant.Const;
 import cn.bdqfork.common.exception.RpcException;
@@ -10,7 +10,6 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -25,9 +24,8 @@ public class InvokerHandler extends ChannelInboundHandlerAdapter {
 
     public void addInvoker(Invoker<?> invoker) {
         URL url = invoker.getUrl();
-        String refName = url.getParameter(Const.REF_NAME_KEY, "");
         String serviceInterface = url.getParameter(Const.INTERFACE_KEY);
-        this.invokers.put(serviceInterface + refName, invoker);
+        this.invokers.put(serviceInterface, invoker);
     }
 
     @Override
@@ -36,10 +34,9 @@ public class InvokerHandler extends ChannelInboundHandlerAdapter {
         Invocation invocation = (Invocation) request.getData();
 
         Map<String, String> attachments = invocation.getAttachments();
-        String serviceInterface = attachments.get(Const.INTERFACE_KEY);
-        String refName = attachments.get(Const.REF_NAME_KEY);
 
-        Invoker<?> invoker = invokers.get(serviceInterface + refName);
+        String serviceInterface = attachments.get(Const.INTERFACE_KEY);
+        Invoker<?> invoker = invokers.get(serviceInterface);
 
         Response response = new Response();
         response.setId(request.getId());
@@ -56,8 +53,8 @@ public class InvokerHandler extends ChannelInboundHandlerAdapter {
             ctx.writeAndFlush(response);
         } else {
             response.setStatus(Response.SERVER_ERROR);
-            RpcException rpcException = new RpcException(String.format("There is no service for Interface %s and refName %s",
-                    serviceInterface, refName));
+            RpcException rpcException = new RpcException(String.format("There is no service for interface %s ",
+                    serviceInterface));
             response.setMessage(rpcException.getMessage());
 
             response.setData(new Result(rpcException.getMessage(), rpcException));

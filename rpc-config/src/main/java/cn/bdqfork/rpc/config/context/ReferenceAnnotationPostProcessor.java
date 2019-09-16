@@ -183,9 +183,14 @@ public class ReferenceAnnotationPostProcessor extends InstantiationAwareBeanPost
 
     }
 
+    @SuppressWarnings("unchecked")
     private <T> ReferenceBean<T> buildReferenceBean(Class<T> serviceInterface, Reference reference) throws Exception {
         ReferenceBean<T> referenceBean = new ReferenceBean<>(reference);
-        referenceBean.setServiceInterface(serviceInterface);
+        if (void.class == reference.serviceInterface()) {
+            referenceBean.setServiceInterface(serviceInterface);
+        } else {
+            referenceBean.setServiceInterface((Class<T>) reference.serviceInterface());
+        }
         ApplicationConfig applicationConfig = applicationContext.getBean(ApplicationConfig.class);
         List<RegistryConfig> registryConfigs = getRegistryConfigs(reference);
         referenceBean.setApplicationConfig(applicationConfig);

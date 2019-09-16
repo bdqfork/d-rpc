@@ -13,8 +13,6 @@ public class RpcContext {
 
     private URL url;
 
-    private String refName;
-
     private String methodName;
 
     private Class<?>[] parameterTypes;
@@ -33,14 +31,6 @@ public class RpcContext {
 
     public void setUrl(URL url) {
         this.url = url;
-    }
-
-    public String getRefName() {
-        return refName;
-    }
-
-    public void setRefName(String refName) {
-        this.refName = refName;
     }
 
     public String getMethodName() {

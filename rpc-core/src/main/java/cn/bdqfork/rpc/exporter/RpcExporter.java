@@ -25,9 +25,9 @@ public class RpcExporter implements Exporter {
     }
 
     @Override
-    public void unexport() {
+    public void undoExport() {
         URL url = invoker.getUrl();
-        registries.forEach(registry -> registry.unregister(url));
+        registries.forEach(registry -> registry.undoRegister(url));
         invoker.destroy();
     }
 

@@ -1,17 +1,14 @@
 package cn.bdqfork.rpc;
 
 import cn.bdqfork.common.constant.Const;
-import cn.bdqfork.common.exception.RpcException;
 import cn.bdqfork.common.extension.ExtensionLoader;
 import cn.bdqfork.rpc.cluster.Cluster;
-import cn.bdqfork.rpc.config.ProtocolConfig;
 import cn.bdqfork.rpc.exporter.Exporter;
 import cn.bdqfork.rpc.exporter.RpcExporter;
 import cn.bdqfork.rpc.proxy.ProxyFactory;
 import cn.bdqfork.rpc.registry.Registry;
 import cn.bdqfork.rpc.registry.URL;
 import cn.bdqfork.rpc.remote.Invoker;
-import cn.bdqfork.rpc.remote.Directory;
 import cn.bdqfork.rpc.remote.RpcServer;
 import cn.bdqfork.rpc.remote.RpcServerFactory;
 
@@ -41,7 +38,7 @@ public class RegistryProtocol implements Protocol {
         URL url = invoker.getUrl();
         String protocol = url.getProtocol();
         if (Const.PROTOCOL_PROVIDER.equals(protocol)) {
-            String key = url.getHost() + url.getPort();
+            String key = url.getAddress();
             buildServerUrl(url);
             RpcServer rpcServer = rpcServerMap.get(key);
             if (rpcServer == null) {
@@ -73,10 +70,14 @@ public class RegistryProtocol implements Protocol {
 
     @Override
     public <T> Invoker<T> refer(Class<T> type, URL url) {
-        Directory<T> directory = new Directory<>(type, url);
+        ClusterDirectory<T> directory = new ClusterDirectory<>(type, url);
         directory.setRegistries(registries);
         directory.subscribe();
         return cluster.join(directory);
+    }
+
+    public static void destroy() {
+        rpcServerMap.values().forEach(Node::destroy);
     }
 
 }

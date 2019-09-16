@@ -1,27 +1,26 @@
-package cn.bdqfork.rpc.protocol;
+package cn.bdqfork.rpc.protocol.serializer;
 
 import cn.bdqfork.common.constant.Const;
 import cn.bdqfork.common.exception.RpcException;
-import cn.bdqfork.rpc.protocol.netty.NettyInitializer;
-import cn.bdqfork.rpc.protocol.netty.client.NettyClient;
-import cn.bdqfork.rpc.protocol.netty.consumer.ClientContextHandler;
-import cn.bdqfork.rpc.protocol.serializer.HessianSerializer;
-import cn.bdqfork.rpc.protocol.serializer.JdkSerializer;
+import cn.bdqfork.common.extension.ExtensionLoader;
+import cn.bdqfork.rpc.protocol.netty.NettyClient;
 import cn.bdqfork.rpc.registry.URL;
 import cn.bdqfork.rpc.remote.RemoteClient;
 import cn.bdqfork.rpc.remote.RemoteClientFactory;
 import cn.bdqfork.rpc.remote.Serializer;
+import cn.bdqfork.rpc.remote.SerializerFactory;
 
 /**
  * @author bdq
  * @since 2019-08-21
  */
 public class DefaultRemoteClientFactory implements RemoteClientFactory {
+    private SerializerFactory serializerFactory = ExtensionLoader.getExtension(SerializerFactory.class);
 
     @Override
     public RemoteClient[] createRemoteClients(URL url) throws RpcException {
         String serialization = url.getParameter(Const.SERIALIZATION_KEY, "jdk");
-        Serializer serializer = getSerializer(serialization);
+        Serializer serializer = serializerFactory.getSerializer(serialization);
         if (serializer == null) {
             throw new RpcException("no serializer !");
         }
@@ -35,23 +34,10 @@ public class DefaultRemoteClientFactory implements RemoteClientFactory {
         return remoteClients;
     }
 
-    private Serializer getSerializer(String serialization) {
-        if ("jdk".equals(serialization)) {
-            return new JdkSerializer();
-        }
-        if ("hessian".equals(serialization)) {
-            return new HessianSerializer();
-        }
-        return null;
-    }
-
     private RemoteClient getRemoteClient(URL url, Serializer serializer) {
         String server = url.getParameter(Const.SERVER_KEY);
         if ("netty".equals(server)) {
-            ClientContextHandler handler = new ClientContextHandler();
-            NettyInitializer.ChannelHandlerElement channelHandlerElement = new NettyInitializer.ChannelHandlerElement(handler);
-            NettyInitializer nettyInitializer = new NettyInitializer(serializer, channelHandlerElement);
-            NettyClient nettyClient = new NettyClient(url.getHost(), url.getPort(), nettyInitializer);
+            NettyClient nettyClient = new NettyClient(url.getHost(), url.getPort(), serializer);
             long timeout = Long.parseLong(url.getParameter(Const.TIMEOUT_KEY));
             nettyClient.setTimeout(timeout);
             return nettyClient;

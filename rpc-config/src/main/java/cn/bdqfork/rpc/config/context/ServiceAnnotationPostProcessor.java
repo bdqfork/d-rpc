@@ -1,7 +1,6 @@
 package cn.bdqfork.rpc.config.context;
 
 import cn.bdqfork.common.util.ClassUtils;
-import cn.bdqfork.rpc.config.RegistryConfig;
 import cn.bdqfork.rpc.config.ServiceBean;
 import cn.bdqfork.rpc.config.annotation.Service;
 import org.slf4j.Logger;
@@ -12,17 +11,15 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.*;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.context.ResourceLoaderAware;
+import org.springframework.context.annotation.AnnotationBeanNameGenerator;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.type.filter.AnnotationTypeFilter;
 import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -60,7 +57,7 @@ public class ServiceAnnotationPostProcessor implements BeanDefinitionRegistryPos
 
         scanner.addIncludeFilter(new AnnotationTypeFilter(Service.class));
 
-        BeanNameGenerator beanNameGenerator = new ServiceBeanNameGenerator(classLoader);
+        BeanNameGenerator beanNameGenerator = new AnnotationBeanNameGenerator();
 
         scanner.setBeanNameGenerator(beanNameGenerator);
 
@@ -72,28 +69,30 @@ public class ServiceAnnotationPostProcessor implements BeanDefinitionRegistryPos
 
             String beanClassName = beanDefinition.getBeanClassName();
 
-            Class<?> clazz = getClass(beanClassName);
+            Class<?> beanClass = getClass(beanClassName);
 
-            Service service = clazz.getAnnotation(Service.class);
+            Service service = beanClass.getAnnotation(Service.class);
 
-            String serviceName = service.refName();
-            if (StringUtils.isEmpty(serviceName)) {
-                serviceName = beanNameGenerator.generateBeanName(beanDefinition, registry);
+            Class<?> interfaceClass = service.serviceInterface();
+
+            if (interfaceClass == null) {
+                interfaceClass = beanClass.getInterfaces()[0];
             }
-            registry.registerBeanDefinition(serviceName, beanDefinition);
 
-            registerServiceBean(beanNameGenerator, registry, service);
+            String serviceBeanName = interfaceClass.getName();
+
+            AbstractBeanDefinition serviceBeanDefinition = BeanDefinitionBuilder.genericBeanDefinition(ServiceBean.class)
+                    .addPropertyValue("service", service)
+                    .getBeanDefinition();
+
+            if (scanner.checkCandidate(serviceBeanName, beanDefinition)) {
+                registry.registerBeanDefinition(serviceBeanName, serviceBeanDefinition);
+            } else {
+                throw new IllegalStateException("Duplicate @Service interfaceClass = " + serviceBeanName);
+            }
 
         }
 
-    }
-
-    private void registerServiceBean(BeanNameGenerator beanNameGenerator, BeanDefinitionRegistry registry, Service service) {
-        AbstractBeanDefinition beanDefinition = BeanDefinitionBuilder.genericBeanDefinition(ServiceBean.class)
-                .addPropertyValue("service", service)
-                .getBeanDefinition();
-        String serviceBeanName = beanNameGenerator.generateBeanName(beanDefinition, registry);
-        registry.registerBeanDefinition(serviceBeanName, beanDefinition);
     }
 
     private Set<String> resolvePackages() {

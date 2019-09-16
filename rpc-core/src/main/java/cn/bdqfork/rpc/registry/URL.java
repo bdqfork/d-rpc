@@ -79,7 +79,7 @@ public class URL implements Serializable {
     }
 
     public String toPath() {
-        return toServiceCategory() + "/" + parameterMap.get(Const.SIDE_KEY) + "/" + host + ":" + port;
+        return toServiceCategory() + "/" + parameterMap.get(Const.SIDE_KEY) + "/" + getAddress();
     }
 
     public <T> void addParameter(String key, T value) {
@@ -135,6 +135,10 @@ public class URL implements Serializable {
         return builder.toString();
     }
 
+    public String getAddress() {
+        return host + ":" + port;
+    }
+
     public String getServiceName() {
         return service;
     }
@@ -161,10 +165,10 @@ public class URL implements Serializable {
         if (o == null || getClass() != o.getClass()) return false;
         URL url = (URL) o;
         return port == url.port &&
-                Objects.equals(protocol, url.protocol) &&
-                Objects.equals(host, url.host) &&
-                Objects.equals(service, url.service) &&
-                Objects.equals(parameterMap, url.parameterMap);
+                protocol.equals(url.protocol) &&
+                host.equals(url.host) &&
+                service.equals(url.service) &&
+                parameterMap.equals(url.parameterMap);
     }
 
     @Override

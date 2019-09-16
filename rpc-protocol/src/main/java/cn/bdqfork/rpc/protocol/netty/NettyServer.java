@@ -1,18 +1,12 @@
-package cn.bdqfork.rpc.protocol.netty.server;
+package cn.bdqfork.rpc.protocol.netty;
 
-import cn.bdqfork.common.constant.Const;
-import cn.bdqfork.rpc.protocol.DataDecoder;
-import cn.bdqfork.rpc.protocol.DataEncoder;
-import cn.bdqfork.rpc.protocol.netty.NettyInitializer;
-import cn.bdqfork.rpc.protocol.netty.provider.InvokerHandler;
-import cn.bdqfork.rpc.protocol.serializer.HessianSerializer;
 import cn.bdqfork.rpc.registry.URL;
+import cn.bdqfork.rpc.remote.AbstractRpcServer;
 import cn.bdqfork.rpc.remote.Invoker;
-import cn.bdqfork.rpc.remote.RpcServer;
-import cn.bdqfork.rpc.remote.Serializer;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelOption;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
@@ -23,36 +17,27 @@ import org.slf4j.LoggerFactory;
  * @author bdq
  * @since 2019-02-20
  */
-public class NettyServer implements RpcServer {
+public class NettyServer extends AbstractRpcServer {
     private static final Logger log = LoggerFactory.getLogger(NettyServer.class);
-    private volatile boolean isRunning;
-    private URL url;
-    private String host;
-    private Integer port;
     private NioEventLoopGroup boss;
     private NioEventLoopGroup worker;
     private InvokerHandler invokerHandler;
-    private Serializer serializer;
 
     public NettyServer(URL url) {
-        this.url = url;
-        this.host = url.getHost();
-        this.port = url.getPort();
-        String serializtion = url.getParameter(Const.SERIALIZATION_KEY);
-        if ("hessian".equals(serializtion)) {
-            this.serializer = new HessianSerializer();
-        }
+        super(url);
         this.invokerHandler = new InvokerHandler();
     }
 
     @Override
-    public void start() {
+    protected void doStart() {
         boss = new NioEventLoopGroup();
         worker = new NioEventLoopGroup();
         try {
             ServerBootstrap bootstrap = new ServerBootstrap();
             bootstrap.group(boss, worker)
                     .channel(NioServerSocketChannel.class)
+                    .option(ChannelOption.SO_BACKLOG, 1024)
+                    .option(ChannelOption.SO_RCVBUF, 32 * 1024)
                     .childHandler(new ChannelInitializer() {
                         @Override
                         protected void initChannel(Channel ch) throws Exception {
@@ -64,7 +49,6 @@ public class NettyServer implements RpcServer {
                         }
                     });
             bootstrap.bind(host, port).sync();
-            isRunning = true;
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             destroy();
@@ -77,18 +61,7 @@ public class NettyServer implements RpcServer {
     }
 
     @Override
-    public URL getUrl() {
-        return url;
-    }
-
-    @Override
-    public boolean isAvailable() {
-        return isRunning;
-    }
-
-    @Override
-    public void destroy() {
-        isRunning = false;
+    protected void doDestroy() {
         try {
             boss.shutdownGracefully().sync();
             worker.shutdownGracefully().sync();

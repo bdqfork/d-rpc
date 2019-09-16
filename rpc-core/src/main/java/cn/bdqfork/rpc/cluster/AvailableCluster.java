@@ -1,7 +1,7 @@
 package cn.bdqfork.rpc.cluster;
 
+import cn.bdqfork.rpc.Directory;
 import cn.bdqfork.rpc.remote.Invoker;
-import cn.bdqfork.rpc.remote.Directory;
 
 /**
  * @author bdq

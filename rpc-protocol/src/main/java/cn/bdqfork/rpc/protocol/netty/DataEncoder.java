@@ -1,4 +1,4 @@
-package cn.bdqfork.rpc.protocol;
+package cn.bdqfork.rpc.protocol.netty;
 
 import cn.bdqfork.common.constant.Const;
 import cn.bdqfork.rpc.remote.Request;
