@@ -42,9 +42,6 @@ public abstract class AbstractInvoker<T> implements Invoker<T> {
 
     @Override
     public Result invoke(Invocation invocation) throws RpcException {
-        log.debug("filter entry ...");
-
-        filters.forEach(filter -> filter.invoke(this, invocation));
         return doInvoke(invocation);
     }
 
