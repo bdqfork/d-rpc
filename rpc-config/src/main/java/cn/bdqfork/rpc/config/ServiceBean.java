@@ -10,6 +10,8 @@ import cn.bdqfork.rpc.exporter.Exporter;
 import cn.bdqfork.rpc.registry.Registry;
 import cn.bdqfork.rpc.registry.RegistryFactory;
 import cn.bdqfork.rpc.registry.URL;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
@@ -26,14 +28,15 @@ import java.util.stream.Collectors;
  * @author bdq
  * @since 2019-03-03
  */
-public class ServiceBean implements InitializingBean, DisposableBean, ApplicationListener<ContextRefreshedEvent>, ApplicationContextAware {
+public class ServiceBean<T> implements InitializingBean, DisposableBean, ApplicationListener<ContextRefreshedEvent>, ApplicationContextAware {
+    private static final Logger log = LoggerFactory.getLogger(ServiceBean.class);
     private RegistryFactory registryFactory = ExtensionLoader.getExtension(RegistryFactory.class);
     private ApplicationContext applicationContext;
     private Service service;
+    private Class<T> serviceInterface;
     private List<Exporter> exporters;
     private boolean inited = false;
 
-    @SuppressWarnings("unchecked")
     @Override
     public void afterPropertiesSet() throws Exception {
 
@@ -48,13 +51,11 @@ public class ServiceBean implements InitializingBean, DisposableBean, Applicatio
         RegistryProtocol registryProtocol = new RegistryProtocol(registries);
 
         for (ProtocolConfig protocolConfig : protocolConfigs) {
-            URL url = buildUrl(protocolConfig, applicationConfig, service);
+            URL url = buildUrl(protocolConfig, applicationConfig, service, serviceInterface);
 
-            Class type = service.serviceInterface();
+            T proxy = applicationContext.getBean(serviceInterface);
 
-            Object proxy = applicationContext.getBean(type);
-
-            Invoker<?> invoker = registryProtocol.getInvoker(proxy, type, url);
+            Invoker<?> invoker = registryProtocol.getInvoker(proxy, serviceInterface, url);
 
             invokers.add(invoker);
 
@@ -84,13 +85,14 @@ public class ServiceBean implements InitializingBean, DisposableBean, Applicatio
         return protocolConfigs;
     }
 
-    private URL buildUrl(ProtocolConfig protocolConfig, ApplicationConfig applicationConfig, Service service) {
-        URL url = new URL(Const.PROTOCOL_PROVIDER, protocolConfig.getHost(), protocolConfig.getPort(), service.serviceInterface().getName());
+    private URL buildUrl(ProtocolConfig protocolConfig, ApplicationConfig applicationConfig, Service service, Class<T> serviceInterface) {
+        URL url = new URL(Const.PROTOCOL_PROVIDER, protocolConfig.getHost(), protocolConfig.getPort(), serviceInterface.getName());
 
         url.addParameter(Const.APPLICATION_KEY, applicationConfig.getApplicationName());
         url.addParameter(Const.GROUP_KEY, service.group());
+        url.addParameter(Const.VERSION_KEY, service.version());
         url.addParameter(Const.SIDE_KEY, Const.PROVIDER_SIDE);
-        url.addParameter(Const.INTERFACE_KEY, service.serviceInterface().getName());
+        url.addParameter(Const.INTERFACE_KEY, serviceInterface.getName());
         url.addParameter(Const.SERVER_KEY, protocolConfig.getServer());
         url.addParameter(Const.SERIALIZATION_KEY, protocolConfig.getSerialization());
         return url;
@@ -98,6 +100,10 @@ public class ServiceBean implements InitializingBean, DisposableBean, Applicatio
 
     public void setService(Service service) {
         this.service = service;
+    }
+
+    public void setServiceInterface(Class<T> serviceInterface) {
+        this.serviceInterface = serviceInterface;
     }
 
     @Override

@@ -1,5 +1,6 @@
 package cn.bdqfork.rpc;
 
+import cn.bdqfork.common.constant.Const;
 import cn.bdqfork.rpc.registry.URL;
 import cn.bdqfork.rpc.remote.Invocation;
 import cn.bdqfork.rpc.remote.Invoker;
@@ -20,11 +21,13 @@ public abstract class AbstractDirectory<T> implements Directory<T> {
     protected AtomicBoolean destroyed = new AtomicBoolean(false);
     protected Class<T> serviceInterface;
     protected URL url;
+    protected String version;
     protected List<URL> urls;
 
     public AbstractDirectory(Class<T> serviceInterface, URL url) {
         this.serviceInterface = serviceInterface;
         this.url = url;
+        this.version = url.getParameter(Const.VERSION_KEY);
         this.urls = Collections.emptyList();
     }
 

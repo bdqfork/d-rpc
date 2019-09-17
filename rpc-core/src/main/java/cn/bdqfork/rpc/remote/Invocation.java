@@ -13,8 +13,8 @@ public interface Invocation {
 
     Object[] getArguments();
 
-    Map<String, String> getAttachments();
+    Map<String, Object> getAttachments();
 
-    void setAttachments(Map<String, String> attachments);
+    void setAttachments(Map<String, Object> attachments);
 
 }

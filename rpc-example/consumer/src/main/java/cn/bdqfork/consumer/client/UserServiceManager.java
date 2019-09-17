@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class UserServiceManager {
-    @Reference(group = "rpc-test")
+    @Reference(group = "rpc-test", version = "1")
     private UserService userService;
 
     public void sayHello() {

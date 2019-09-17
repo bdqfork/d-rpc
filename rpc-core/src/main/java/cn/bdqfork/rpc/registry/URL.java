@@ -83,9 +83,13 @@ public class URL implements Serializable {
     }
 
     public <T> void addParameter(String key, T value) {
-        if (value != null) {
-            parameterMap.put(key, value);
+        if (value == null) {
+            return;
         }
+        if (value instanceof String && StringUtils.isBlank((String) value)) {
+            return;
+        }
+        parameterMap.put(key, value);
     }
 
     @SuppressWarnings("unchecked")

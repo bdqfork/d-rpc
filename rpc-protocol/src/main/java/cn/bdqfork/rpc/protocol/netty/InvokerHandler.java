@@ -7,6 +7,7 @@ import cn.bdqfork.rpc.remote.*;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,7 +26,8 @@ public class InvokerHandler extends ChannelInboundHandlerAdapter {
     public void addInvoker(Invoker<?> invoker) {
         URL url = invoker.getUrl();
         String serviceInterface = url.getParameter(Const.INTERFACE_KEY);
-        this.invokers.put(serviceInterface, invoker);
+        String version = url.getParameter(Const.VERSION_KEY, "");
+        this.invokers.put(getKey(serviceInterface, version), invoker);
     }
 
     @Override
@@ -33,10 +35,25 @@ public class InvokerHandler extends ChannelInboundHandlerAdapter {
         Request request = (Request) msg;
         Invocation invocation = (Invocation) request.getData();
 
-        Map<String, String> attachments = invocation.getAttachments();
+        Map<String, Object> attachments = invocation.getAttachments();
 
-        String serviceInterface = attachments.get(Const.INTERFACE_KEY);
-        Invoker<?> invoker = invokers.get(serviceInterface);
+        Invoker<?> invoker = null;
+
+        String serviceInterface = (String) attachments.get(Const.INTERFACE_KEY);
+        String version = (String) attachments.getOrDefault(Const.VERSION_KEY, "");
+
+        if (!StringUtils.isBlank(version)) {
+            invoker = invokers.get(getKey(serviceInterface, version));
+        } else {
+            for (Map.Entry<String, Invoker> entry : invokers.entrySet()) {
+                String key = entry.getKey();
+                String interfaceName = key.substring(0, key.indexOf(":"));
+                if (interfaceName.equals(serviceInterface)) {
+                    invoker = entry.getValue();
+                    break;
+                }
+            }
+        }
 
         Response response = new Response();
         response.setId(request.getId());
@@ -53,8 +70,7 @@ public class InvokerHandler extends ChannelInboundHandlerAdapter {
             ctx.writeAndFlush(response);
         } else {
             response.setStatus(Response.SERVER_ERROR);
-            RpcException rpcException = new RpcException(String.format("There is no service for interface %s ",
-                    serviceInterface));
+            RpcException rpcException = new RpcException("There is no service for interface named " + serviceInterface + " and version = " + version);
             response.setMessage(rpcException.getMessage());
 
             response.setData(new Result(rpcException.getMessage(), rpcException));
@@ -63,4 +79,12 @@ public class InvokerHandler extends ChannelInboundHandlerAdapter {
         }
     }
 
+    private String getKey(String serviceInterface, String version) {
+        return serviceInterface + ":" + version;
+    }
+
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        log.error(cause.getMessage(), cause);
+    }
 }

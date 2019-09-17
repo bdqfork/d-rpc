@@ -13,6 +13,8 @@ public @interface Reference {
 
     String group() default "rpc";
 
+    String version() default "";
+
     Class<?> serviceInterface() default void.class;
 
     String loadBalance() default "random";

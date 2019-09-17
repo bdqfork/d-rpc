@@ -18,7 +18,7 @@ public class RpcInvocation implements Invocation, Serializable {
 
     private Object[] arguments;
 
-    private Map<String, String> attachments = new HashMap<>();
+    private Map<String, Object> attachments = new HashMap<>();
 
     public RpcInvocation(String methodName, Class<?>[] parameterTypes, Object[] arguments) {
         this.methodName = methodName;
@@ -26,7 +26,7 @@ public class RpcInvocation implements Invocation, Serializable {
         this.arguments = arguments;
     }
 
-    public RpcInvocation(String methodName, Class<?>[] parameterTypes, Object[] arguments, Map<String, String> attachments) {
+    public RpcInvocation(String methodName, Class<?>[] parameterTypes, Object[] arguments, Map<String, Object> attachments) {
         this.methodName = methodName;
         this.parameterTypes = parameterTypes;
         this.arguments = arguments;
@@ -57,11 +57,12 @@ public class RpcInvocation implements Invocation, Serializable {
         this.arguments = arguments;
     }
 
-    public Map<String, String> getAttachments() {
+    @Override
+    public Map<String, Object> getAttachments() {
         return attachments;
     }
 
-    public void setAttachments(Map<String, String> attachments) {
+    public void setAttachments(Map<String, Object> attachments) {
         this.attachments = attachments;
     }
 

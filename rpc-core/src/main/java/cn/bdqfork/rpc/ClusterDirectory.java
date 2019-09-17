@@ -10,6 +10,7 @@ import cn.bdqfork.rpc.remote.Invocation;
 import cn.bdqfork.rpc.remote.Invoker;
 import cn.bdqfork.rpc.remote.RemoteClient;
 import cn.bdqfork.rpc.remote.RemoteClientFactory;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,10 +31,6 @@ public class ClusterDirectory<T> extends AbstractDirectory<T> implements Notifie
 
     public ClusterDirectory(Class<T> serviceInterface, URL url) {
         super(serviceInterface, url);
-    }
-
-    public URL getUrl() {
-        return url;
     }
 
     @Override
@@ -63,11 +60,11 @@ public class ClusterDirectory<T> extends AbstractDirectory<T> implements Notifie
             return;
         }
         if (urls == null || urls.isEmpty()) {
-            log.info("Destroy all invokers !");
+            log.debug("Destroy all invokers !");
             this.invokers.values().forEach(Node::destroy);
             this.invokers.clear();
         } else {
-            log.info("Update invokers !");
+            log.debug("Update invokers !");
             urls.forEach(this::mergeUrl);
 
             this.urls.removeAll(urls);
@@ -75,10 +72,18 @@ public class ClusterDirectory<T> extends AbstractDirectory<T> implements Notifie
                     .map(URL::buildString)
                     .forEach(url -> invokers.remove(url).destroy());
             urls.stream()
-                    .filter(url -> !invokers.containsKey(url.buildString()))
+                    .filter(this::isMatch)
                     .forEach(this::addRpcInvoker);
         }
         this.urls = urls;
+    }
+
+    private boolean isMatch(URL url) {
+        if (StringUtils.isBlank(this.version)) {
+            return !invokers.containsKey(url.buildString());
+        }
+        return url.getParameter(Const.VERSION_KEY).equals(this.version)
+                && !invokers.containsKey(url.buildString());
     }
 
     private void addRpcInvoker(URL url) {
@@ -102,6 +107,7 @@ public class ClusterDirectory<T> extends AbstractDirectory<T> implements Notifie
         url.addParameter(Const.CONNECTIONS_KEY, connections);
         String refName = this.url.getParameter(Const.REF_NAME_KEY);
         url.addParameter(Const.REF_NAME_KEY, refName);
+        url.addParameter(Const.VERSION_KEY, this.version);
     }
 
     public void setRegistries(List<Registry> registries) {

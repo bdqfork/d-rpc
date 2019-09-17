@@ -11,6 +11,7 @@ import cn.bdqfork.rpc.registry.Registry;
 import cn.bdqfork.rpc.registry.RegistryFactory;
 import cn.bdqfork.rpc.registry.URL;
 import cn.bdqfork.rpc.remote.Invoker;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 
@@ -66,7 +67,14 @@ public class ReferenceBean<T> implements FactoryBean<Object>, InitializingBean {
         String host = NetUtils.getIp();//获得本机IP
         URL url = new URL(Const.PROTOCOL_CONSUMER, host, 0, serviceInterface.getName());
         url.addParameter(Const.APPLICATION_KEY, applicationConfig.getApplicationName());
-        url.addParameter(Const.VERSION_KEY, applicationConfig.getVersion());
+
+        String version = reference.version();
+        if (StringUtils.isNotBlank(version)) {
+            url.addParameter(Const.VERSION_KEY, version);
+        } else {
+            url.addParameter(Const.VERSION_KEY, applicationConfig.getVersion());
+        }
+
         url.addParameter(Const.ENVIRONMENT_KEY, applicationConfig.getEnvironment());
         url.addParameter(Const.GROUP_KEY, reference.group());
         url.addParameter(Const.INTERFACE_KEY, serviceInterface.getName());

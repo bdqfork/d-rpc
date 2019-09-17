@@ -1,7 +1,6 @@
 package cn.bdqfork.rpc.filter;
 
 import cn.bdqfork.common.constant.Const;
-import cn.bdqfork.rpc.filter.Filter;
 import cn.bdqfork.rpc.registry.URL;
 import cn.bdqfork.rpc.remote.Invocation;
 import cn.bdqfork.rpc.remote.Invoker;
@@ -24,12 +23,13 @@ public class RpcContextFilter implements Filter {
         rpcContext.setMethodName(invocation.getMethodName());
         rpcContext.setParameterTypes(invocation.getParameterTypes());
 
-        rpcContext.setArguments(invocation.getArguments());
-
-        Map<String, String> attachments = new HashMap<>();
+        Map<String, Object> attachments = new HashMap<>();
         attachments.put(Const.INTERFACE_KEY, invoker.getInterface().getName());
+        attachments.put(Const.VERSION_KEY, url.getParameter(Const.VERSION_KEY));
 
         invocation.setAttachments(attachments);
+
+        rpcContext.setArguments(invocation.getArguments());
         rpcContext.setInvocation(invocation);
     }
 

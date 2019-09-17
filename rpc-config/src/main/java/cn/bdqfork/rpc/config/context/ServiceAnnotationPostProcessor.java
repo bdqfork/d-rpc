@@ -75,14 +75,19 @@ public class ServiceAnnotationPostProcessor implements BeanDefinitionRegistryPos
 
             Class<?> interfaceClass = service.serviceInterface();
 
-            if (interfaceClass == null) {
+            if (interfaceClass == void.class) {
                 interfaceClass = beanClass.getInterfaces()[0];
             }
 
             String serviceBeanName = interfaceClass.getName();
 
+            if (!interfaceClass.isInterface()) {
+                throw new IllegalStateException("@Service interfaceClass = " + serviceBeanName + " is not interface");
+            }
+
             AbstractBeanDefinition serviceBeanDefinition = BeanDefinitionBuilder.genericBeanDefinition(ServiceBean.class)
                     .addPropertyValue("service", service)
+                    .addPropertyValue("serviceInterface", interfaceClass)
                     .getBeanDefinition();
 
             if (scanner.checkCandidate(serviceBeanName, beanDefinition)) {

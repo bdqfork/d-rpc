@@ -13,6 +13,8 @@ public @interface Service {
 
     String group() default "rpc";
 
+    String version() default "";
+
     Class<?> serviceInterface() default void.class;
 
     String[] registry() default {};
