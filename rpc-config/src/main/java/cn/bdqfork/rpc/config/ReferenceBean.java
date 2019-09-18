@@ -9,6 +9,7 @@ import cn.bdqfork.rpc.exporter.Exporter;
 import cn.bdqfork.rpc.proxy.ProxyFactory;
 import cn.bdqfork.rpc.registry.Registry;
 import cn.bdqfork.rpc.registry.RegistryFactory;
+import cn.bdqfork.rpc.util.RegistryUtils;
 import cn.bdqfork.rpc.registry.URL;
 import cn.bdqfork.rpc.remote.Invoker;
 import org.apache.commons.lang3.StringUtils;
@@ -87,17 +88,8 @@ public class ReferenceBean<T> implements FactoryBean<Object>, InitializingBean {
     }
 
     private List<Registry> getRegistries() {
-        String ip = NetUtils.getIp();
         return registryConfigs.stream()
-                .map(registryConfig -> {
-                    URL url = new URL(registryConfig.getProtocol(), ip, 0, "");
-                    url.addParameter(Const.REGISTRY_KEY, registryConfig.getAddress());
-                    url.addParameter(Const.SEESION_TIMEOUT_KEY, registryConfig.getSessionTimeout());
-                    url.addParameter(Const.CONNECTION_TIMEOUT_KEY, registryConfig.getConnectionTimeout());
-                    url.addParameter(Const.USERNAME_KEY, registryConfig.getUsername());
-                    url.addParameter(Const.PASSWORD_KEY, registryConfig.getPassword());
-                    return url;
-                })
+                .map(RegistryUtils::buildRegistryURL)
                 .map(url -> registryFactory.getRegistry(url))
                 .collect(Collectors.toList());
     }

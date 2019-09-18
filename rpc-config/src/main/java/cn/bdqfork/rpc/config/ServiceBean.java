@@ -2,7 +2,7 @@ package cn.bdqfork.rpc.config;
 
 import cn.bdqfork.common.constant.Const;
 import cn.bdqfork.common.extension.ExtensionLoader;
-import cn.bdqfork.common.util.NetUtils;
+import cn.bdqfork.rpc.util.RegistryUtils;
 import cn.bdqfork.rpc.remote.Invoker;
 import cn.bdqfork.rpc.RegistryProtocol;
 import cn.bdqfork.rpc.config.annotation.Service;
@@ -111,25 +111,8 @@ public class ServiceBean<T> implements InitializingBean, DisposableBean, Applica
         this.applicationContext = applicationContext;
     }
 
+
     private List<Registry> getRegistries() {
-        String ip = NetUtils.getIp();
-        List<RegistryConfig> registryConfigs = getRegistryConfigs();
-        return registryConfigs.stream()
-                .map(registryConfig -> {
-                    URL url = new URL(registryConfig.getProtocol(), ip, 0, "");
-                    url.addParameter(Const.REGISTRY_KEY, registryConfig.getAddress());
-                    url.addParameter(Const.SEESION_TIMEOUT_KEY, registryConfig.getSessionTimeout());
-                    url.addParameter(Const.CONNECTION_TIMEOUT_KEY, registryConfig.getConnectionTimeout());
-                    url.addParameter(Const.USERNAME_KEY, registryConfig.getUsername());
-                    url.addParameter(Const.PASSWORD_KEY, registryConfig.getPassword());
-                    return url;
-                })
-                .map(url -> registryFactory.getRegistry(url))
-                .collect(Collectors.toList());
-    }
-
-
-    private List<RegistryConfig> getRegistryConfigs() {
         List<RegistryConfig> registryConfigs = new ArrayList<>();
         if (service.registry().length > 0) {
             for (String registryConfigBeanName : service.registry()) {
@@ -139,7 +122,10 @@ public class ServiceBean<T> implements InitializingBean, DisposableBean, Applica
         } else {
             registryConfigs.addAll(applicationContext.getBeansOfType(RegistryConfig.class).values());
         }
-        return registryConfigs;
+        return registryConfigs.stream()
+                .map(RegistryUtils::buildRegistryURL)
+                .map(url -> registryFactory.getRegistry(url))
+                .collect(Collectors.toList());
     }
 
     @Override
