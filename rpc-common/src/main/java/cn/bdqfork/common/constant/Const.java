@@ -32,5 +32,5 @@ public class Const {
     public static final String CONNECTION_TIMEOUT_KEY = "connectionTimeout";
     public static final String USERNAME_KEY = "username";
     public static final String PASSWORD_KEY = "password";
-    public static final String PROTOCOL_KEY = "protocol";
+    public static final String ASYNC_KEY = "async";
 }

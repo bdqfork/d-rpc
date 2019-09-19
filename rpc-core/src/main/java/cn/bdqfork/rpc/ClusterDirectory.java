@@ -107,6 +107,8 @@ public class ClusterDirectory<T> extends AbstractDirectory<T> implements Notifie
         url.addParameter(Const.CONNECTIONS_KEY, connections);
         String refName = this.url.getParameter(Const.REF_NAME_KEY);
         url.addParameter(Const.REF_NAME_KEY, refName);
+        boolean isAsync = this.url.getParameter(Const.ASYNC_KEY);
+        url.addParameter(Const.ASYNC_KEY, isAsync);
         url.addParameter(Const.VERSION_KEY, this.version);
     }
 

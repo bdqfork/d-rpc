@@ -31,4 +31,6 @@ public @interface Reference {
 
     boolean isLazy() default false;
 
+    boolean async() default false;
+
 }

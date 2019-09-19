@@ -84,6 +84,7 @@ public class ReferenceBean<T> implements FactoryBean<Object>, InitializingBean {
         url.addParameter(Const.CONNECTIONS_KEY, String.valueOf(reference.connections()));
         url.addParameter(Const.SIDE_KEY, Const.CONSUMER_SIDE);
         url.addParameter(Const.LOADBALANCE_KEY, reference.loadBalance());
+        url.addParameter(Const.ASYNC_KEY,reference.async());
         return url;
     }
 

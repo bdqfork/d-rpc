@@ -6,29 +6,18 @@ import java.io.Serializable;
  * @author bdq
  * @since 2019-02-20
  */
-public class Result implements Serializable {
-    private Object data;
-    private String message;
-    private Throwable exception;
+public interface Result extends Serializable {
 
-    public Result(Object data) {
-        this.data = data;
-    }
+    Object getValue();
 
-    public Result(String message, Throwable exception) {
-        this.exception = exception;
-        this.message = message;
-    }
+    void setValue(Object value);
 
-    public Object getData() {
-        return data;
-    }
+    Throwable getException();
 
-    public Throwable getException() {
-        return exception;
-    }
+    void setException(Throwable throwable);
 
-    public String getMessage() {
-        return message;
-    }
+    boolean hasException();
+
+    String getMessage();
+
 }

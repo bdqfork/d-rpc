@@ -1,7 +1,10 @@
 package cn.bdqfork.rpc.proxy;
 
+import cn.bdqfork.rpc.AsyncResult;
+import cn.bdqfork.rpc.ResponseResult;
 import cn.bdqfork.rpc.RpcInvocation;
 import cn.bdqfork.rpc.remote.Invoker;
+import cn.bdqfork.rpc.remote.Result;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -35,7 +38,12 @@ public class InvokerInvocationHandler implements InvocationHandler {
             return invoker.equals(args[0]);
         }
         RpcInvocation rpcInvocation = new RpcInvocation(method.getName(), method.getParameterTypes(), args);
-        return invoker.invoke(rpcInvocation).getData();
+        AsyncResult asyncResult = (AsyncResult) invoker.invoke(rpcInvocation);
+        Result result = asyncResult.get();
+        if (result.hasException()) {
+            throw result.getException();
+        }
+        return result.getValue();
     }
 
 }

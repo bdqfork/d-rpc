@@ -6,6 +6,7 @@ import cn.bdqfork.rpc.registry.URL;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Future;
 
 /**
  * @author bdq
@@ -23,6 +24,8 @@ public class RpcContext {
     private Object[] arguments;
 
     private Invocation invocation;
+
+    private Future<?> future;
 
     private Map<String, Object> attachments = new HashMap<>();
 
@@ -72,6 +75,14 @@ public class RpcContext {
 
     public void setInvocation(Invocation invocation) {
         this.invocation = invocation;
+    }
+
+    public Future<?> getFuture() {
+        return future;
+    }
+
+    public void setFuture(Future<?> future) {
+        this.future = future;
     }
 
     public Map<String, Object> getAttachments() {

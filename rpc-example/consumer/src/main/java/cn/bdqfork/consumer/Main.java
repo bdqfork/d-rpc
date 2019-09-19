@@ -2,6 +2,7 @@ package cn.bdqfork.consumer;
 
 import cn.bdqfork.consumer.client.UserServiceManager;
 import cn.bdqfork.rpc.config.annotation.RpcComponentScan;
+import cn.bdqfork.rpc.remote.context.RpcContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 
@@ -12,14 +13,13 @@ import org.springframework.context.annotation.ComponentScan;
 @ComponentScan
 @RpcComponentScan(basePackages = "cn.bdqfork.consumer.client")
 public class Main {
-    public static void main(String[] args)  {
+    public static void main(String[] args) {
 
         AnnotationConfigApplicationContext applicationContext = new AnnotationConfigApplicationContext(Main.class);
 
         applicationContext.registerShutdownHook();
 
         UserServiceManager userServiceManager = applicationContext.getBean(UserServiceManager.class);
-
         while (true) {
             try {
                 userServiceManager.sayHello();

@@ -2,6 +2,7 @@ package cn.bdqfork.rpc.proxy;
 
 import cn.bdqfork.common.exception.RpcException;
 import cn.bdqfork.rpc.AbstractInvoker;
+import cn.bdqfork.rpc.ResponseResult;
 import cn.bdqfork.rpc.remote.Invocation;
 import cn.bdqfork.rpc.remote.Invoker;
 import cn.bdqfork.rpc.registry.URL;
@@ -41,9 +42,9 @@ public class JdkProxyFactory implements ProxyFactory {
                 try {
                     result = method.invoke(proxy, invocation.getArguments());
                 } catch (IllegalAccessException | InvocationTargetException e) {
-                    return new Result(e.getMessage(), e);
+                    return new ResponseResult(e.getMessage(), e);
                 }
-                return new Result(result);
+                return new ResponseResult(result);
             }
         };
     }

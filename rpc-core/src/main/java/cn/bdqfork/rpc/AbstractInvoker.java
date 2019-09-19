@@ -20,7 +20,6 @@ import java.util.stream.Collectors;
  * @since 2019-09-04
  */
 public abstract class AbstractInvoker<T> implements Invoker<T> {
-    private static Logger log = LoggerFactory.getLogger(AbstractInvoker.class);
     private List<Filter> filters = ExtensionLoader.getExtensions(Filter.class);
     private boolean isAvailable = true;
     private AtomicBoolean destroyed = new AtomicBoolean(false);
@@ -32,7 +31,6 @@ public abstract class AbstractInvoker<T> implements Invoker<T> {
         this.proxy = proxy;
         this.type = type;
         this.url = url;
-        sortFilters();
     }
 
     @Override
@@ -64,9 +62,4 @@ public abstract class AbstractInvoker<T> implements Invoker<T> {
         }
     }
 
-    private void sortFilters() {
-        this.filters = this.filters.stream()
-                .sorted(Comparator.comparingInt(Filter::getOrder))
-                .collect(Collectors.toList());
-    }
 }
