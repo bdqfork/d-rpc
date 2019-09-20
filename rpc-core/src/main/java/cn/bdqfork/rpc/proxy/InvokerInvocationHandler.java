@@ -1,10 +1,9 @@
 package cn.bdqfork.rpc.proxy;
 
-import cn.bdqfork.rpc.AsyncResult;
-import cn.bdqfork.rpc.ResponseResult;
-import cn.bdqfork.rpc.RpcInvocation;
-import cn.bdqfork.rpc.remote.Invoker;
-import cn.bdqfork.rpc.remote.Result;
+import cn.bdqfork.rpc.context.AsyncResult;
+import cn.bdqfork.rpc.context.RpcInvocation;
+import cn.bdqfork.rpc.Invoker;
+import cn.bdqfork.rpc.Result;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;

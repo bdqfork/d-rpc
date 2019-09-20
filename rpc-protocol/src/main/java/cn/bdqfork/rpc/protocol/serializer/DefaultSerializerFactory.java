@@ -1,7 +1,7 @@
 package cn.bdqfork.rpc.protocol.serializer;
 
-import cn.bdqfork.rpc.remote.Serializer;
-import cn.bdqfork.rpc.remote.SerializerFactory;
+import cn.bdqfork.rpc.context.remote.Serializer;
+import cn.bdqfork.rpc.context.remote.SerializerFactory;
 
 /**
  * @author bdq

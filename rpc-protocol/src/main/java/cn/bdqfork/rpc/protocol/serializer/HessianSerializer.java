@@ -1,6 +1,6 @@
 package cn.bdqfork.rpc.protocol.serializer;
 
-import cn.bdqfork.rpc.remote.Serializer;
+import cn.bdqfork.rpc.context.remote.Serializer;
 import com.caucho.hessian.io.HessianInput;
 import com.caucho.hessian.io.HessianOutput;
 
@@ -21,6 +21,7 @@ public class HessianSerializer implements Serializer {
         return byteArrayOutputStream.toByteArray();
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public <T> T deserialize(byte[] data, Class<T> clazz) throws Exception {
         ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(data);

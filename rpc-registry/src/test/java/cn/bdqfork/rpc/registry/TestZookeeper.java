@@ -1,11 +1,8 @@
 package cn.bdqfork.rpc.registry;
 
 import cn.bdqfork.common.constant.Const;
-import cn.bdqfork.rpc.config.ApplicationConfig;
-import cn.bdqfork.rpc.config.ProtocolConfig;
+import cn.bdqfork.rpc.URL;
 import cn.bdqfork.rpc.config.RegistryConfig;
-import cn.bdqfork.rpc.config.annotation.Service;
-import cn.bdqfork.rpc.registry.zookeeper.ZkRegistry;
 import org.junit.Test;
 
 /**

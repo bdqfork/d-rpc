@@ -2,7 +2,7 @@ package cn.bdqfork.rpc.cluster;
 
 import cn.bdqfork.common.constant.Const;
 import cn.bdqfork.common.exception.RpcException;
-import cn.bdqfork.rpc.registry.URL;
+import cn.bdqfork.rpc.URL;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

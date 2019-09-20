@@ -2,7 +2,7 @@ package cn.bdqfork.common.util;
 
 /**
  * @author bdq
- * @date 2019-03-04
+ * @since 2019-03-04
  */
 public class ClassUtils {
 

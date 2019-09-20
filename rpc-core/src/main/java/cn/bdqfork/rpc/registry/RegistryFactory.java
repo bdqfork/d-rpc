@@ -1,5 +1,7 @@
 package cn.bdqfork.rpc.registry;
 
+import cn.bdqfork.rpc.URL;
+
 /**
  * @author bdq
  * @since 2019-08-20

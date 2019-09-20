@@ -1,7 +1,7 @@
 package cn.bdqfork.rpc.cluster;
 
 import cn.bdqfork.common.exception.RpcException;
-import cn.bdqfork.rpc.remote.Invoker;
+import cn.bdqfork.rpc.Invoker;
 
 import java.util.List;
 

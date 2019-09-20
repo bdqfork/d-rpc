@@ -1,12 +1,12 @@
 package cn.bdqfork.rpc.proxy;
 
 import cn.bdqfork.common.exception.RpcException;
-import cn.bdqfork.rpc.AbstractInvoker;
-import cn.bdqfork.rpc.ResponseResult;
-import cn.bdqfork.rpc.remote.Invocation;
-import cn.bdqfork.rpc.remote.Invoker;
-import cn.bdqfork.rpc.registry.URL;
-import cn.bdqfork.rpc.remote.Result;
+import cn.bdqfork.rpc.context.remote.AbstractInvoker;
+import cn.bdqfork.rpc.context.ResponseResult;
+import cn.bdqfork.rpc.Invocation;
+import cn.bdqfork.rpc.Invoker;
+import cn.bdqfork.rpc.URL;
+import cn.bdqfork.rpc.Result;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

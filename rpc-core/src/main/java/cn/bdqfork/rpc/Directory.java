@@ -1,8 +1,5 @@
 package cn.bdqfork.rpc;
 
-import cn.bdqfork.rpc.remote.Invocation;
-import cn.bdqfork.rpc.remote.Invoker;
-
 import java.util.List;
 
 /**

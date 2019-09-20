@@ -1,8 +1,8 @@
 package cn.bdqfork.rpc.protocol.netty;
 
-import cn.bdqfork.rpc.registry.URL;
-import cn.bdqfork.rpc.remote.RpcServer;
-import cn.bdqfork.rpc.remote.RpcServerFactory;
+import cn.bdqfork.rpc.URL;
+import cn.bdqfork.rpc.context.remote.RpcServer;
+import cn.bdqfork.rpc.context.remote.RpcServerFactory;
 
 /**
  * @author bdq

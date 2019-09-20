@@ -1,7 +1,7 @@
 package cn.bdqfork.rpc.protocol.serializer;
 
 
-import cn.bdqfork.rpc.remote.Serializer;
+import cn.bdqfork.rpc.context.remote.Serializer;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -21,6 +21,7 @@ public class JdkSerializer implements Serializer {
         return byteArrayOutputStream.toByteArray();
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public <T> T deserialize(byte[] data, Class<T> clazz) throws Exception {
         ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(data);

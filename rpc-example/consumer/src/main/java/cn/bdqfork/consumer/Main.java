@@ -2,7 +2,6 @@ package cn.bdqfork.consumer;
 
 import cn.bdqfork.consumer.client.UserServiceManager;
 import cn.bdqfork.rpc.config.annotation.RpcComponentScan;
-import cn.bdqfork.rpc.remote.context.RpcContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 

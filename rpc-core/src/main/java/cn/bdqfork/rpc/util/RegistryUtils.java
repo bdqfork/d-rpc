@@ -3,7 +3,7 @@ package cn.bdqfork.rpc.util;
 import cn.bdqfork.common.constant.Const;
 import cn.bdqfork.common.util.NetUtils;
 import cn.bdqfork.rpc.config.RegistryConfig;
-import cn.bdqfork.rpc.registry.URL;
+import cn.bdqfork.rpc.URL;
 
 /**
  * @author bdq

@@ -1,7 +1,7 @@
 package cn.bdqfork.rpc.proxy;
 
-import cn.bdqfork.rpc.remote.Invoker;
-import cn.bdqfork.rpc.registry.URL;
+import cn.bdqfork.rpc.Invoker;
+import cn.bdqfork.rpc.URL;
 
 /**
  * @author bdq
