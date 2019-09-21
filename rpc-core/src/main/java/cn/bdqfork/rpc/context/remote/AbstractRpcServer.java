@@ -27,7 +27,8 @@ public abstract class AbstractRpcServer implements RpcServer {
 
     private void initSerializer(URL url) {
         String serializtion = url.getParameter(Const.SERIALIZATION_KEY);
-        SerializerFactory serializerFactory = ExtensionLoader.getExtension(SerializerFactory.class);
+        SerializerFactory serializerFactory = ExtensionLoader.getExtensionLoader(SerializerFactory.class)
+                .getExtension("default");
         this.serializer = serializerFactory.getSerializer(serializtion);
     }
 

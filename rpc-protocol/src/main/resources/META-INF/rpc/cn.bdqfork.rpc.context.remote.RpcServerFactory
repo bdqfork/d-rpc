@@ -1,0 +1,1 @@
+default=cn.bdqfork.rpc.protocol.netty.DefaultRpcServerFactory

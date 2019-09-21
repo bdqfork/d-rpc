@@ -23,9 +23,10 @@ import java.util.stream.Collectors;
  */
 public class RegistryProtocol implements Protocol {
     private static final Map<String, RpcServer> rpcServerMap = new ConcurrentHashMap<>();
-    private RpcServerFactory rpcServerFactory = ExtensionLoader.getExtension(RpcServerFactory.class);
-    private ProxyFactory proxyFactory = ExtensionLoader.getExtension(ProxyFactory.class);
-    private Cluster cluster = ExtensionLoader.getExtension(Cluster.class);
+    private RpcServerFactory rpcServerFactory = ExtensionLoader.getExtensionLoader(RpcServerFactory.class).getExtension("default");
+    private ProxyFactory proxyFactory = ExtensionLoader.getExtensionLoader(ProxyFactory.class)
+            .getExtension("default");
+    private Cluster cluster = ExtensionLoader.getExtensionLoader(Cluster.class).getExtension("default");
     private List<Registry> registries;
 
     public RegistryProtocol(List<Registry> registries) {
@@ -81,8 +82,11 @@ public class RegistryProtocol implements Protocol {
 
     private <T> Invoker<T> buildInvokerChain(Invoker<T> invoker, String group) {
         Invoker<T> last = invoker;
-        List<Filter> filters = ExtensionLoader.getExtensions(Filter.class)
+        List<Filter> filters = ExtensionLoader.getExtensionLoader(Filter.class)
+                .getExtensions()
+                .values()
                 .stream()
+                .map(filter-> (Filter) filter)
                 .filter(filter -> group.equals(filter.getGroup()))
                 .sorted(Comparator.comparing(Filter::getOrder).reversed())
                 .collect(Collectors.toList());

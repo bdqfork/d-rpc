@@ -24,8 +24,10 @@ import java.util.stream.Collectors;
  * @since 2019-03-04
  */
 public class ReferenceBean<T> implements FactoryBean<Object>, InitializingBean {
-    private RegistryFactory registryFactory = ExtensionLoader.getExtension(RegistryFactory.class);
-    private ProxyFactory proxyFactory = ExtensionLoader.getExtension(ProxyFactory.class);
+    private RegistryFactory registryFactory = ExtensionLoader.getExtensionLoader(RegistryFactory.class)
+            .getExtension("default");
+    private ProxyFactory proxyFactory = ExtensionLoader.getExtensionLoader(ProxyFactory.class)
+            .getExtension("default");
     private Reference reference;
     private Class<T> serviceInterface;
     private ApplicationConfig applicationConfig;

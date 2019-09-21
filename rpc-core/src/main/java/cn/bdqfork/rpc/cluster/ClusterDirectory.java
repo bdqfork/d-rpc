@@ -26,7 +26,8 @@ import java.util.stream.Collectors;
  */
 public class ClusterDirectory<T> extends AbstractDirectory<T> implements Notifier {
     private static final Logger log = LoggerFactory.getLogger(ClusterDirectory.class);
-    private RemoteClientFactory remoteClientFactory = ExtensionLoader.getExtension(RemoteClientFactory.class);
+    private RemoteClientFactory remoteClientFactory = ExtensionLoader.getExtensionLoader(RemoteClientFactory.class)
+            .getExtension("default");
 
     private List<Registry> registries;
 

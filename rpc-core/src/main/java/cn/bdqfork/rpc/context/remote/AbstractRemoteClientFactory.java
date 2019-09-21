@@ -10,7 +10,8 @@ import cn.bdqfork.rpc.URL;
  * @since 2019/9/20
  */
 public abstract class AbstractRemoteClientFactory implements RemoteClientFactory {
-    private SerializerFactory serializerFactory = ExtensionLoader.getExtension(SerializerFactory.class);
+    private SerializerFactory serializerFactory = ExtensionLoader.getExtensionLoader(SerializerFactory.class)
+            .getExtension("default");
 
     @Override
     public RemoteClient[] getRemoteClients(URL url) throws RpcException {

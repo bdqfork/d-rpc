@@ -30,7 +30,8 @@ import java.util.stream.Collectors;
  */
 public class ServiceBean<T> implements InitializingBean, DisposableBean, ApplicationListener<ContextRefreshedEvent>, ApplicationContextAware {
     private static final Logger log = LoggerFactory.getLogger(ServiceBean.class);
-    private RegistryFactory registryFactory = ExtensionLoader.getExtension(RegistryFactory.class);
+    private RegistryFactory registryFactory = ExtensionLoader.getExtensionLoader(RegistryFactory.class)
+            .getExtension("default");
     private ApplicationContext applicationContext;
     private Service service;
     private Class<T> serviceInterface;

@@ -10,4 +10,5 @@ findProject(':rpc-example:consumer')?.name = 'consumer'
 include 'rpc-protocol'
 include 'rpc-common'
 include 'rpc-config'
+include 'rpc'
 
