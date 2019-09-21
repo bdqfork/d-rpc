@@ -1,5 +1,4 @@
 rootProject.name = 'rpc-toy-parent'
-include 'rpc-toy'
 include 'rpc-core'
 include 'rpc-registry'
 include 'rpc-example'
