@@ -9,7 +9,7 @@ import java.io.ByteArrayOutputStream;
 
 /**
  * @author bdq
- * @date 2019-03-01
+ * @since 2019-03-01
  */
 public class HessianSerializer implements Serializer {
 

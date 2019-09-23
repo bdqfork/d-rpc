@@ -61,7 +61,7 @@ public class ClusterDirectory<T> extends AbstractDirectory<T> implements Notifie
         if (destroyed.get()) {
             return;
         }
-        if (urls == null || urls.isEmpty()) {
+        if ((urls == null || urls.isEmpty()) && invokers.size() > 0) {
             log.debug("Destroy all invokers !");
             this.invokers.values().forEach(Node::destroy);
             this.invokers.clear();

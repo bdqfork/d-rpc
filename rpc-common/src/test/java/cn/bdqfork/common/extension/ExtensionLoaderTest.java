@@ -28,7 +28,7 @@ public class ExtensionLoaderTest {
     public void getAdaptiveExtension() throws Exception {
         ExtensionLoader<AdaptiveExt> extensionLoader = ExtensionLoader.getExtensionLoader(AdaptiveExt.class);
         AdaptiveExt adaptiveEx = extensionLoader.getAdaptiveExtension();
-        adaptiveEx.test(new URL("rpc://test:0/?name=testAdaptive"));
+        adaptiveEx.test(new URL("testAdaptive://test:0/?name=testAdaptive"));
         adaptiveEx.test2();
     }
 }

@@ -12,6 +12,7 @@ import java.io.Reader;
 import java.net.URLConnection;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.ToIntFunction;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -79,7 +80,7 @@ public class ExtensionLoader<T> {
                     try {
                         createExtension();
                     } catch (Exception e) {
-                        throw new IllegalStateException("Fail to create extensions !", e);
+                        throw new IllegalStateException("Fail to create extensions for class " + getDefaultName() + "!", e);
                     }
                 }
             }
@@ -209,8 +210,8 @@ public class ExtensionLoader<T> {
             }
             StringUtils.removeLastChar(defaultNameBuilder);
             defaultName = StringUtils.lowerFirst(defaultNameBuilder.toString());
-        }else {
-            defaultName=spi.value();
+        } else {
+            defaultName = spi.value();
         }
         return defaultName;
     }
@@ -224,14 +225,15 @@ public class ExtensionLoader<T> {
         List<T> extensions = activateClasses.values()
                 .stream()
                 .filter(activateClass -> checkActive(url, groupName, activateClass))
+                .sorted(Comparator.comparingInt((ToIntFunction<Class<T>>) value -> {
+                    Activate activate = value.getAnnotation(Activate.class);
+                    return activate.order();
+                }).reversed())
                 .map(activateClass -> classNames.get(activateClass))
                 .map(this::getExtension)
                 .collect(Collectors.toList());
 
-        if (extensions.size() > 0) {
-            return extensions;
-        }
-        throw new IllegalArgumentException("No extension for group " + groupName + " !");
+        return extensions;
     }
 
     public T getActivateExtension(URL url, String extensionName, String groupName) {

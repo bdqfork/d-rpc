@@ -1,1 +1,1 @@
-default=cn.bdqfork.rpc.proxy.JdkProxyFactory
+jdk=cn.bdqfork.rpc.proxy.JdkProxyFactory

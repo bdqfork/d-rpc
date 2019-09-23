@@ -1,9 +1,12 @@
 package cn.bdqfork.rpc.context.remote;
 
+import cn.bdqfork.common.extension.SPI;
+
 /**
  * @author bdq
- * @date 2019-02-19
+ * @since 2019-02-19
  */
+@SPI("hessian")
 public interface Serializer {
 
     byte[] serialize(Object data) throws Exception;

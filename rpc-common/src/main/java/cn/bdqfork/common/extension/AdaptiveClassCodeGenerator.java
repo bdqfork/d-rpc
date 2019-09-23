@@ -17,7 +17,7 @@ public class AdaptiveClassCodeGenerator {
     private static final String THROW_FORMATER = "throws %s";
     private static final String URL_FORMATER = "%s url = %s;\n";
     private static final String CODE_KEYS_FORMATER = "String[] keys = new String[]{%s};\n";
-    private static final String EXTENSION_NAME_FORMATER = "if (extensionName == null) { extensionName = %s;\n}\n";
+    private static final String EXTENSION_NAME_FORMATER = "if (extensionName == null){ extensionName = %s;\n}\n";
     private static final String EXTENSION_FORMATER = "%s extension = (%s)%s.getExtensionLoader(%s.class).getExtension(extensionName);\n";
     private static final String ILLEGAL_FORMATER = "if (extension == null) {\nthrow new IllegalStateException(\"Fail to get extension for class %s use keys (%s) !\");\n}";
     private static final String RETURN_FORMATER = "%s extension.%s(%s);\n";
@@ -92,22 +92,30 @@ public class AdaptiveClassCodeGenerator {
                     urlCode = String.format(URL_FORMATER, URL.class.getCanonicalName(), "arg" + index + ".getUrl()");
                 }
 
+                String keyCode;
                 StringBuilder keysCodeBuilder = new StringBuilder();
                 String[] value = adaptive.value();
-                for (String key : value) {
-                    keysCodeBuilder.append("\"")
-                            .append(key)
-                            .append("\"")
-                            .append(",");
+                if (value.length == 0) {
+                    keyCode = "String[] keys = null;\n";
+                } else {
+                    for (String key : value) {
+                        keysCodeBuilder.append("\"")
+                                .append(key)
+                                .append("\"")
+                                .append(",");
+                    }
+                    removeLastChar(keysCodeBuilder);
+                    String keys = keysCodeBuilder.toString();
+                    keyCode = String.format(CODE_KEYS_FORMATER, keys);
                 }
-                removeLastChar(keysCodeBuilder);
-                String keys = keysCodeBuilder.toString();
-                String keyCode = String.format(CODE_KEYS_FORMATER, keys);
+
                 StringBuilder extensionNameCodeBuilder = new StringBuilder();
                 extensionNameCodeBuilder.append("String extensionName = null;\n")
+                        .append("if (keys != null){\n")
                         .append("for(int i=0; i < keys.length; i++) {\n")
                         .append("extensionName = (String)url.getParameter(keys[i]);\n")
-                        .append("if (extensionName != null) {\n break;\n}\n}\n");
+                        .append("if (extensionName != null) {\n break;\n}\n}\n}")
+                        .append("else {\nextensionName=(String)url.getProtocol();\n}\n");
                 String defaultExtensionNameCode = String.format(EXTENSION_NAME_FORMATER, defaultName == null ? null : "\"" + defaultName + "\"");
                 extensionNameCodeBuilder.append(defaultExtensionNameCode);
 

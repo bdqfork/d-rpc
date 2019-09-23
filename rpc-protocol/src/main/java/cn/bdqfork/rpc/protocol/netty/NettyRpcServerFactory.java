@@ -8,14 +8,10 @@ import cn.bdqfork.rpc.context.remote.RpcServerFactory;
  * @author bdq
  * @since 2019-08-21
  */
-public class DefaultRpcServerFactory implements RpcServerFactory {
+public class NettyRpcServerFactory implements RpcServerFactory {
 
     @Override
     public RpcServer getServer(URL url) {
-        String server = url.getProtocol();
-        if ("netty".equals(server)) {
-            return new NettyServer(url);
-        }
-        return null;
+        return new NettyServer(url);
     }
 }

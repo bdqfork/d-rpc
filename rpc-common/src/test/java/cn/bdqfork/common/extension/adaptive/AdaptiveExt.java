@@ -11,7 +11,7 @@ import cn.bdqfork.common.extension.SPI;
 @SPI("adaptive")
 public interface AdaptiveExt {
 
-    @Adaptive({"name"})
+    @Adaptive
     void test(URL url) throws Exception;
 
     void test2() throws Exception;

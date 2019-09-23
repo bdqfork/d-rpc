@@ -10,13 +10,12 @@ import cn.bdqfork.common.URL;
  * @since 2019/9/20
  */
 public abstract class AbstractRemoteClientFactory implements RemoteClientFactory {
-    private SerializerFactory serializerFactory = ExtensionLoader.getExtensionLoader(SerializerFactory.class)
-            .getAdaptiveExtension();
 
     @Override
     public RemoteClient[] getRemoteClients(URL url) throws RpcException {
         String serialization = url.getParameter(Const.SERIALIZATION_KEY, "jdk");
-        Serializer serializer = serializerFactory.getSerializer(serialization);
+        Serializer serializer = ExtensionLoader.getExtensionLoader(Serializer.class)
+                .getExtension(serialization);
         if (serializer == null) {
             throw new RpcException("no serializer !");
         }

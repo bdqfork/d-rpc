@@ -32,5 +32,7 @@ public class Const {
     public static final String USERNAME_KEY = "username";
     public static final String PASSWORD_KEY = "password";
     public static final String ASYNC_KEY = "async";
+    //TODO:添加到配置中
     public static final String PROXY_KEY = "proxy";
+    public static final String CLUSTER_KEY = "cluster";
 }

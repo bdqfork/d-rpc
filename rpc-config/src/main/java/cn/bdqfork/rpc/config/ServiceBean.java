@@ -2,13 +2,13 @@ package cn.bdqfork.rpc.config;
 
 import cn.bdqfork.common.constant.Const;
 import cn.bdqfork.common.extension.ExtensionLoader;
+import cn.bdqfork.rpc.registry.RegistryFactory;
 import cn.bdqfork.rpc.util.RegistryUtils;
 import cn.bdqfork.rpc.Invoker;
 import cn.bdqfork.rpc.context.RegistryProtocol;
 import cn.bdqfork.rpc.config.annotation.Service;
 import cn.bdqfork.rpc.Exporter;
 import cn.bdqfork.rpc.registry.Registry;
-import cn.bdqfork.rpc.registry.RegistryFactory;
 import cn.bdqfork.common.URL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
