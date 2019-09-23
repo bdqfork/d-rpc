@@ -32,7 +32,7 @@ public class FailoverClusterInvoker<T> extends AbstractClusterInvoker<T> {
         RpcException lastException = null;
         while (count++ < reties) {
             try {
-                Invoker<T> invoker = loadBalance.select(copyInvokers);
+                Invoker<T> invoker = loadBalance.select(copyInvokers, this.getUrl(), invocation);
                 return invoker.invoke(invocation);
             } catch (RpcException e) {
                 if (count > 1) {

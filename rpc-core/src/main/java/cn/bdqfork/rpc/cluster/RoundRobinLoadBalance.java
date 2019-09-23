@@ -1,5 +1,7 @@
 package cn.bdqfork.rpc.cluster;
 
+import cn.bdqfork.common.URL;
+import cn.bdqfork.rpc.Invocation;
 import cn.bdqfork.rpc.Invoker;
 
 import java.util.List;
@@ -13,7 +15,7 @@ public class RoundRobinLoadBalance extends AbstractLoadBalance {
     private AtomicInteger count = new AtomicInteger(0);
 
     @Override
-    protected <T> Invoker<T> doSelect(List<Invoker<T>> invokers) {
+    protected <T> Invoker<T> doSelect(List<Invoker<T>> invokers, URL url, Invocation invocation) {
         return invokers.get(count.getAndIncrement() % invokers.size());
     }
 

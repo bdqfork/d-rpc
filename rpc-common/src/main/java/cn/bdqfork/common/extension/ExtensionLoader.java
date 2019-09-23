@@ -249,7 +249,8 @@ public class ExtensionLoader<T> {
                 return getExtension(extensionName);
             }
         }
-        throw new IllegalArgumentException("No extension named " + extensionName + " for group " + groupName + " !");
+        throw new IllegalArgumentException("No extension named " + extensionName + " and group by " + groupName +
+                " for class " + type.getCanonicalName() + "!");
     }
 
     private boolean checkActive(URL url, String groupName, Class<T> activateClass) {

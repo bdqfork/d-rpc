@@ -1,6 +1,7 @@
 package cn.bdqfork.rpc.cluster;
 
 import cn.bdqfork.common.exception.RpcException;
+import cn.bdqfork.common.extension.ExtensionLoader;
 import cn.bdqfork.rpc.Directory;
 import cn.bdqfork.common.URL;
 import cn.bdqfork.rpc.Invocation;
@@ -23,7 +24,7 @@ public abstract class AbstractClusterInvoker<T> implements Invoker<T> {
     @Override
     public Result invoke(Invocation invocation) throws RpcException {
         List<Invoker<T>> invokers = directory.list(invocation);
-        LoadBalance loadBalance = LoadBalanceFactory.getLoadBalance(this.getUrl());
+        LoadBalance loadBalance = ExtensionLoader.getExtensionLoader(LoadBalance.class).getAdaptiveExtension();
         return doInvoke(invocation, invokers, loadBalance);
     }
 

@@ -1,7 +1,9 @@
 package cn.bdqfork.rpc.cluster;
 
+import cn.bdqfork.common.URL;
 import cn.bdqfork.common.exception.RpcException;
 import cn.bdqfork.common.util.CollectionUtils;
+import cn.bdqfork.rpc.Invocation;
 import cn.bdqfork.rpc.Invoker;
 
 import java.util.List;
@@ -11,13 +13,14 @@ import java.util.List;
  * @since 2019/9/11
  */
 public abstract class AbstractLoadBalance implements LoadBalance {
+
     @Override
-    public <T> Invoker<T> select(List<Invoker<T>> invokers) throws RpcException {
+    public <T> Invoker<T> select(List<Invoker<T>> invokers, URL url, Invocation invocation) throws RpcException {
         if (invokers == null || CollectionUtils.isEmpty(invokers)) {
             throw new RpcException("No providers");
         }
-        return doSelect(invokers);
+        return doSelect(invokers, url, invocation);
     }
 
-    protected abstract <T> Invoker<T> doSelect(List<Invoker<T>> invokers);
+    protected abstract <T> Invoker<T> doSelect(List<Invoker<T>> invokers, URL url, Invocation invocation);
 }

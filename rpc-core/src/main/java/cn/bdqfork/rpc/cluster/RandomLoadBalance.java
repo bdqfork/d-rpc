@@ -1,5 +1,7 @@
 package cn.bdqfork.rpc.cluster;
 
+import cn.bdqfork.common.URL;
+import cn.bdqfork.rpc.Invocation;
 import cn.bdqfork.rpc.Invoker;
 
 import java.util.List;
@@ -11,8 +13,10 @@ import java.util.Random;
  */
 public class RandomLoadBalance extends AbstractLoadBalance {
 
+    public static final String NAME = "random";
+
     @Override
-    protected <T> Invoker<T> doSelect(List<Invoker<T>> invokers) {
+    protected <T> Invoker<T> doSelect(List<Invoker<T>> invokers, URL url, Invocation invocation) {
         int size = invokers.size();
         Random random = new Random();
         int index = random.nextInt(size);
