@@ -1,7 +1,7 @@
 package cn.bdqfork.rpc.registry;
 
 import cn.bdqfork.common.constant.Const;
-import cn.bdqfork.rpc.URL;
+import cn.bdqfork.common.URL;
 import cn.bdqfork.rpc.config.RegistryConfig;
 import org.junit.Test;
 

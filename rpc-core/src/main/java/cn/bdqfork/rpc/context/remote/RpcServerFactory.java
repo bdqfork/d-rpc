@@ -1,6 +1,6 @@
 package cn.bdqfork.rpc.context.remote;
 
-import cn.bdqfork.rpc.URL;
+import cn.bdqfork.common.URL;
 
 /**
  * @author bdq

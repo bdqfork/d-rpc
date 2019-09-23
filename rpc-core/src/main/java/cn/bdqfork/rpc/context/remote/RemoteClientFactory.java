@@ -1,7 +1,7 @@
 package cn.bdqfork.rpc.context.remote;
 
 import cn.bdqfork.common.exception.RpcException;
-import cn.bdqfork.rpc.URL;
+import cn.bdqfork.common.URL;
 
 /**
  * @author bdq

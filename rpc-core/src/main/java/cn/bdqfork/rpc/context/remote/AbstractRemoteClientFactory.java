@@ -3,7 +3,7 @@ package cn.bdqfork.rpc.context.remote;
 import cn.bdqfork.common.constant.Const;
 import cn.bdqfork.common.exception.RpcException;
 import cn.bdqfork.common.extension.ExtensionLoader;
-import cn.bdqfork.rpc.URL;
+import cn.bdqfork.common.URL;
 
 /**
  * @author bdq
@@ -11,7 +11,7 @@ import cn.bdqfork.rpc.URL;
  */
 public abstract class AbstractRemoteClientFactory implements RemoteClientFactory {
     private SerializerFactory serializerFactory = ExtensionLoader.getExtensionLoader(SerializerFactory.class)
-            .getExtension("default");
+            .getAdaptiveExtension();
 
     @Override
     public RemoteClient[] getRemoteClients(URL url) throws RpcException {

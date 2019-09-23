@@ -9,7 +9,7 @@ import cn.bdqfork.rpc.config.annotation.Service;
 import cn.bdqfork.rpc.Exporter;
 import cn.bdqfork.rpc.registry.Registry;
 import cn.bdqfork.rpc.registry.RegistryFactory;
-import cn.bdqfork.rpc.URL;
+import cn.bdqfork.common.URL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
 public class ServiceBean<T> implements InitializingBean, DisposableBean, ApplicationListener<ContextRefreshedEvent>, ApplicationContextAware {
     private static final Logger log = LoggerFactory.getLogger(ServiceBean.class);
     private RegistryFactory registryFactory = ExtensionLoader.getExtensionLoader(RegistryFactory.class)
-            .getExtension("default");
+            .getAdaptiveExtension();
     private ApplicationContext applicationContext;
     private Service service;
     private Class<T> serviceInterface;

@@ -9,7 +9,7 @@ import cn.bdqfork.rpc.context.AbstractDirectory;
 import cn.bdqfork.rpc.Node;
 import cn.bdqfork.rpc.registry.Notifier;
 import cn.bdqfork.rpc.registry.Registry;
-import cn.bdqfork.rpc.URL;
+import cn.bdqfork.common.URL;
 import cn.bdqfork.rpc.context.remote.*;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 public class ClusterDirectory<T> extends AbstractDirectory<T> implements Notifier {
     private static final Logger log = LoggerFactory.getLogger(ClusterDirectory.class);
     private RemoteClientFactory remoteClientFactory = ExtensionLoader.getExtensionLoader(RemoteClientFactory.class)
-            .getExtension("default");
+            .getAdaptiveExtension();
 
     private List<Registry> registries;
 

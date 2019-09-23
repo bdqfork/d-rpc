@@ -1,6 +1,6 @@
 package cn.bdqfork.rpc.protocol.netty;
 
-import cn.bdqfork.rpc.URL;
+import cn.bdqfork.common.URL;
 import cn.bdqfork.rpc.context.remote.RpcServer;
 import cn.bdqfork.rpc.context.remote.RpcServerFactory;
 

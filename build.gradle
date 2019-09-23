@@ -7,7 +7,7 @@ ext {
             netty       : "4.1.33.Final",
             slf4j       : "1.7.25",
             spring      : "5.1.4.RELEASE",
-            javassist   : "3.12.1.GA",
+            javassist   : "3.25.0-GA",
             etcd4j      : "2.15.0",
     ]
 }
@@ -23,20 +23,14 @@ repositories {
     mavenCentral()
 }
 
+task showRepos {
+    doLast {
+        repositories.each {
+            println "repository: ${it.name} ('${it.url}')"
+        }
+    }
+}
+
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
-}
-
-buildscript {
-    repositories {
-        maven { url 'http://maven.aliyun.com/nexus/content/groups/public/' }
-        maven { url 'http://maven.aliyun.com/nexus/content/repositories/jcenter' }
-    }
-}
-
-allprojects {
-    repositories {
-        maven { url 'http://maven.aliyun.com/nexus/content/groups/public/' }
-        maven { url 'http://maven.aliyun.com/nexus/content/repositories/jcenter' }
-    }
 }

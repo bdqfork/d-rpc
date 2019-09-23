@@ -1,6 +1,6 @@
 package cn.bdqfork.rpc.registry;
 
-import cn.bdqfork.rpc.URL;
+import cn.bdqfork.common.URL;
 
 import java.util.HashMap;
 import java.util.Map;

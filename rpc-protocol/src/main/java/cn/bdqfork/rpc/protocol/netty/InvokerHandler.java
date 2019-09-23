@@ -7,7 +7,7 @@ import cn.bdqfork.rpc.Invoker;
 import cn.bdqfork.rpc.context.remote.Request;
 import cn.bdqfork.rpc.context.remote.Response;
 import cn.bdqfork.rpc.Result;
-import cn.bdqfork.rpc.URL;
+import cn.bdqfork.common.URL;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;

@@ -1,21 +1,21 @@
 package cn.bdqfork.rpc.context;
 
+import cn.bdqfork.common.URL;
 import cn.bdqfork.common.constant.Const;
 import cn.bdqfork.common.exception.RpcException;
 import cn.bdqfork.common.extension.ExtensionLoader;
 import cn.bdqfork.rpc.*;
-import cn.bdqfork.rpc.cluster.ClusterDirectory;
 import cn.bdqfork.rpc.cluster.Cluster;
+import cn.bdqfork.rpc.cluster.ClusterDirectory;
 import cn.bdqfork.rpc.context.filter.Filter;
+import cn.bdqfork.rpc.context.remote.RpcServer;
+import cn.bdqfork.rpc.context.remote.RpcServerFactory;
 import cn.bdqfork.rpc.proxy.ProxyFactory;
 import cn.bdqfork.rpc.registry.Registry;
-import cn.bdqfork.rpc.context.remote.*;
 
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
 /**
  * @author bdq
@@ -23,10 +23,11 @@ import java.util.stream.Collectors;
  */
 public class RegistryProtocol implements Protocol {
     private static final Map<String, RpcServer> rpcServerMap = new ConcurrentHashMap<>();
-    private RpcServerFactory rpcServerFactory = ExtensionLoader.getExtensionLoader(RpcServerFactory.class).getExtension("default");
+    private RpcServerFactory rpcServerFactory = ExtensionLoader.getExtensionLoader(RpcServerFactory.class)
+            .getAdaptiveExtension();
     private ProxyFactory proxyFactory = ExtensionLoader.getExtensionLoader(ProxyFactory.class)
-            .getExtension("default");
-    private Cluster cluster = ExtensionLoader.getExtensionLoader(Cluster.class).getExtension("default");
+            .getAdaptiveExtension();
+    private Cluster cluster = ExtensionLoader.getExtensionLoader(Cluster.class).getAdaptiveExtension();
     private List<Registry> registries;
 
     public RegistryProtocol(List<Registry> registries) {
@@ -83,13 +84,7 @@ public class RegistryProtocol implements Protocol {
     private <T> Invoker<T> buildInvokerChain(Invoker<T> invoker, String group) {
         Invoker<T> last = invoker;
         List<Filter> filters = ExtensionLoader.getExtensionLoader(Filter.class)
-                .getExtensions()
-                .values()
-                .stream()
-                .map(filter-> (Filter) filter)
-                .filter(filter -> group.equals(filter.getGroup()))
-                .sorted(Comparator.comparing(Filter::getOrder).reversed())
-                .collect(Collectors.toList());
+                .getActivateExtensions(invoker.getUrl(), group);
         for (int i = 0; i < filters.size(); i++) {
             Filter next = filters.get(i);
             Invoker<T> finalLast = last;

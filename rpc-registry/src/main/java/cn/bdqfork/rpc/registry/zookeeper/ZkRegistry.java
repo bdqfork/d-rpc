@@ -3,7 +3,7 @@ package cn.bdqfork.rpc.registry.zookeeper;
 import cn.bdqfork.common.constant.Const;
 import cn.bdqfork.rpc.registry.AbstractRegistry;
 import cn.bdqfork.rpc.registry.Notifier;
-import cn.bdqfork.rpc.URL;
+import cn.bdqfork.common.URL;
 import org.apache.curator.RetryPolicy;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;

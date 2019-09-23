@@ -1,4 +1,4 @@
-package cn.bdqfork.rpc;
+package cn.bdqfork.common;
 
 import cn.bdqfork.common.constant.Const;
 import org.apache.commons.lang3.StringUtils;
@@ -113,6 +113,10 @@ public class URL implements Serializable {
 
     public void clear() {
         this.parameterMap.clear();
+    }
+
+    public boolean hasParameter(String key) {
+        return parameterMap.containsKey(key);
     }
 
     public String buildString() {

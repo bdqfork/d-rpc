@@ -1,6 +1,6 @@
 package cn.bdqfork.rpc.protocol.netty;
 
-import cn.bdqfork.rpc.URL;
+import cn.bdqfork.common.URL;
 import cn.bdqfork.rpc.context.remote.AbstractRpcServer;
 import cn.bdqfork.rpc.Invoker;
 import io.netty.bootstrap.ServerBootstrap;
@@ -10,7 +10,6 @@ import io.netty.channel.ChannelOption;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
-import io.netty.handler.timeout.IdleStateHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

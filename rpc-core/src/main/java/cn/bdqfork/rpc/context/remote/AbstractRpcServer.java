@@ -2,7 +2,7 @@ package cn.bdqfork.rpc.context.remote;
 
 import cn.bdqfork.common.constant.Const;
 import cn.bdqfork.common.extension.ExtensionLoader;
-import cn.bdqfork.rpc.URL;
+import cn.bdqfork.common.URL;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -28,7 +28,7 @@ public abstract class AbstractRpcServer implements RpcServer {
     private void initSerializer(URL url) {
         String serializtion = url.getParameter(Const.SERIALIZATION_KEY);
         SerializerFactory serializerFactory = ExtensionLoader.getExtensionLoader(SerializerFactory.class)
-                .getExtension("default");
+                .getAdaptiveExtension();
         this.serializer = serializerFactory.getSerializer(serializtion);
     }
 

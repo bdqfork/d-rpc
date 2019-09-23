@@ -2,7 +2,7 @@ package cn.bdqfork.rpc.context;
 
 import cn.bdqfork.rpc.Exporter;
 import cn.bdqfork.rpc.registry.Registry;
-import cn.bdqfork.rpc.URL;
+import cn.bdqfork.common.URL;
 import cn.bdqfork.rpc.Invoker;
 
 import java.util.List;

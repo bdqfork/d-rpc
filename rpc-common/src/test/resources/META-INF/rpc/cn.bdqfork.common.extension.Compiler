@@ -1,0 +1,2 @@
+javassist=cn.bdqfork.common.extension.JavassistCompiler
+adaptive.Compiler=cn.bdqfork.common.extension.AdaptiveCompiler

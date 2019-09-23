@@ -5,7 +5,7 @@ import cn.bdqfork.rpc.context.remote.AbstractInvoker;
 import cn.bdqfork.rpc.context.ResponseResult;
 import cn.bdqfork.rpc.Invocation;
 import cn.bdqfork.rpc.Invoker;
-import cn.bdqfork.rpc.URL;
+import cn.bdqfork.common.URL;
 import cn.bdqfork.rpc.Result;
 
 import java.lang.reflect.InvocationTargetException;

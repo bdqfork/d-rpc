@@ -10,7 +10,7 @@ import cn.bdqfork.rpc.proxy.ProxyFactory;
 import cn.bdqfork.rpc.registry.Registry;
 import cn.bdqfork.rpc.registry.RegistryFactory;
 import cn.bdqfork.rpc.util.RegistryUtils;
-import cn.bdqfork.rpc.URL;
+import cn.bdqfork.common.URL;
 import cn.bdqfork.rpc.Invoker;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.FactoryBean;
@@ -25,9 +25,9 @@ import java.util.stream.Collectors;
  */
 public class ReferenceBean<T> implements FactoryBean<Object>, InitializingBean {
     private RegistryFactory registryFactory = ExtensionLoader.getExtensionLoader(RegistryFactory.class)
-            .getExtension("default");
+            .getAdaptiveExtension();
     private ProxyFactory proxyFactory = ExtensionLoader.getExtensionLoader(ProxyFactory.class)
-            .getExtension("default");
+            .getAdaptiveExtension();
     private Reference reference;
     private Class<T> serviceInterface;
     private ApplicationConfig applicationConfig;
@@ -79,6 +79,7 @@ public class ReferenceBean<T> implements FactoryBean<Object>, InitializingBean {
         }
 
         url.addParameter(Const.ENVIRONMENT_KEY, applicationConfig.getEnvironment());
+        url.addParameter(Const.PROXY_KEY, applicationConfig.getCompiler());
         url.addParameter(Const.GROUP_KEY, reference.group());
         url.addParameter(Const.INTERFACE_KEY, serviceInterface.getName());
         url.addParameter(Const.RETRY_KEY, String.valueOf(reference.retries()));
@@ -86,7 +87,7 @@ public class ReferenceBean<T> implements FactoryBean<Object>, InitializingBean {
         url.addParameter(Const.CONNECTIONS_KEY, String.valueOf(reference.connections()));
         url.addParameter(Const.SIDE_KEY, Const.CONSUMER_SIDE);
         url.addParameter(Const.LOADBALANCE_KEY, reference.loadBalance());
-        url.addParameter(Const.ASYNC_KEY,reference.async());
+        url.addParameter(Const.ASYNC_KEY, reference.async());
         return url;
     }
 

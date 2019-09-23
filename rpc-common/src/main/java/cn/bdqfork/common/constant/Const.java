@@ -32,4 +32,5 @@ public class Const {
     public static final String USERNAME_KEY = "username";
     public static final String PASSWORD_KEY = "password";
     public static final String ASYNC_KEY = "async";
+    public static final String PROXY_KEY = "proxy";
 }

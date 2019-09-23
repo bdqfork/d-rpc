@@ -2,7 +2,8 @@ package cn.bdqfork.rpc.context.filter;
 
 import cn.bdqfork.common.constant.Const;
 import cn.bdqfork.common.exception.RpcException;
-import cn.bdqfork.rpc.URL;
+import cn.bdqfork.common.URL;
+import cn.bdqfork.common.extension.Activate;
 import cn.bdqfork.rpc.Invocation;
 import cn.bdqfork.rpc.Invoker;
 import cn.bdqfork.rpc.Result;
@@ -15,6 +16,7 @@ import java.util.Map;
  * @author bdq
  * @since 2019-09-04
  */
+@Activate(group = Const.PROTOCOL_CONSUMER, order = -1000)
 public class RpcContextFilter implements Filter {
     @Override
     public Result invoke(Invoker<?> invoker, Invocation invocation) throws RpcException {
@@ -42,13 +44,4 @@ public class RpcContextFilter implements Filter {
         }
     }
 
-    @Override
-    public String getGroup() {
-        return Const.PROTOCOL_CONSUMER;
-    }
-
-    @Override
-    public int getOrder() {
-        return -1000;
-    }
 }

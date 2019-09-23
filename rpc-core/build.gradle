@@ -16,11 +16,7 @@ repositories {
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
 
-    compile "org.apache.commons:commons-lang3:${libs.common_lang3}"
-
     compile "org.slf4j:slf4j-api:${libs.slf4j}"
-
-    compile "javassist:javassist:${libs.javassist}"
 
     compile project(':rpc-common')
 }
