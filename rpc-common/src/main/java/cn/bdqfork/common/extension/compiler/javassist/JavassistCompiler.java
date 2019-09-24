@@ -20,8 +20,8 @@ public class JavassistCompiler extends AbstractCompiler {
     private static final Pattern METHODS_PATTERN = Pattern.compile("\n(public|private|protected)\\s+");
 
     @Override
-    protected Class<?> doCompile(String className, String code) throws Throwable {
-        CtClassBuilder builder = CtClassBuilder.builder(className);
+    protected Class<?> doCompile(String fullClassName, String code) throws Throwable {
+        CtClassBuilder builder = CtClassBuilder.builder(fullClassName);
 
         Matcher matcher = IMPORT_PATTERN.matcher(code);
         while (matcher.find()) {

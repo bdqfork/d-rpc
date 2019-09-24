@@ -49,6 +49,6 @@ public abstract class AbstractCompiler implements Compiler {
         }
     }
 
-    protected abstract Class<?> doCompile(String className, String code) throws Throwable;
+    protected abstract Class<?> doCompile(String fullClassName, String code) throws Throwable;
 
 }
