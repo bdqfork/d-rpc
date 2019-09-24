@@ -1,18 +1,18 @@
 package cn.bdqfork.common.extension;
 
 import cn.bdqfork.common.URL;
+import cn.bdqfork.common.util.ClassUtils;
 import cn.bdqfork.common.util.StringUtils;
-import javassist.CannotCompileException;
-import javassist.NotFoundException;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URLConnection;
-import java.util.*;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.ToIntFunction;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -22,19 +22,18 @@ import java.util.stream.Collectors;
  * @since 2019-08-20
  */
 public class ExtensionLoader<T> {
-
     private static final String PREFIX = "META-INF/rpc/";
-
+    private static final Pattern NAME_PATTERN = Pattern.compile("[A-Z][a-z]+");
     private static final Map<String, ExtensionLoader> CACHES = new ConcurrentHashMap<>();
 
     private Class<T> type;
-    private Class<T> adaptiveClass;
-    private T adaptiveExtension;
     private String defaultName;
-    private Map<Class<T>, String> classNames;
+    private volatile Class<T> adaptiveClass;
+    private volatile T adaptiveExtension;
     private volatile Map<String, T> cacheExtensions;
-    private volatile Map<String, Class<T>> extensionClasses;
-    private volatile Map<String, Class<T>> activateClasses = new HashMap<>();
+    private final Map<Class<T>, String> classNames = new ConcurrentHashMap<>();
+    private final Map<String, Class<T>> extensionClasses = new ConcurrentHashMap<>();
+    private final Map<String, Class<T>> activateClasses = new ConcurrentHashMap<>();
 
     private ExtensionLoader(Class<T> type) {
         this.type = type;
@@ -43,20 +42,26 @@ public class ExtensionLoader<T> {
     @SuppressWarnings("unchecked")
     public static <T> ExtensionLoader<T> getExtensionLoader(Class<T> clazz) {
         String className = clazz.getName();
+
         if (!clazz.isInterface()) {
             throw new IllegalArgumentException("Fail to create ExtensionLoader for class " + className
                     + ", class is not Interface !");
         }
+
         SPI spi = clazz.getAnnotation(SPI.class);
+
         if (spi == null) {
             throw new IllegalArgumentException("Fail to create ExtensionLoader for class " + className
                     + ", class is not annotated by @SPI !");
         }
+
         ExtensionLoader<T> extensionLoader = (ExtensionLoader<T>) CACHES.get(className);
+
         if (extensionLoader == null) {
             CACHES.putIfAbsent(className, new ExtensionLoader<>(clazz));
             extensionLoader = (ExtensionLoader<T>) CACHES.get(className);
         }
+
         return extensionLoader;
     }
 
@@ -70,81 +75,73 @@ public class ExtensionLoader<T> {
         if (extension != null) {
             return extension;
         }
-        throw new IllegalStateException("No extension named " + extensionName);
+        throw new IllegalStateException("No extension named " + extensionName + " for class " + type.getName() + "!");
     }
 
     public Map<String, T> getExtensions() {
         if (cacheExtensions == null) {
-            synchronized (ExtensionLoader.class) {
-                if (cacheExtensions == null) {
-                    try {
-                        createExtension();
-                    } catch (Exception e) {
-                        throw new IllegalStateException("Fail to create extensions for class " + getDefaultName() + "!", e);
-                    }
-                }
+            cacheExtensions = new ConcurrentHashMap<>();
+            getExtensionClasses();
+
+            for (Map.Entry<String, Class<T>> entry : extensionClasses.entrySet()) {
+                Class<T> clazz = entry.getValue();
+                cacheExtensions.putIfAbsent(entry.getKey(), ClassUtils.newInstance(clazz));
             }
+
         }
         return Collections.unmodifiableMap(cacheExtensions);
     }
 
-    private void createExtension() throws IllegalAccessException, InstantiationException, IOException, ClassNotFoundException {
-        getExtensionClasses();
-        cacheExtensions = new HashMap<>();
-
-        for (Map.Entry<String, Class<T>> entry : extensionClasses.entrySet()) {
-            Class<?> clazz = entry.getValue();
-            cacheExtensions.putIfAbsent(entry.getKey(), (T) clazz.newInstance());
-        }
-    }
-
-    private void getExtensionClasses() throws IOException, ClassNotFoundException {
-        if (classNames != null && extensionClasses != null) {
+    private void getExtensionClasses() {
+        if (classNames.size() > 0 && classNames.size() > 0) {
             return;
         }
-        classNames = new HashMap<>();
-        extensionClasses = new HashMap<>();
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
         java.net.URL url = classLoader.getResource(PREFIX + type.getName());
-        if (url.getProtocol().equals("file") || url.getProtocol().equals("jar")) {
-            URLConnection urlConnection = url.openConnection();
-            Reader reader = new InputStreamReader(urlConnection.getInputStream());
-            BufferedReader bufferedReader = new BufferedReader(reader);
-            String line;
-            while ((line = bufferedReader.readLine()) != null) {
-                if (line.equals("")) {
-                    continue;
-                }
-                //过滤注释
-                if (line.contains("#")) {
-                    line = line.substring(0, line.indexOf("#"));
-                }
-                String[] values = line.split("=");
-                String name = values[0].trim();
-                String impl = values[1].trim();
-                if (extensionClasses.containsKey(name)) {
-                    throw new IllegalStateException("Duplicate extension named " + name);
-                }
-                Class<T> clazz = (Class<T>) classLoader.loadClass(impl);
-                if (clazz.isAnnotationPresent(Adaptive.class)) {
-                    cacheAdaptiveClass(name, clazz);
-                } else {
-                    cacheActivateClass(name, clazz);
-                }
-                classNames.put(clazz, name);
-                extensionClasses.put(name, clazz);
-            }
-        } else {
+        if (url.getPath().isEmpty()) {
             throw new IllegalArgumentException("Extension path " + PREFIX + type.getName() + " don't exsist !");
+        }
+        try {
+            if (url.getProtocol().equals("file") || url.getProtocol().equals("jar")) {
+                URLConnection urlConnection = url.openConnection();
+                Reader reader = new InputStreamReader(urlConnection.getInputStream());
+                BufferedReader bufferedReader = new BufferedReader(reader);
+                String line;
+                while ((line = bufferedReader.readLine()) != null) {
+                    if (line.equals("")) {
+                        continue;
+                    }
+                    //过滤注释
+                    if (line.contains("#")) {
+                        line = line.substring(0, line.indexOf("#"));
+                    }
+                    String[] values = line.split("=");
+                    String name = values[0].trim();
+                    String impl = values[1].trim();
+                    if (extensionClasses.containsKey(name)) {
+                        throw new IllegalStateException("Duplicate extension named " + name);
+                    }
+                    @SuppressWarnings("unchecked")
+                    Class<T> clazz = (Class<T>) classLoader.loadClass(impl);
+
+                    if (clazz.isAnnotationPresent(Adaptive.class)) {
+                        cacheAdaptiveClass(name, clazz);
+                    } else {
+                        cacheActivateClass(name, clazz);
+                    }
+
+                    classNames.putIfAbsent(clazz, name);
+                    extensionClasses.putIfAbsent(name, clazz);
+                }
+            }
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Fail to get extension class from " + PREFIX + type.getName() + "!", e.getCause());
         }
     }
 
     private void cacheActivateClass(String name, Class<T> clazz) {
-        if (activateClasses == null) {
-            activateClasses = new HashMap<>();
-        }
         if (clazz.isAnnotationPresent(Activate.class)) {
-            activateClasses.put(name, clazz);
+            activateClasses.putIfAbsent(name, clazz);
         }
     }
 
@@ -158,52 +155,44 @@ public class ExtensionLoader<T> {
 
     public T getAdaptiveExtension() {
         if (adaptiveExtension == null) {
-            synchronized (ExtensionLoader.class) {
-                if (adaptiveExtension == null) {
-                    try {
-                        createAdaptiveExtension();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
+            try {
+                createAdaptiveExtension();
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
         return adaptiveExtension;
     }
 
     private void createAdaptiveExtension() {
-        try {
-            getExtensionClasses();
-        } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
-        }
+        getExtensionClasses();
+
         if (adaptiveClass != null) {
             String extensionName = classNames.get(adaptiveClass);
             adaptiveExtension = getExtension(extensionName);
             return;
         }
+
         String defaultName = getDefaultName();
+
         String code = new AdaptiveClassCodeGenerator(type, defaultName)
                 .generate();
         Compiler compiler = ExtensionLoader.getExtensionLoader(Compiler.class).getAdaptiveExtension();
-        try {
-            @SuppressWarnings("unchecked")
-            Class<T> adaptiveClass = (Class<T>) compiler.compile(code, getClass().getClassLoader());
-            adaptiveExtension = adaptiveClass.newInstance();
-        } catch (IllegalAccessException | InstantiationException e) {
-            e.printStackTrace();
-        }
+
+        @SuppressWarnings("unchecked")
+        Class<T> adaptiveClass = (Class<T>) compiler.compile(code, getClass().getClassLoader());
+
+        adaptiveExtension = ClassUtils.newInstance(adaptiveClass);
     }
 
     private String getDefaultName() {
         if (defaultName != null) {
             return defaultName;
         }
-        Pattern pattern = Pattern.compile("[A-Z][a-z]+");
         SPI spi = type.getAnnotation(SPI.class);
         if (spi.value().isEmpty()) {
+            Matcher matcher = NAME_PATTERN.matcher(type.getSimpleName());
             StringBuilder defaultNameBuilder = new StringBuilder();
-            Matcher matcher = pattern.matcher(type.getSimpleName());
             while (matcher.find()) {
                 defaultNameBuilder.append(matcher.group())
                         .append(".");
@@ -217,37 +206,33 @@ public class ExtensionLoader<T> {
     }
 
     public List<T> getActivateExtensions(URL url, String groupName) {
-        try {
-            getExtensionClasses();
-        } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-        List<T> extensions = activateClasses.values()
+        getExtensionClasses();
+        return activateClasses.values()
                 .stream()
                 .filter(activateClass -> checkActive(url, groupName, activateClass))
-                .sorted(Comparator.comparingInt((ToIntFunction<Class<T>>) value -> {
-                    Activate activate = value.getAnnotation(Activate.class);
-                    return activate.order();
-                }).reversed())
-                .map(activateClass -> classNames.get(activateClass))
+                .sorted(Comparator.comparingInt(this::getOrder).reversed())
+                .map(classNames::get)
                 .map(this::getExtension)
                 .collect(Collectors.toList());
+    }
 
-        return extensions;
+    private int getOrder(Class<T> value) {
+        Activate activate = value.getAnnotation(Activate.class);
+        return activate.order();
     }
 
     public T getActivateExtension(URL url, String extensionName, String groupName) {
-        try {
-            getExtensionClasses();
-        } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
-        }
+        getExtensionClasses();
+
         if (activateClasses.containsKey(extensionName)) {
             Class<T> activateClass = activateClasses.get(extensionName);
+
             Activate activate = activateClass.getAnnotation(Activate.class);
+
             if (activate != null && checkGroup(groupName, activate) && checkKey(url, activate)) {
                 return getExtension(extensionName);
             }
+
         }
         throw new IllegalArgumentException("No extension named " + extensionName + " and group by " + groupName +
                 " for class " + type.getCanonicalName() + "!");

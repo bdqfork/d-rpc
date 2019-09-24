@@ -17,6 +17,14 @@ public class ClassUtils {
         return Class.forName(beanClassName, false, classLoader);
     }
 
+    public static <T> T newInstance(Class<T> clazz) {
+        try {
+            return clazz.newInstance();
+        } catch (InstantiationException | IllegalAccessException e) {
+            throw new IllegalStateException("Can't instantiate class " + clazz.getName() + "!");
+        }
+    }
+
     public static URI toURI(String baseName) {
         try {
             return new URI(baseName);
