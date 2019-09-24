@@ -1,6 +1,4 @@
-package cn.bdqfork.rpc;
-
-import cn.bdqfork.common.URL;
+package cn.bdqfork.common;
 
 /**
  * @author bdq

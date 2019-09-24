@@ -1,4 +1,4 @@
-package cn.bdqfork.rpc.protocol.serializer;
+package cn.bdqfork.rpc.protocol.netty;
 
 import cn.bdqfork.common.URL;
 import cn.bdqfork.common.constant.Const;

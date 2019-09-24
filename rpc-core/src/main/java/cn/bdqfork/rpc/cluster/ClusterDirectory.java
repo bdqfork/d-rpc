@@ -6,7 +6,7 @@ import cn.bdqfork.common.extension.ExtensionLoader;
 import cn.bdqfork.rpc.Invocation;
 import cn.bdqfork.rpc.Invoker;
 import cn.bdqfork.rpc.context.AbstractDirectory;
-import cn.bdqfork.rpc.Node;
+import cn.bdqfork.common.Node;
 import cn.bdqfork.rpc.registry.Notifier;
 import cn.bdqfork.rpc.registry.Registry;
 import cn.bdqfork.common.URL;

@@ -1,9 +1,7 @@
 package cn.bdqfork.rpc.registry;
 
-import cn.bdqfork.common.extension.Adaptive;
-import cn.bdqfork.common.extension.SPI;
-import cn.bdqfork.rpc.Node;
 import cn.bdqfork.common.URL;
+import cn.bdqfork.common.Node;
 
 import java.util.List;
 

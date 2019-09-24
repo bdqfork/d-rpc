@@ -9,7 +9,7 @@ import cn.bdqfork.rpc.Exporter;
 import cn.bdqfork.rpc.proxy.ProxyFactory;
 import cn.bdqfork.rpc.registry.Registry;
 import cn.bdqfork.rpc.registry.RegistryFactory;
-import cn.bdqfork.rpc.util.RegistryUtils;
+import cn.bdqfork.rpc.registry.util.RegistryUtils;
 import cn.bdqfork.common.URL;
 import cn.bdqfork.rpc.Invoker;
 import org.apache.commons.lang3.StringUtils;
@@ -79,13 +79,14 @@ public class ReferenceBean<T> implements FactoryBean<Object>, InitializingBean {
         }
 
         url.addParameter(Const.ENVIRONMENT_KEY, applicationConfig.getEnvironment());
-        url.addParameter(Const.PROXY_KEY, applicationConfig.getCompiler());
+        url.addParameter(Const.PROXY_KEY, reference.proxy());
         url.addParameter(Const.GROUP_KEY, reference.group());
         url.addParameter(Const.INTERFACE_KEY, serviceInterface.getName());
         url.addParameter(Const.RETRY_KEY, String.valueOf(reference.retries()));
         url.addParameter(Const.TIMEOUT_KEY, String.valueOf(reference.timeout()));
         url.addParameter(Const.CONNECTIONS_KEY, String.valueOf(reference.connections()));
         url.addParameter(Const.SIDE_KEY, Const.CONSUMER_SIDE);
+        url.addParameter(Const.CLUSTER_KEY, reference.cluster());
         url.addParameter(Const.LOADBALANCE_KEY, reference.loadBalance());
         url.addParameter(Const.ASYNC_KEY, reference.async());
         return url;

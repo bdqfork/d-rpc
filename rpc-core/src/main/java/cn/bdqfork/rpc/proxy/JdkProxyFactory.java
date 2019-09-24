@@ -17,6 +17,7 @@ import java.lang.reflect.Proxy;
  * @since 2019-02-15
  */
 public class JdkProxyFactory implements ProxyFactory {
+    public static final String NAME = "jdk";
 
     @SuppressWarnings("unchecked")
     @Override
@@ -28,7 +29,7 @@ public class JdkProxyFactory implements ProxyFactory {
     }
 
     @Override
-    public <T> Invoker<T> getInvoker(T proxy, Class<T> type, URL url){
+    public <T> Invoker<T> getInvoker(T proxy, Class<T> type, URL url) {
         return new AbstractInvoker<T>(proxy, type, url) {
             @Override
             protected Result doInvoke(Invocation invocation) throws RpcException {

@@ -1,7 +1,7 @@
 package cn.bdqfork.rpc.context.remote;
 
 import cn.bdqfork.rpc.Invoker;
-import cn.bdqfork.rpc.Node;
+import cn.bdqfork.common.Node;
 
 /**
  * @author bdq

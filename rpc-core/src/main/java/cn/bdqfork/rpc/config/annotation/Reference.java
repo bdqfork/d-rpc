@@ -17,6 +17,10 @@ public @interface Reference {
 
     Class<?> serviceInterface() default void.class;
 
+    String proxy() default "jdk";
+
+    String cluster() default "failover";
+
     String loadBalance() default "random";
 
     long timeout() default 1000;

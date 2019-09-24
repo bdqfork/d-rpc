@@ -1,4 +1,4 @@
-package cn.bdqfork.rpc.util;
+package cn.bdqfork.rpc.registry.util;
 
 import cn.bdqfork.common.constant.Const;
 import cn.bdqfork.common.util.NetUtils;

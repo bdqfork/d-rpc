@@ -1,5 +1,6 @@
 package cn.bdqfork.rpc;
 
+import cn.bdqfork.common.Node;
 import cn.bdqfork.common.exception.RpcException;
 
 /**

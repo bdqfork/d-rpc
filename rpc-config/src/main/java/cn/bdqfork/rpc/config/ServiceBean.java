@@ -1,9 +1,10 @@
 package cn.bdqfork.rpc.config;
 
 import cn.bdqfork.common.constant.Const;
+import cn.bdqfork.common.extension.AdaptiveCompiler;
 import cn.bdqfork.common.extension.ExtensionLoader;
 import cn.bdqfork.rpc.registry.RegistryFactory;
-import cn.bdqfork.rpc.util.RegistryUtils;
+import cn.bdqfork.rpc.registry.util.RegistryUtils;
 import cn.bdqfork.rpc.Invoker;
 import cn.bdqfork.rpc.context.RegistryProtocol;
 import cn.bdqfork.rpc.config.annotation.Service;
@@ -30,8 +31,6 @@ import java.util.stream.Collectors;
  */
 public class ServiceBean<T> implements InitializingBean, DisposableBean, ApplicationListener<ContextRefreshedEvent>, ApplicationContextAware {
     private static final Logger log = LoggerFactory.getLogger(ServiceBean.class);
-    private RegistryFactory registryFactory = ExtensionLoader.getExtensionLoader(RegistryFactory.class)
-            .getAdaptiveExtension();
     private ApplicationContext applicationContext;
     private Service service;
     private Class<T> serviceInterface;
@@ -42,6 +41,8 @@ public class ServiceBean<T> implements InitializingBean, DisposableBean, Applica
     public void afterPropertiesSet() throws Exception {
 
         ApplicationConfig applicationConfig = applicationContext.getBean(ApplicationConfig.class);
+
+        AdaptiveCompiler.setDefaultCompiler(applicationConfig.getCompiler());
 
         List<Invoker<?>> invokers = new ArrayList<>();
 
@@ -123,9 +124,11 @@ public class ServiceBean<T> implements InitializingBean, DisposableBean, Applica
         } else {
             registryConfigs.addAll(applicationContext.getBeansOfType(RegistryConfig.class).values());
         }
+        RegistryFactory registryFactory = ExtensionLoader.getExtensionLoader(RegistryFactory.class)
+                .getAdaptiveExtension();
         return registryConfigs.stream()
                 .map(RegistryUtils::buildRegistryURL)
-                .map(url -> registryFactory.getRegistry(url))
+                .map(registryFactory::getRegistry)
                 .collect(Collectors.toList());
     }
 

@@ -16,7 +16,7 @@ public abstract class AbstractLoadBalance implements LoadBalance {
 
     @Override
     public <T> Invoker<T> select(List<Invoker<T>> invokers, URL url, Invocation invocation) throws RpcException {
-        if (invokers == null || CollectionUtils.isEmpty(invokers)) {
+        if (CollectionUtils.isEmpty(invokers)) {
             throw new RpcException("No providers");
         }
         return doSelect(invokers, url, invocation);

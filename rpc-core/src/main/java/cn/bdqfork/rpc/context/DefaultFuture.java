@@ -1,7 +1,6 @@
 package cn.bdqfork.rpc.context;
 
 import cn.bdqfork.common.exception.RpcException;
-import cn.bdqfork.common.exception.TimeoutException;
 import cn.bdqfork.rpc.context.remote.Request;
 import cn.bdqfork.rpc.context.remote.Response;
 import org.slf4j.Logger;
@@ -12,6 +11,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeoutException;
 
 /**
  * @author bdq

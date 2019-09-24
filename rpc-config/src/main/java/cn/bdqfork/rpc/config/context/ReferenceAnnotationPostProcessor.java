@@ -1,5 +1,6 @@
 package cn.bdqfork.rpc.config.context;
 
+import cn.bdqfork.common.extension.AdaptiveCompiler;
 import cn.bdqfork.rpc.config.ApplicationConfig;
 import cn.bdqfork.rpc.config.ReferenceBean;
 import cn.bdqfork.rpc.config.RegistryConfig;
@@ -194,6 +195,7 @@ public class ReferenceAnnotationPostProcessor extends InstantiationAwareBeanPost
         }
         referenceBean.setServiceInterface(serviceInterface);
         ApplicationConfig applicationConfig = applicationContext.getBean(ApplicationConfig.class);
+        AdaptiveCompiler.setDefaultCompiler(applicationConfig.getCompiler());
         List<RegistryConfig> registryConfigs = getRegistryConfigs(reference);
         referenceBean.setApplicationConfig(applicationConfig);
         referenceBean.setRegistryConfigs(registryConfigs);
