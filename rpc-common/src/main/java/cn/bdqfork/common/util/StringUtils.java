@@ -11,7 +11,9 @@ public class StringUtils {
         return String.valueOf(chars);
     }
 
-    public static void removeLastChar(StringBuilder stringBuilder) {
-        stringBuilder.deleteCharAt(stringBuilder.length() - 1);
+    public static void removeLastChar(StringBuilder builder) {
+        if (builder.length() > 0) {
+            builder.deleteCharAt(builder.length() - 1);
+        }
     }
 }

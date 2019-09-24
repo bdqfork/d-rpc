@@ -1,6 +1,6 @@
 package cn.bdqfork.rpc.config.context;
 
-import cn.bdqfork.common.extension.AdaptiveCompiler;
+import cn.bdqfork.common.extension.compiler.AdaptiveCompiler;
 import cn.bdqfork.rpc.config.ApplicationConfig;
 import cn.bdqfork.rpc.config.ReferenceBean;
 import cn.bdqfork.rpc.config.RegistryConfig;

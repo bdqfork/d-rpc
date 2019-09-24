@@ -1,7 +1,8 @@
-package cn.bdqfork.common.extension;
+package cn.bdqfork.common.extension.compiler;
 
-import javassist.CannotCompileException;
-import javassist.NotFoundException;
+import cn.bdqfork.common.extension.Adaptive;
+import cn.bdqfork.common.extension.Compiler;
+import cn.bdqfork.common.extension.ExtensionLoader;
 
 /**
  * @author bdq
@@ -16,7 +17,7 @@ public class AdaptiveCompiler implements Compiler {
     }
 
     @Override
-    public Class<?> compile(String className, String code) throws CannotCompileException, NotFoundException {
+    public Class<?> compile(String code, ClassLoader classLoader) {
         Compiler compiler;
         ExtensionLoader<Compiler> loader = ExtensionLoader.getExtensionLoader(Compiler.class);
         String name = DEFAULT_COMPILER;
@@ -25,6 +26,6 @@ public class AdaptiveCompiler implements Compiler {
         } else {
             compiler = loader.getDefaultExtension();
         }
-        return compiler.compile(className, code);
+        return compiler.compile(code, classLoader);
     }
 }

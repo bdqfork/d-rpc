@@ -1,7 +1,7 @@
 package cn.bdqfork.rpc.config;
 
 import cn.bdqfork.common.constant.Const;
-import cn.bdqfork.common.extension.AdaptiveCompiler;
+import cn.bdqfork.common.extension.compiler.AdaptiveCompiler;
 import cn.bdqfork.common.extension.ExtensionLoader;
 import cn.bdqfork.rpc.registry.RegistryFactory;
 import cn.bdqfork.rpc.registry.util.RegistryUtils;

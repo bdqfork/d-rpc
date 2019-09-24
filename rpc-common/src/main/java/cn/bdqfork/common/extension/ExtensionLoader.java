@@ -188,9 +188,9 @@ public class ExtensionLoader<T> {
         Compiler compiler = ExtensionLoader.getExtensionLoader(Compiler.class).getAdaptiveExtension();
         try {
             @SuppressWarnings("unchecked")
-            Class<T> adaptiveClass = (Class<T>) compiler.compile(type.getCanonicalName() + "$Adaptive", code);
+            Class<T> adaptiveClass = (Class<T>) compiler.compile(code, getClass().getClassLoader());
             adaptiveExtension = adaptiveClass.newInstance();
-        } catch (CannotCompileException | NotFoundException | IllegalAccessException | InstantiationException e) {
+        } catch (IllegalAccessException | InstantiationException e) {
             e.printStackTrace();
         }
     }
