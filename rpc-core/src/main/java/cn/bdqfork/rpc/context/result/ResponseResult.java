@@ -1,4 +1,4 @@
-package cn.bdqfork.rpc.context;
+package cn.bdqfork.rpc.context.result;
 
 import cn.bdqfork.rpc.Result;
 

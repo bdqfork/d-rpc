@@ -1,24 +1,21 @@
 package cn.bdqfork.rpc.config;
 
+import cn.bdqfork.common.URL;
+import cn.bdqfork.common.config.ApplicationConfig;
+import cn.bdqfork.common.config.RegistryConfig;
 import cn.bdqfork.common.constant.Const;
 import cn.bdqfork.common.extension.ExtensionLoader;
 import cn.bdqfork.common.util.NetUtils;
+import cn.bdqfork.common.util.RegistryUtils;
+import cn.bdqfork.rpc.Invoker;
 import cn.bdqfork.rpc.Protocol;
 import cn.bdqfork.rpc.config.annotation.Reference;
-import cn.bdqfork.rpc.Exporter;
 import cn.bdqfork.rpc.proxy.ProxyFactory;
-import cn.bdqfork.rpc.registry.Registry;
-import cn.bdqfork.rpc.registry.RegistryFactory;
-import cn.bdqfork.rpc.registry.util.RegistryUtils;
-import cn.bdqfork.common.URL;
-import cn.bdqfork.rpc.Invoker;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * @author bdq
@@ -88,15 +85,8 @@ public class ReferenceBean<T> implements FactoryBean<Object>, InitializingBean {
         url.addParameter(Const.ASYNC_KEY, reference.async());
 
         url.addParameter(Const.SERVER_KEY, reference.protocol());
-        url.addParameter(Const.REGISTRY_KEY, buildRegistryUrlString());
+        url.addParameter(Const.REGISTRY_KEY, RegistryUtils.buildRegistryUrlString(registryConfigs));
         return url;
-    }
-
-    private String buildRegistryUrlString() {
-        return registryConfigs.stream()
-                .map(RegistryUtils::buildRegistryURL)
-                .map(URL::buildString)
-                .collect(Collectors.joining(","));
     }
 
     @Override

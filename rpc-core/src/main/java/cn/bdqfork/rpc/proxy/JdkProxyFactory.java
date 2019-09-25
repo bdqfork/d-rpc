@@ -2,7 +2,7 @@ package cn.bdqfork.rpc.proxy;
 
 import cn.bdqfork.common.exception.RpcException;
 import cn.bdqfork.rpc.context.remote.AbstractInvoker;
-import cn.bdqfork.rpc.context.ResponseResult;
+import cn.bdqfork.rpc.context.result.ResponseResult;
 import cn.bdqfork.rpc.Invocation;
 import cn.bdqfork.rpc.Invoker;
 import cn.bdqfork.common.URL;

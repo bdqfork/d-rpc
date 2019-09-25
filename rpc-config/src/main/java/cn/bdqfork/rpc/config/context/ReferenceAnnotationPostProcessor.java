@@ -1,9 +1,9 @@
 package cn.bdqfork.rpc.config.context;
 
+import cn.bdqfork.common.config.ApplicationConfig;
+import cn.bdqfork.common.config.RegistryConfig;
 import cn.bdqfork.common.extension.compiler.AdaptiveCompiler;
-import cn.bdqfork.rpc.config.ApplicationConfig;
 import cn.bdqfork.rpc.config.ReferenceBean;
-import cn.bdqfork.rpc.config.RegistryConfig;
 import cn.bdqfork.rpc.config.annotation.Reference;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeansException;

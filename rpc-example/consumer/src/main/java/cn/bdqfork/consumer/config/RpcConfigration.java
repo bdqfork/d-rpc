@@ -1,7 +1,7 @@
 package cn.bdqfork.consumer.config;
 
-import cn.bdqfork.rpc.config.ApplicationConfig;
-import cn.bdqfork.rpc.config.RegistryConfig;
+import cn.bdqfork.common.config.ApplicationConfig;
+import cn.bdqfork.common.config.RegistryConfig;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

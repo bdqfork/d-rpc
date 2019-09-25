@@ -3,7 +3,7 @@ package cn.bdqfork.rpc.context.remote;
 import cn.bdqfork.common.constant.Const;
 import cn.bdqfork.common.exception.RpcException;
 import cn.bdqfork.rpc.Invocation;
-import cn.bdqfork.rpc.context.AsyncResult;
+import cn.bdqfork.rpc.context.result.AsyncResult;
 import cn.bdqfork.rpc.context.FutureAdapter;
 import cn.bdqfork.common.URL;
 import cn.bdqfork.rpc.Result;

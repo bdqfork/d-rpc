@@ -1,19 +1,19 @@
 package cn.bdqfork.rpc.config;
 
-import cn.bdqfork.common.constant.Const;
-import cn.bdqfork.common.extension.compiler.AdaptiveCompiler;
-import cn.bdqfork.common.extension.ExtensionLoader;
-import cn.bdqfork.rpc.Protocol;
-import cn.bdqfork.rpc.proxy.ProxyFactory;
-import cn.bdqfork.rpc.registry.RegistryFactory;
-import cn.bdqfork.rpc.registry.util.RegistryUtils;
-import cn.bdqfork.rpc.Invoker;
-import cn.bdqfork.rpc.config.annotation.Service;
-import cn.bdqfork.rpc.Exporter;
-import cn.bdqfork.rpc.registry.Registry;
 import cn.bdqfork.common.URL;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import cn.bdqfork.common.URLBuilder;
+import cn.bdqfork.common.config.ApplicationConfig;
+import cn.bdqfork.common.config.ProtocolConfig;
+import cn.bdqfork.common.config.RegistryConfig;
+import cn.bdqfork.common.constant.Const;
+import cn.bdqfork.common.extension.ExtensionLoader;
+import cn.bdqfork.common.extension.compiler.AdaptiveCompiler;
+import cn.bdqfork.common.util.RegistryUtils;
+import cn.bdqfork.rpc.Exporter;
+import cn.bdqfork.rpc.Invoker;
+import cn.bdqfork.rpc.Protocol;
+import cn.bdqfork.rpc.config.annotation.Service;
+import cn.bdqfork.rpc.proxy.ProxyFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
@@ -88,7 +88,17 @@ public class ServiceBean<T> implements InitializingBean, DisposableBean, Applica
         url.addParameter(Const.INTERFACE_KEY, serviceInterface.getName());
         url.addParameter(Const.SERVER_KEY, protocolConfig.getServer());
         url.addParameter(Const.SERIALIZATION_KEY, protocolConfig.getSerialization());
-        url.addParameter(Const.REGISTRY_KEY, buildRegistryUrlString());
+
+        List<RegistryConfig> registryConfigs = new ArrayList<>();
+        if (service.registry().length > 0) {
+            for (String registryConfigBeanName : service.registry()) {
+                RegistryConfig registryConfig = applicationContext.getBean(registryConfigBeanName, RegistryConfig.class);
+                registryConfigs.add(registryConfig);
+            }
+        } else {
+            registryConfigs.addAll(applicationContext.getBeansOfType(RegistryConfig.class).values());
+        }
+        url.addParameter(Const.REGISTRY_KEY, RegistryUtils.buildRegistryUrlString(registryConfigs));
 
         return url;
     }
@@ -106,22 +116,6 @@ public class ServiceBean<T> implements InitializingBean, DisposableBean, Applica
         this.applicationContext = applicationContext;
     }
 
-
-    private String buildRegistryUrlString() {
-        List<RegistryConfig> registryConfigs = new ArrayList<>();
-        if (service.registry().length > 0) {
-            for (String registryConfigBeanName : service.registry()) {
-                RegistryConfig registryConfig = applicationContext.getBean(registryConfigBeanName, RegistryConfig.class);
-                registryConfigs.add(registryConfig);
-            }
-        } else {
-            registryConfigs.addAll(applicationContext.getBeansOfType(RegistryConfig.class).values());
-        }
-        return registryConfigs.stream()
-                .map(RegistryUtils::buildRegistryURL)
-                .map(URL::buildString)
-                .collect(Collectors.joining(","));
-    }
 
     @Override
     public void destroy() throws Exception {

@@ -1,4 +1,4 @@
-package cn.bdqfork.rpc.config;
+package cn.bdqfork.common.config;
 
 /**
  * @author bdq
