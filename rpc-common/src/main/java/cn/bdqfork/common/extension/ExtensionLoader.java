@@ -8,10 +8,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URLConnection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -96,42 +93,45 @@ public class ExtensionLoader<T> {
         if (classNames.size() > 0 && classNames.size() > 0) {
             return;
         }
-        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-        java.net.URL url = classLoader.getResource(PREFIX + type.getName());
-        if (url.getPath().isEmpty()) {
-            throw new IllegalArgumentException("Extension path " + PREFIX + type.getName() + " don't exsist !");
-        }
         try {
-            if (url.getProtocol().equals("file") || url.getProtocol().equals("jar")) {
-                URLConnection urlConnection = url.openConnection();
-                Reader reader = new InputStreamReader(urlConnection.getInputStream());
-                BufferedReader bufferedReader = new BufferedReader(reader);
-                String line;
-                while ((line = bufferedReader.readLine()) != null) {
-                    if (line.equals("")) {
-                        continue;
-                    }
-                    //过滤注释
-                    if (line.contains("#")) {
-                        line = line.substring(0, line.indexOf("#"));
-                    }
-                    String[] values = line.split("=");
-                    String name = values[0].trim();
-                    String impl = values[1].trim();
-                    if (extensionClasses.containsKey(name)) {
-                        throw new IllegalStateException("Duplicate extension named " + name);
-                    }
-                    @SuppressWarnings("unchecked")
-                    Class<T> clazz = (Class<T>) classLoader.loadClass(impl);
+            ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+            Enumeration<java.net.URL> urlEnumeration = classLoader.getResources(PREFIX + type.getName());
+            while (urlEnumeration.hasMoreElements()) {
+                java.net.URL url = urlEnumeration.nextElement();
+                if (url.getPath().isEmpty()) {
+                    throw new IllegalArgumentException("Extension path " + PREFIX + type.getName() + " don't exsist !");
+                }
+                if (url.getProtocol().equals("file") || url.getProtocol().equals("jar")) {
+                    URLConnection urlConnection = url.openConnection();
+                    Reader reader = new InputStreamReader(urlConnection.getInputStream());
+                    BufferedReader bufferedReader = new BufferedReader(reader);
+                    String line;
+                    while ((line = bufferedReader.readLine()) != null) {
+                        if (line.equals("")) {
+                            continue;
+                        }
+                        //过滤注释
+                        if (line.contains("#")) {
+                            line = line.substring(0, line.indexOf("#"));
+                        }
+                        String[] values = line.split("=");
+                        String name = values[0].trim();
+                        String impl = values[1].trim();
+                        if (extensionClasses.containsKey(name)) {
+                            throw new IllegalStateException("Duplicate extension named " + name);
+                        }
+                        @SuppressWarnings("unchecked")
+                        Class<T> clazz = (Class<T>) classLoader.loadClass(impl);
 
-                    if (clazz.isAnnotationPresent(Adaptive.class)) {
-                        cacheAdaptiveClass(name, clazz);
-                    } else {
-                        cacheActivateClass(name, clazz);
-                    }
+                        if (clazz.isAnnotationPresent(Adaptive.class)) {
+                            cacheAdaptiveClass(name, clazz);
+                        } else {
+                            cacheActivateClass(name, clazz);
+                        }
 
-                    classNames.putIfAbsent(clazz, name);
-                    extensionClasses.putIfAbsent(name, clazz);
+                        classNames.putIfAbsent(clazz, name);
+                        extensionClasses.putIfAbsent(name, clazz);
+                    }
                 }
             }
         } catch (Exception e) {

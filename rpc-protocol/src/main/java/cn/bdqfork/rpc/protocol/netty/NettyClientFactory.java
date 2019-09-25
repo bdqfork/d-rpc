@@ -14,7 +14,7 @@ import cn.bdqfork.rpc.protocol.netty.NettyClient;
 public class NettyClientFactory extends AbstractRemoteClientFactory {
 
     @Override
-    protected RemoteClient createRemoteClient(URL url, Serializer serializer) throws IllegalStateException {
+    protected RemoteClient createRemoteClient(URL url, Serializer serializer) {
         NettyClient nettyClient = new NettyClient(url.getHost(), url.getPort(), serializer);
         long timeout = Long.parseLong(url.getParameter(Const.TIMEOUT_KEY));
         nettyClient.setTimeout(timeout);

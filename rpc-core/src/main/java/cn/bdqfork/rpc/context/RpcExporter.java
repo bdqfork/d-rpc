@@ -13,22 +13,13 @@ import java.util.List;
  */
 public class RpcExporter implements Exporter {
     private Invoker invoker;
-    private List<Registry> registries;
 
     public RpcExporter(Invoker invoker) {
         this.invoker = invoker;
     }
 
     @Override
-    public void doExport() {
-        URL url = invoker.getUrl();
-        registries.forEach(registry -> registry.register(url));
-    }
-
-    @Override
     public void undoExport() {
-        URL url = invoker.getUrl();
-        registries.forEach(registry -> registry.undoRegister(url));
         invoker.destroy();
     }
 
@@ -37,7 +28,4 @@ public class RpcExporter implements Exporter {
         return invoker;
     }
 
-    public void setRegistries(List<Registry> registries) {
-        this.registries = registries;
-    }
 }

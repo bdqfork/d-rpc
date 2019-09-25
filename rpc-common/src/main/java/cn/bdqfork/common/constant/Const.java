@@ -34,4 +34,5 @@ public class Const {
     public static final String ASYNC_KEY = "async";
     public static final String PROXY_KEY = "proxy";
     public static final String CLUSTER_KEY = "cluster";
+    public static final String PROTOCOL_REGISTRY = "registry";
 }

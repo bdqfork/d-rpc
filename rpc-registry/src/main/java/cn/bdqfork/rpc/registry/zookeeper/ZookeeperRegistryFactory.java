@@ -12,6 +12,6 @@ public class ZookeeperRegistryFactory extends AbstractRegistryFactory {
 
     @Override
     protected Registry createRegistry(URL url) {
-        return new ZkRegistry(url);
+        return new ZookeeperRegistry(url);
     }
 }

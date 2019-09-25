@@ -3,7 +3,7 @@ package cn.bdqfork.rpc.config;
 import cn.bdqfork.common.constant.Const;
 import cn.bdqfork.common.extension.ExtensionLoader;
 import cn.bdqfork.common.util.NetUtils;
-import cn.bdqfork.rpc.context.RegistryProtocol;
+import cn.bdqfork.rpc.Protocol;
 import cn.bdqfork.rpc.config.annotation.Reference;
 import cn.bdqfork.rpc.Exporter;
 import cn.bdqfork.rpc.proxy.ProxyFactory;
@@ -16,6 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,8 +25,6 @@ import java.util.stream.Collectors;
  * @since 2019-03-04
  */
 public class ReferenceBean<T> implements FactoryBean<Object>, InitializingBean {
-    private RegistryFactory registryFactory = ExtensionLoader.getExtensionLoader(RegistryFactory.class)
-            .getAdaptiveExtension();
     private ProxyFactory proxyFactory = ExtensionLoader.getExtensionLoader(ProxyFactory.class)
             .getAdaptiveExtension();
     private Reference reference;
@@ -50,16 +49,13 @@ public class ReferenceBean<T> implements FactoryBean<Object>, InitializingBean {
         if (bean != null) {
             return bean;
         }
-        List<Registry> registries = getRegistries();
-        RegistryProtocol registryProtocol = new RegistryProtocol(registries);
+        Protocol protocol = ExtensionLoader.getExtensionLoader(Protocol.class).getAdaptiveExtension();
 
         URL url = buildUrl(applicationConfig);
 
-        Invoker<T> invoker = registryProtocol.refer(serviceInterface, url);
+        Invoker<T> invoker = protocol.refer(serviceInterface, url);
 
-        Exporter exporter = registryProtocol.export(invoker);
-
-        exporter.doExport();
+        protocol.export(invoker);
 
         bean = proxyFactory.getProxy(invoker);
 
@@ -67,8 +63,9 @@ public class ReferenceBean<T> implements FactoryBean<Object>, InitializingBean {
     }
 
     private URL buildUrl(ApplicationConfig applicationConfig) {
-        String host = NetUtils.getIp();//获得本机IP
-        URL url = new URL(Const.PROTOCOL_CONSUMER, host, 0, serviceInterface.getName());
+        //获得本机IP
+        String host = NetUtils.getIp();
+        URL url = new URL(Const.PROTOCOL_REGISTRY, host, 0, serviceInterface.getName());
         url.addParameter(Const.APPLICATION_KEY, applicationConfig.getApplicationName());
 
         String version = reference.version();
@@ -89,14 +86,17 @@ public class ReferenceBean<T> implements FactoryBean<Object>, InitializingBean {
         url.addParameter(Const.CLUSTER_KEY, reference.cluster());
         url.addParameter(Const.LOADBALANCE_KEY, reference.loadBalance());
         url.addParameter(Const.ASYNC_KEY, reference.async());
+
+        url.addParameter(Const.SERVER_KEY, reference.protocol());
+        url.addParameter(Const.REGISTRY_KEY, buildRegistryUrlString());
         return url;
     }
 
-    private List<Registry> getRegistries() {
+    private String buildRegistryUrlString() {
         return registryConfigs.stream()
                 .map(RegistryUtils::buildRegistryURL)
-                .map(url -> registryFactory.getRegistry(url))
-                .collect(Collectors.toList());
+                .map(URL::buildString)
+                .collect(Collectors.joining(","));
     }
 
     @Override

@@ -1,16 +1,13 @@
-package cn.bdqfork.rpc.cluster;
+package cn.bdqfork.rpc.registry;
 
+import cn.bdqfork.common.Node;
+import cn.bdqfork.common.URL;
 import cn.bdqfork.common.constant.Const;
-import cn.bdqfork.common.exception.RpcException;
 import cn.bdqfork.common.extension.ExtensionLoader;
 import cn.bdqfork.rpc.Invocation;
 import cn.bdqfork.rpc.Invoker;
+import cn.bdqfork.rpc.Protocol;
 import cn.bdqfork.rpc.context.AbstractDirectory;
-import cn.bdqfork.common.Node;
-import cn.bdqfork.rpc.registry.Notifier;
-import cn.bdqfork.rpc.registry.Registry;
-import cn.bdqfork.common.URL;
-import cn.bdqfork.rpc.context.remote.*;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,20 +21,18 @@ import java.util.stream.Collectors;
  * @author bdq
  * @since 2019-08-28
  */
-public class ClusterDirectory<T> extends AbstractDirectory<T> implements Notifier {
-    private static final Logger log = LoggerFactory.getLogger(ClusterDirectory.class);
-    private RemoteClientFactory remoteClientFactory = ExtensionLoader.getExtensionLoader(RemoteClientFactory.class)
-            .getAdaptiveExtension();
-
+public class RegistryDirectory<T> extends AbstractDirectory<T> implements Notifier {
+    private static final Logger log = LoggerFactory.getLogger(RegistryDirectory.class);
+    private Protocol protocol = ExtensionLoader.getExtensionLoader(Protocol.class).getAdaptiveExtension();
     private List<Registry> registries;
 
-    public ClusterDirectory(Class<T> serviceInterface, URL url) {
+    public RegistryDirectory(Class<T> serviceInterface, URL url, List<Registry> registries) {
         super(serviceInterface, url);
+        this.registries = registries;
     }
 
     @Override
     protected List<Invoker<T>> doList(Invocation invocation) {
-        //TODO:根据Invocation作路由条件筛选
         return new ArrayList<>(invokers.values());
     }
 
@@ -52,11 +47,10 @@ public class ClusterDirectory<T> extends AbstractDirectory<T> implements Notifie
                 .map(registry -> registry.lookup(url))
                 .flatMap(Collection::stream)
                 .collect(Collectors.toList());
-        notify(urls);
+        doRefresh(urls);
     }
 
-    @Override
-    public void notify(List<URL> urls) {
+    private void doRefresh(List<URL> urls) {
         log.debug("directory notified with url size {} !", urls.size());
         if (destroyed.get()) {
             return;
@@ -80,23 +74,41 @@ public class ClusterDirectory<T> extends AbstractDirectory<T> implements Notifie
         this.urls = urls;
     }
 
+    @Override
+    public synchronized void notify(List<URL> urls) {
+        log.debug("notify !");
+        doRefresh(urls);
+    }
+
     private boolean isMatch(URL url) {
+        return checkVersion(url) && checkServer(url) && checkUrl(url);
+    }
+
+    private boolean checkVersion(URL url) {
         if (StringUtils.isBlank(this.version)) {
-            return !invokers.containsKey(url.buildString());
+            return true;
         }
-        return url.getParameter(Const.VERSION_KEY).equals(this.version)
-                && !invokers.containsKey(url.buildString());
+        return url.getParameter(Const.VERSION_KEY).equals(this.version);
+    }
+
+    private boolean checkUrl(URL url) {
+        return !invokers.containsKey(url.buildString());
+    }
+
+    private boolean checkServer(URL url) {
+        String serverString = this.url.getParameter(Const.SERVER_KEY, "rpc");
+        String[] servers = serverString.split(",");
+        String serverType = url.getParameter(Const.SERVER_KEY);
+        for (String server : servers) {
+            if (server.equals(serverType)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void addRpcInvoker(URL url) {
-        RemoteClient[] remoteClients = new RemoteClient[0];
-        try {
-            remoteClients = remoteClientFactory.getRemoteClients(url);
-        } catch (RpcException e) {
-            log.warn(e.getMessage(), e);
-        }
-        RpcInvoker<T> invoker = new RpcInvoker<>(serviceInterface, url);
-        invoker.setRemoteClients(remoteClients);
+        Invoker<T> invoker = protocol.refer(serviceInterface, url);
         invokers.put(url.buildString(), invoker);
     }
 
@@ -112,10 +124,6 @@ public class ClusterDirectory<T> extends AbstractDirectory<T> implements Notifie
         boolean isAsync = this.url.getParameter(Const.ASYNC_KEY);
         url.addParameter(Const.ASYNC_KEY, isAsync);
         url.addParameter(Const.VERSION_KEY, this.version);
-    }
-
-    public void setRegistries(List<Registry> registries) {
-        this.registries = registries;
     }
 
 }

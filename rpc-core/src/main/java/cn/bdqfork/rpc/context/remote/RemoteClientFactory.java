@@ -13,5 +13,5 @@ import cn.bdqfork.common.extension.SPI;
 @SPI("netty")
 public interface RemoteClientFactory {
     @Adaptive({Const.SERVER_KEY})
-    RemoteClient[] getRemoteClients(URL url) throws RpcException;
+    RemoteClient[] getRemoteClients(URL url);
 }

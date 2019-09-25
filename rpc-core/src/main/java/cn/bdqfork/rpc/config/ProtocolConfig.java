@@ -18,7 +18,7 @@ public class ProtocolConfig {
     /**
      * transport方式
      */
-    private String server = "netty";
+    private String server = "rpc";
     /**
      * 序列化方式
      */

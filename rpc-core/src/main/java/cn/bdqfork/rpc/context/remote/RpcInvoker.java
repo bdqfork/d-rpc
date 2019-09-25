@@ -20,8 +20,9 @@ public class RpcInvoker<T> extends AbstractInvoker<T> {
     private RemoteClient[] remoteClients;
     private AtomicInteger count = new AtomicInteger(0);
 
-    public RpcInvoker(Class<T> type, URL url) {
+    public RpcInvoker(Class<T> type, URL url, RemoteClient[] remoteClients) {
         super(null, type, url);
+        this.remoteClients = remoteClients;
     }
 
     @Override

@@ -7,11 +7,6 @@ package cn.bdqfork.rpc;
  */
 public interface Exporter<T> {
 
-    /**
-     * 注册服务
-     */
-    void doExport();
-
     void undoExport();
 
     Invoker<T> getInvoker();

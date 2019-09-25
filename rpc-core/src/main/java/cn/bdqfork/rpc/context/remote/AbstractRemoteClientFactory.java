@@ -12,14 +12,10 @@ import cn.bdqfork.common.URL;
 public abstract class AbstractRemoteClientFactory implements RemoteClientFactory {
 
     @Override
-    public RemoteClient[] getRemoteClients(URL url) throws RpcException {
+    public RemoteClient[] getRemoteClients(URL url) {
         String serialization = url.getParameter(Const.SERIALIZATION_KEY, "jdk");
         Serializer serializer = ExtensionLoader.getExtensionLoader(Serializer.class)
                 .getExtension(serialization);
-        if (serializer == null) {
-            throw new RpcException("no serializer !");
-        }
-
         int connections = Integer.parseInt(url.getParameter(Const.CONNECTIONS_KEY, "1"));
 
         RemoteClient[] remoteClients = new RemoteClient[connections];
@@ -29,5 +25,5 @@ public abstract class AbstractRemoteClientFactory implements RemoteClientFactory
         return remoteClients;
     }
 
-    protected abstract RemoteClient createRemoteClient(URL url, Serializer serializer) throws IllegalStateException;
+    protected abstract RemoteClient createRemoteClient(URL url, Serializer serializer);
 }

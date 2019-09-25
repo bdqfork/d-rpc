@@ -5,6 +5,8 @@ import cn.bdqfork.common.util.NetUtils;
 import cn.bdqfork.rpc.config.RegistryConfig;
 import cn.bdqfork.common.URL;
 
+import java.util.List;
+
 /**
  * @author bdq
  * @since 2019/9/18
@@ -19,4 +21,5 @@ public class RegistryUtils {
         url.addParameter(Const.PASSWORD_KEY, registryConfig.getPassword());
         return url;
     }
+
 }

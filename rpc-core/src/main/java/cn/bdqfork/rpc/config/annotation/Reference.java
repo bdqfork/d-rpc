@@ -31,7 +31,12 @@ public @interface Reference {
 
     String[] registry() default {};
 
-    String[] protocol() default {};
+    /**
+     * 支持的协议,多个协议用,隔开
+     *
+     * @return
+     */
+    String protocol() default "";
 
     boolean isLazy() default false;
 

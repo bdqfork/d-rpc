@@ -103,6 +103,10 @@ public class URL implements Serializable {
         return value == null ? defaultValue : value;
     }
 
+    public void removeParameter(String key) {
+        parameterMap.remove(key);
+    }
+
     public Map<String, Object> getParameterMap() {
         return parameterMap;
     }

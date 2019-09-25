@@ -28,13 +28,13 @@ import java.util.stream.Collectors;
  * @author bdq
  * @since 2019-02-26
  */
-public class ZkRegistry extends AbstractRegistry {
-    private static final Logger log = LoggerFactory.getLogger(ZkRegistry.class);
+public class ZookeeperRegistry extends AbstractRegistry {
+    private static final Logger log = LoggerFactory.getLogger(ZookeeperRegistry.class);
     private Map<String, URL> cacheNodes = new ConcurrentHashMap<>();
     private Map<String, CacheWatcher> cacheWatchers = new ConcurrentHashMap<>();
     private CuratorFramework client;
 
-    public ZkRegistry(URL url) {
+    public ZookeeperRegistry(URL url) {
         super(url);
     }
 
@@ -43,8 +43,8 @@ public class ZkRegistry extends AbstractRegistry {
         RetryPolicy retryPolicy = new RetryNTimes(3, 1000);
         //获取zookeeper地址
         String hostUrl = url.getParameter(Const.REGISTRY_KEY);
-        int seesionTimeout = url.getParameter(Const.SEESION_TIMEOUT_KEY);
-        int connectionTimeout = url.getParameter(Const.CONNECTION_TIMEOUT_KEY);
+        int seesionTimeout = Integer.parseInt(url.getParameter(Const.SEESION_TIMEOUT_KEY));
+        int connectionTimeout = Integer.parseInt(url.getParameter(Const.CONNECTION_TIMEOUT_KEY));
 
         client = CuratorFrameworkFactory.builder()
                 .connectString(hostUrl)
@@ -132,7 +132,7 @@ public class ZkRegistry extends AbstractRegistry {
     }
 
     private boolean isMatch(TreeCacheEvent treeCacheEvent) {
-        log.debug("zookeeper notify event: {} !",treeCacheEvent.getType());
+        log.debug("zookeeper notify event: {} !", treeCacheEvent.getType());
         return treeCacheEvent.getType() == TreeCacheEvent.Type.NODE_ADDED || treeCacheEvent.getType() == TreeCacheEvent.Type.NODE_UPDATED ||
                 treeCacheEvent.getType() == TreeCacheEvent.Type.NODE_REMOVED;
     }

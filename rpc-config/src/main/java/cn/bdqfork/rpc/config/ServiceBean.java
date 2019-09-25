@@ -3,10 +3,11 @@ package cn.bdqfork.rpc.config;
 import cn.bdqfork.common.constant.Const;
 import cn.bdqfork.common.extension.compiler.AdaptiveCompiler;
 import cn.bdqfork.common.extension.ExtensionLoader;
+import cn.bdqfork.rpc.Protocol;
+import cn.bdqfork.rpc.proxy.ProxyFactory;
 import cn.bdqfork.rpc.registry.RegistryFactory;
 import cn.bdqfork.rpc.registry.util.RegistryUtils;
 import cn.bdqfork.rpc.Invoker;
-import cn.bdqfork.rpc.context.RegistryProtocol;
 import cn.bdqfork.rpc.config.annotation.Service;
 import cn.bdqfork.rpc.Exporter;
 import cn.bdqfork.rpc.registry.Registry;
@@ -30,10 +31,12 @@ import java.util.stream.Collectors;
  * @since 2019-03-03
  */
 public class ServiceBean<T> implements InitializingBean, DisposableBean, ApplicationListener<ContextRefreshedEvent>, ApplicationContextAware {
-    private static final Logger log = LoggerFactory.getLogger(ServiceBean.class);
+    private Protocol protocol = ExtensionLoader.getExtensionLoader(Protocol.class).getAdaptiveExtension();
+    private ProxyFactory proxyFactory = ExtensionLoader.getExtensionLoader(ProxyFactory.class).getAdaptiveExtension();
     private ApplicationContext applicationContext;
     private Service service;
     private Class<T> serviceInterface;
+    private List<Invoker<?>> invokers;
     private List<Exporter> exporters;
     private boolean inited = false;
 
@@ -44,33 +47,21 @@ public class ServiceBean<T> implements InitializingBean, DisposableBean, Applica
 
         AdaptiveCompiler.setDefaultCompiler(applicationConfig.getCompiler());
 
-        List<Invoker<?>> invokers = new ArrayList<>();
-
-        List<Registry> registries = getRegistries();
+        invokers = new ArrayList<>();
 
         List<ProtocolConfig> protocolConfigs = getProtocolConfigs();
-
-        RegistryProtocol registryProtocol = new RegistryProtocol(registries);
 
         for (ProtocolConfig protocolConfig : protocolConfigs) {
             URL url = buildUrl(protocolConfig, applicationConfig, service, serviceInterface);
 
             T proxy = applicationContext.getBean(serviceInterface);
 
-            Invoker<?> invoker = registryProtocol.getInvoker(proxy, serviceInterface, url);
+            Invoker<?> invoker = proxyFactory.getInvoker(proxy, serviceInterface, url);
 
             invokers.add(invoker);
 
         }
 
-        exporters = invokers.stream()
-                .map(registryProtocol::export)
-                .collect(Collectors.toList());
-
-    }
-
-    private void export() {
-        exporters.forEach(Exporter::doExport);
     }
 
     private List<ProtocolConfig> getProtocolConfigs() {
@@ -88,7 +79,7 @@ public class ServiceBean<T> implements InitializingBean, DisposableBean, Applica
     }
 
     private URL buildUrl(ProtocolConfig protocolConfig, ApplicationConfig applicationConfig, Service service, Class<T> serviceInterface) {
-        URL url = new URL(Const.PROTOCOL_PROVIDER, protocolConfig.getHost(), protocolConfig.getPort(), serviceInterface.getName());
+        URL url = new URL(Const.PROTOCOL_REGISTRY, protocolConfig.getHost(), protocolConfig.getPort(), serviceInterface.getName());
 
         url.addParameter(Const.APPLICATION_KEY, applicationConfig.getApplicationName());
         url.addParameter(Const.GROUP_KEY, service.group());
@@ -97,6 +88,8 @@ public class ServiceBean<T> implements InitializingBean, DisposableBean, Applica
         url.addParameter(Const.INTERFACE_KEY, serviceInterface.getName());
         url.addParameter(Const.SERVER_KEY, protocolConfig.getServer());
         url.addParameter(Const.SERIALIZATION_KEY, protocolConfig.getSerialization());
+        url.addParameter(Const.REGISTRY_KEY, buildRegistryUrlString());
+
         return url;
     }
 
@@ -114,7 +107,7 @@ public class ServiceBean<T> implements InitializingBean, DisposableBean, Applica
     }
 
 
-    private List<Registry> getRegistries() {
+    private String buildRegistryUrlString() {
         List<RegistryConfig> registryConfigs = new ArrayList<>();
         if (service.registry().length > 0) {
             for (String registryConfigBeanName : service.registry()) {
@@ -124,12 +117,10 @@ public class ServiceBean<T> implements InitializingBean, DisposableBean, Applica
         } else {
             registryConfigs.addAll(applicationContext.getBeansOfType(RegistryConfig.class).values());
         }
-        RegistryFactory registryFactory = ExtensionLoader.getExtensionLoader(RegistryFactory.class)
-                .getAdaptiveExtension();
         return registryConfigs.stream()
                 .map(RegistryUtils::buildRegistryURL)
-                .map(registryFactory::getRegistry)
-                .collect(Collectors.toList());
+                .map(URL::buildString)
+                .collect(Collectors.joining(","));
     }
 
     @Override
@@ -141,7 +132,9 @@ public class ServiceBean<T> implements InitializingBean, DisposableBean, Applica
     public void onApplicationEvent(ContextRefreshedEvent event) {
         if (!inited) {
             inited = true;
-            export();
+            exporters = invokers.stream()
+                    .map(protocol::export)
+                    .collect(Collectors.toList());
         }
     }
 }
