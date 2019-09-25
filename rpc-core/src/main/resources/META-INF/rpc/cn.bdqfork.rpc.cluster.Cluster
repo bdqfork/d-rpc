@@ -1,1 +1,2 @@
 failover=cn.bdqfork.rpc.cluster.FailoverCluster
+available=cn.bdqfork.rpc.cluster.AvailableCluster

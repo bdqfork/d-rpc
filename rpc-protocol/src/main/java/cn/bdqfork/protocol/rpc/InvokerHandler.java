@@ -67,7 +67,8 @@ public class InvokerHandler extends ChannelInboundHandlerAdapter {
             ctx.writeAndFlush(response);
         } else {
             response.setStatus(Response.SERVER_ERROR);
-            RpcException rpcException = new RpcException("There is no service for interface named " + serviceInterface + " and version = " + version);
+            RpcException rpcException = new RpcException("There is no service for interface named "
+                    + serviceInterface + " and version = " + version);
             response.setMessage(rpcException.getMessage());
             ctx.writeAndFlush(response);
             throw rpcException;
