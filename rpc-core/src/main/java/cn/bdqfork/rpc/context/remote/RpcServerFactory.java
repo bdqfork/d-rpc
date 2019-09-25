@@ -9,8 +9,8 @@ import cn.bdqfork.common.extension.SPI;
  * @author bdq
  * @since 2019-08-21
  */
-@SPI("netty")
+@SPI("rpc")
 public interface RpcServerFactory {
-    @Adaptive({Const.SERVER_KEY})
+    @Adaptive
     RpcServer getServer(URL url);
 }

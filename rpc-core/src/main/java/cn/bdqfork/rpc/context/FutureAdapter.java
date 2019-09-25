@@ -9,6 +9,7 @@ import java.util.concurrent.*;
 public class FutureAdapter<V> extends CompletableFuture<V> {
     private CompletableFuture<ResponseResult> future;
 
+    @SuppressWarnings("unchecked")
     public FutureAdapter(CompletableFuture<ResponseResult> future) {
         this.future = future;
         future.whenComplete((result, throwable) -> {

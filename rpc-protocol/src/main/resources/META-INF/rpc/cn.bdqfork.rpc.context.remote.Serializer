@@ -1,2 +1,2 @@
-hessian=cn.bdqfork.rpc.protocol.serializer.HessianSerializer
-jdk=cn.bdqfork.rpc.protocol.serializer.JdkSerializer
+hessian=cn.bdqfork.protocol.serializer.HessianSerializer
+jdk=cn.bdqfork.protocol.serializer.JdkSerializer

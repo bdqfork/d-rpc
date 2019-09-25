@@ -1,4 +1,4 @@
-package cn.bdqfork.rpc.protocol.netty;
+package cn.bdqfork.protocol.rpc;
 
 import cn.bdqfork.common.exception.RemoteException;
 import cn.bdqfork.common.exception.RpcException;

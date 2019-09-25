@@ -1,1 +1,1 @@
-netty=cn.bdqfork.rpc.protocol.netty.NettyRpcServerFactory
+rpc=cn.bdqfork.protocol.rpc.NettyRpcServerFactory

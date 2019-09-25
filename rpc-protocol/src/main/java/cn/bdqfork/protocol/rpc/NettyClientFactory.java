@@ -1,11 +1,10 @@
-package cn.bdqfork.rpc.protocol.netty;
+package cn.bdqfork.protocol.rpc;
 
 import cn.bdqfork.common.URL;
 import cn.bdqfork.common.constant.Const;
 import cn.bdqfork.rpc.context.remote.AbstractRemoteClientFactory;
 import cn.bdqfork.rpc.context.remote.RemoteClient;
 import cn.bdqfork.rpc.context.remote.Serializer;
-import cn.bdqfork.rpc.protocol.netty.NettyClient;
 
 /**
  * @author bdq

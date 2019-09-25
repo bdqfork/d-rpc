@@ -1,13 +1,14 @@
-package cn.bdqfork.rpc.context;
+package cn.bdqfork.protocol.rpc;
 
+import cn.bdqfork.common.Node;
 import cn.bdqfork.common.URL;
 import cn.bdqfork.common.constant.Const;
 import cn.bdqfork.common.extension.ExtensionLoader;
 import cn.bdqfork.rpc.Exporter;
 import cn.bdqfork.rpc.Invoker;
 import cn.bdqfork.rpc.Protocol;
+import cn.bdqfork.rpc.context.RpcExporter;
 import cn.bdqfork.rpc.context.remote.*;
-import cn.bdqfork.rpc.proxy.ProxyFactory;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -35,7 +36,8 @@ public class RpcProtocol implements Protocol {
             RpcServer rpcServer = rpcServerMap.get(key);
             if (rpcServer == null) {
 
-                rpcServer = rpcServerFactory.getServer(buildServerUrl(url));
+                URL serverUrl = buildServerUrl(url);
+                rpcServer = rpcServerFactory.getServer(serverUrl);
 
                 rpcServer.start();
 
@@ -48,9 +50,8 @@ public class RpcProtocol implements Protocol {
     }
 
     private URL buildServerUrl(URL url) {
-        String server = url.getParameter(Const.SERVER_KEY);
+        URL serverUrl = new URL(url.getProtocol(), url.getHost(), url.getPort(), "");
         String serialization = url.getParameter(Const.SERIALIZATION_KEY);
-        URL serverUrl = new URL(server, url.getHost(), url.getPort(), "");
         serverUrl.addParameter(Const.SERIALIZATION_KEY, serialization);
         return serverUrl;
     }
@@ -63,6 +64,6 @@ public class RpcProtocol implements Protocol {
 
     @Override
     public void destory() {
-
+        rpcServerMap.values().forEach(Node::destroy);
     }
 }
