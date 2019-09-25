@@ -81,7 +81,15 @@ public class RegistryDirectory<T> extends AbstractDirectory<T> implements Notifi
     }
 
     private boolean isMatch(URL url) {
-        return checkVersion(url) && checkServer(url) && checkUrl(url);
+        return checkEnvironment(url) && checkVersion(url) && checkServer(url) && checkUrl(url);
+    }
+
+    private boolean checkEnvironment(URL url) {
+        String environment = this.url.getParameter(Const.ENVIRONMENT_KEY);
+        if (StringUtils.isBlank(environment)) {
+            return true;
+        }
+        return url.getParameter(Const.ENVIRONMENT_KEY).equals(environment);
     }
 
     private boolean checkVersion(URL url) {

@@ -18,7 +18,7 @@ public class ApplicationConfig {
      */
     private String environment;
     /**
-     * 编译方式,jdk或者javassist
+     * 编译方式，暂时只支持javassist
      */
     private String compiler;
 
