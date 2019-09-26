@@ -6,12 +6,15 @@ import cn.bdqfork.common.extension.ExtensionLoader;
 import cn.bdqfork.protocol.AbstractProtocol;
 import cn.bdqfork.rpc.Invoker;
 import cn.bdqfork.rpc.protocol.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author bdq
  * @since 2019/9/25
  */
 public class RpcProtocol extends AbstractProtocol {
+    private static final Logger log = LoggerFactory.getLogger(RpcProtocol.class);
     private RemoteClientFactory remoteClientFactory = ExtensionLoader.getExtensionLoader(RemoteClientFactory.class)
             .getAdaptiveExtension();
     private RpcServerFactory rpcServerFactory = ExtensionLoader.getExtensionLoader(RpcServerFactory.class)
@@ -20,8 +23,8 @@ public class RpcProtocol extends AbstractProtocol {
     @Override
     protected <T> void doExport(Invoker<T> invoker) {
         URL url = invoker.getUrl();
-        String key = url.getAddress();
-        RpcServer rpcServer = rpcServerMap.get(key);
+        String serverKey = url.getAddress();
+        RpcServer rpcServer = rpcServerMap.get(serverKey);
         if (rpcServer == null) {
 
             URL serverUrl = buildServerUrl(url);
@@ -29,7 +32,7 @@ public class RpcProtocol extends AbstractProtocol {
 
             rpcServer.start();
 
-            rpcServerMap.put(key, rpcServer);
+            rpcServerMap.put(serverKey, rpcServer);
         }
 
         rpcServer.addInvoker(invoker);
@@ -46,5 +49,13 @@ public class RpcProtocol extends AbstractProtocol {
     protected <T> Invoker<T> getBindInvoker(Class<T> type, URL url) {
         RemoteClient[] remoteClients = remoteClientFactory.getRemoteClients(url);
         return new RpcInvoker<>(type, url, remoteClients);
+    }
+
+    @Override
+    public void destory() {
+        rpcServerMap.forEach((k, v) -> {
+            log.info("Close Rpc server {} !", k);
+            v.destroy();
+        });
     }
 }

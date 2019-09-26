@@ -1,6 +1,5 @@
 package cn.bdqfork.protocol;
 
-import cn.bdqfork.common.Node;
 import cn.bdqfork.common.URL;
 import cn.bdqfork.common.constant.Const;
 import cn.bdqfork.rpc.Exporter;
@@ -8,6 +7,8 @@ import cn.bdqfork.rpc.Invoker;
 import cn.bdqfork.rpc.protocol.Protocol;
 import cn.bdqfork.rpc.protocol.RpcExporter;
 import cn.bdqfork.rpc.protocol.RpcServer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -17,7 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @since 2019/9/26
  */
 public abstract class AbstractProtocol implements Protocol {
-    protected static final Map<String, RpcServer> rpcServerMap = new ConcurrentHashMap<>();
+    protected final Map<String, RpcServer> rpcServerMap = new ConcurrentHashMap<>();
 
     @Override
     public <T> Exporter export(Invoker<T> invoker) {
@@ -38,8 +39,4 @@ public abstract class AbstractProtocol implements Protocol {
 
     protected abstract <T> Invoker<T> getBindInvoker(Class<T> type, URL url);
 
-    @Override
-    public void destory() {
-        rpcServerMap.values().forEach(Node::destroy);
-    }
 }
