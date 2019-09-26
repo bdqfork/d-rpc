@@ -8,7 +8,7 @@ import cn.bdqfork.common.extension.ExtensionLoader;
 import cn.bdqfork.common.util.NetUtils;
 import cn.bdqfork.common.util.RegistryUtils;
 import cn.bdqfork.rpc.Invoker;
-import cn.bdqfork.rpc.Protocol;
+import cn.bdqfork.rpc.protocol.Protocol;
 import cn.bdqfork.rpc.config.annotation.Reference;
 import cn.bdqfork.rpc.proxy.ProxyFactory;
 import org.apache.commons.lang3.StringUtils;

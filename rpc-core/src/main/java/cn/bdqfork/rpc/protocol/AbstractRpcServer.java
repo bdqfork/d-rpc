@@ -1,4 +1,4 @@
-package cn.bdqfork.rpc.context.remote;
+package cn.bdqfork.rpc.protocol;
 
 import cn.bdqfork.common.constant.Const;
 import cn.bdqfork.common.extension.ExtensionLoader;

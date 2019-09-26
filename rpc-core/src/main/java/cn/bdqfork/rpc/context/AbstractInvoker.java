@@ -1,10 +1,12 @@
-package cn.bdqfork.rpc.context.remote;
+package cn.bdqfork.rpc.context;
 
 import cn.bdqfork.common.URL;
 import cn.bdqfork.common.exception.RpcException;
 import cn.bdqfork.rpc.Invocation;
 import cn.bdqfork.rpc.Invoker;
 import cn.bdqfork.rpc.Result;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -13,8 +15,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @since 2019-09-04
  */
 public abstract class AbstractInvoker<T> implements Invoker<T> {
-    private boolean isAvailable = true;
+    private static final Logger log = LoggerFactory.getLogger(AbstractInvoker.class);
     private AtomicBoolean destroyed = new AtomicBoolean(false);
+    private boolean isAvailable = true;
     protected T proxy;
     protected Class<T> type;
     protected URL url;
@@ -51,6 +54,7 @@ public abstract class AbstractInvoker<T> implements Invoker<T> {
     public void destroy() {
         if (destroyed.compareAndSet(false, true)) {
             isAvailable = false;
+            log.info("Service {} is Destroyed!", type.getName());
         }
     }
 

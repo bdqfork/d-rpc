@@ -1,8 +1,8 @@
 package cn.bdqfork.rpc.context;
 
 import cn.bdqfork.common.exception.RpcException;
-import cn.bdqfork.rpc.context.remote.Request;
-import cn.bdqfork.rpc.context.remote.Response;
+import cn.bdqfork.rpc.protocol.Request;
+import cn.bdqfork.rpc.protocol.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

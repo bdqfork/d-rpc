@@ -1,6 +1,5 @@
 package cn.bdqfork.rpc.proxy;
 
-import cn.bdqfork.rpc.context.result.AsyncResult;
 import cn.bdqfork.rpc.context.RpcInvocation;
 import cn.bdqfork.rpc.Invoker;
 import cn.bdqfork.rpc.Result;

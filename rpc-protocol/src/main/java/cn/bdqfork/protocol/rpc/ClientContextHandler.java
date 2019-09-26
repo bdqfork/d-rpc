@@ -1,6 +1,6 @@
 package cn.bdqfork.protocol.rpc;
 
-import cn.bdqfork.rpc.context.remote.Response;
+import cn.bdqfork.rpc.protocol.Response;
 import cn.bdqfork.rpc.context.DefaultFuture;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;

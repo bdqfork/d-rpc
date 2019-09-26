@@ -6,7 +6,7 @@ import cn.bdqfork.common.constant.Const;
 import cn.bdqfork.common.extension.ExtensionLoader;
 import cn.bdqfork.rpc.Invocation;
 import cn.bdqfork.rpc.Invoker;
-import cn.bdqfork.rpc.Protocol;
+import cn.bdqfork.rpc.protocol.Protocol;
 import cn.bdqfork.rpc.context.AbstractDirectory;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;

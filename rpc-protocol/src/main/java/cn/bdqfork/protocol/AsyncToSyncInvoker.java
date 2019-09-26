@@ -6,7 +6,7 @@ import cn.bdqfork.common.exception.RpcException;
 import cn.bdqfork.rpc.Invocation;
 import cn.bdqfork.rpc.Invoker;
 import cn.bdqfork.rpc.Result;
-import cn.bdqfork.rpc.context.result.AsyncResult;
+import cn.bdqfork.rpc.context.AsyncResult;
 
 import java.util.concurrent.ExecutionException;
 

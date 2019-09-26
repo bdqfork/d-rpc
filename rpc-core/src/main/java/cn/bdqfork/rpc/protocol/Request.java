@@ -1,4 +1,4 @@
-package cn.bdqfork.rpc.context.remote;
+package cn.bdqfork.rpc.protocol;
 
 import java.util.concurrent.atomic.AtomicLong;
 

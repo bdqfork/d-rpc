@@ -1,4 +1,4 @@
-package cn.bdqfork.rpc.context.result;
+package cn.bdqfork.rpc.context;
 
 import cn.bdqfork.rpc.Result;
 import org.slf4j.Logger;

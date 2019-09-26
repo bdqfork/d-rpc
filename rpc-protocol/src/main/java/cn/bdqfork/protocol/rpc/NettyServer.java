@@ -1,7 +1,7 @@
 package cn.bdqfork.protocol.rpc;
 
 import cn.bdqfork.common.URL;
-import cn.bdqfork.rpc.context.remote.AbstractRpcServer;
+import cn.bdqfork.rpc.protocol.AbstractRpcServer;
 import cn.bdqfork.rpc.Invoker;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;

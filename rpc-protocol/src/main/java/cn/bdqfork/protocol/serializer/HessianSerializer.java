@@ -1,6 +1,6 @@
 package cn.bdqfork.protocol.serializer;
 
-import cn.bdqfork.rpc.context.remote.Serializer;
+import cn.bdqfork.rpc.protocol.Serializer;
 import com.caucho.hessian.io.HessianInput;
 import com.caucho.hessian.io.HessianOutput;
 
