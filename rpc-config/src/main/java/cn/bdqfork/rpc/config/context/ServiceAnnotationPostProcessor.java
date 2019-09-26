@@ -1,8 +1,10 @@
 package cn.bdqfork.rpc.config.context;
 
+import cn.bdqfork.common.extension.ExtensionLoader;
 import cn.bdqfork.common.util.ClassUtils;
 import cn.bdqfork.rpc.config.ServiceBean;
 import cn.bdqfork.rpc.config.annotation.Service;
+import cn.bdqfork.rpc.protocol.Protocol;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -11,13 +13,14 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.*;
+import org.springframework.context.ApplicationListener;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.context.ResourceLoaderAware;
 import org.springframework.context.annotation.AnnotationBeanNameGenerator;
+import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.type.filter.AnnotationTypeFilter;
-import org.springframework.util.StringUtils;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -27,7 +30,7 @@ import java.util.Set;
  * @since 2019-03-03
  */
 public class ServiceAnnotationPostProcessor implements BeanDefinitionRegistryPostProcessor,
-        EnvironmentAware, ResourceLoaderAware, BeanClassLoaderAware {
+        EnvironmentAware, ResourceLoaderAware, BeanClassLoaderAware, ApplicationListener<ContextClosedEvent> {
     public static final String SERVICE_ANNOTATION_POST_PROCESSOR_NAME = "serviceAnnotationPostProcessor";
     private static final Logger log = LoggerFactory.getLogger(ServiceAnnotationPostProcessor.class);
 
@@ -139,4 +142,11 @@ public class ServiceAnnotationPostProcessor implements BeanDefinitionRegistryPos
         this.resourceLoader = resourceLoader;
     }
 
+    @Override
+    public void onApplicationEvent(ContextClosedEvent event) {
+        ExtensionLoader.getExtensionLoader(Protocol.class)
+                .getExtensions()
+                .values()
+                .forEach(Protocol::destory);
+    }
 }

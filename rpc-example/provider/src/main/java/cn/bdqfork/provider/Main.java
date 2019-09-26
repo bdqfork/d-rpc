@@ -15,5 +15,6 @@ public class Main {
     public static void main(String[] args) {
         AbstractApplicationContext applicationContext = new AnnotationConfigApplicationContext(Main.class);
         applicationContext.registerShutdownHook();
+//        System.exit(0);
     }
 }

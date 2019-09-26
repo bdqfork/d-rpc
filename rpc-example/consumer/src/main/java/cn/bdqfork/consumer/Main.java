@@ -19,6 +19,7 @@ public class Main {
         applicationContext.registerShutdownHook();
 
         UserServiceManager userServiceManager = applicationContext.getBean(UserServiceManager.class);
+        //System.exit(0);
         while (true) {
             try {
                 userServiceManager.sayHello();

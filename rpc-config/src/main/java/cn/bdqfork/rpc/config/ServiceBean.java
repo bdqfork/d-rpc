@@ -55,7 +55,6 @@ public class ServiceBean<T> implements InitializingBean, DisposableBean, Applica
 
         for (ProtocolConfig protocolConfig : protocolConfigs) {
             URL url = buildUrl(protocolConfig, applicationConfig, service);
-
             T proxy = applicationContext.getBean(serviceInterface);
 
             Invoker<?> invoker = proxyFactory.getInvoker(proxy, serviceInterface, url);
@@ -131,17 +130,13 @@ public class ServiceBean<T> implements InitializingBean, DisposableBean, Applica
     @Override
     public void destroy() throws Exception {
         log.info("Destroy service {} !", getServiceName());
-        exporters.forEach(Exporter::undoExport);
-        protocol.destory();
     }
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
         if (!inited) {
             inited = true;
-            exporters = invokers.stream()
-                    .map(protocol::export)
-                    .collect(Collectors.toList());
+            invokers.forEach(protocol::export);
         }
     }
 }

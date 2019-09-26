@@ -1,5 +1,6 @@
 package cn.bdqfork.rpc.registry;
 
+import cn.bdqfork.common.Node;
 import cn.bdqfork.common.URL;
 import cn.bdqfork.common.constant.Const;
 import cn.bdqfork.common.exception.RpcException;
@@ -9,8 +10,10 @@ import cn.bdqfork.rpc.cluster.Cluster;
 import cn.bdqfork.rpc.filter.Filter;
 import cn.bdqfork.rpc.protocol.Protocol;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
 /**
@@ -18,6 +21,8 @@ import java.util.stream.Collectors;
  * @since 2019-08-24
  */
 public class RegistryProtocol implements Protocol {
+    private static final Map<String, Registry> REGISTRIES = new ConcurrentHashMap<>();
+    private List<Exporter> exporters = new CopyOnWriteArrayList<>();
     private Cluster cluster = ExtensionLoader.getExtensionLoader(Cluster.class).getAdaptiveExtension();
     private Protocol protocol = ExtensionLoader.getExtensionLoader(Protocol.class).getAdaptiveExtension();
     private RegistryFactory registryFactory = ExtensionLoader.getExtensionLoader(RegistryFactory.class).getAdaptiveExtension();
@@ -31,11 +36,13 @@ public class RegistryProtocol implements Protocol {
         url.setProtocol(server);
 
         List<Registry> registries = getRegistries(url);
+
         url.removeParameter(Const.REGISTRY_KEY);
         registries.forEach(registry -> registry.register(url));
 
-        Exporter exporter = protocol.export(invoker);
-        return new DestroyableExporter(exporter, registries);
+        Exporter exporter = new DestroyableExporter(protocol.export(invoker), registries);
+        exporters.add(exporter);
+        return exporter;
     }
 
     @Override
@@ -50,15 +57,26 @@ public class RegistryProtocol implements Protocol {
     private List<Registry> getRegistries(URL url) {
         String registryUrlString = url.getParameter(Const.REGISTRY_KEY);
         String[] registryUrlStrings = registryUrlString.split(",");
-        return Arrays.stream(registryUrlStrings)
-                .map(URL::new)
-                .map(registryFactory::getRegistry)
-                .collect(Collectors.toList());
+        List<Registry> registries = new ArrayList<>(registryUrlStrings.length);
+        for (String urlString : registryUrlStrings) {
+            registries.add(getRegistry(urlString));
+        }
+        return registries;
+    }
+
+    private Registry getRegistry(String urlString) {
+        Registry registry = REGISTRIES.get(urlString);
+        if (registry == null) {
+            registry = registryFactory.getRegistry(new URL(urlString));
+            REGISTRIES.putIfAbsent(urlString, registry);
+        }
+        return registry;
     }
 
     @Override
     public void destory() {
-        protocol.destory();
+        exporters.forEach(Exporter::undoExport);
+        REGISTRIES.values().forEach(Node::destroy);
     }
 
     private <T> Invoker<T> buildInvokerChain(Invoker<T> invoker, String group) {
