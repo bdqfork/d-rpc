@@ -37,8 +37,7 @@ public class InvokerInvocationHandler implements InvocationHandler {
             return invoker.equals(args[0]);
         }
         RpcInvocation rpcInvocation = new RpcInvocation(method.getName(), method.getParameterTypes(), args);
-        AsyncResult asyncResult = (AsyncResult) invoker.invoke(rpcInvocation);
-        Result result = asyncResult.get();
+        Result result = invoker.invoke(rpcInvocation);
         if (result.hasException()) {
             throw result.getException();
         }

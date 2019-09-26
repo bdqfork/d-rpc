@@ -73,9 +73,7 @@ public class AsyncResult extends CompletableFuture<Result> implements Result {
     }
 
     public static AsyncResult newDefaultAsyncResult() {
-        AsyncResult asyncResult = new AsyncResult();
-        asyncResult.setValue(null);
-        return asyncResult;
+        return new AsyncResult();
     }
 
 }

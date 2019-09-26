@@ -89,6 +89,13 @@ public class ServiceBean<T> implements InitializingBean, DisposableBean, Applica
         url.addParameter(Const.SERVER_KEY, protocolConfig.getServer());
         url.addParameter(Const.SERIALIZATION_KEY, protocolConfig.getSerialization());
 
+        List<RegistryConfig> registryConfigs = getRegistryConfigs(service);
+        url.addParameter(Const.REGISTRY_KEY, RegistryUtils.buildRegistryUrlString(registryConfigs));
+
+        return url;
+    }
+
+    private List<RegistryConfig> getRegistryConfigs(Service service) {
         List<RegistryConfig> registryConfigs = new ArrayList<>();
         if (service.registry().length > 0) {
             for (String registryConfigBeanName : service.registry()) {
@@ -98,9 +105,7 @@ public class ServiceBean<T> implements InitializingBean, DisposableBean, Applica
         } else {
             registryConfigs.addAll(applicationContext.getBeansOfType(RegistryConfig.class).values());
         }
-        url.addParameter(Const.REGISTRY_KEY, RegistryUtils.buildRegistryUrlString(registryConfigs));
-
-        return url;
+        return registryConfigs;
     }
 
     public void setService(Service service) {

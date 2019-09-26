@@ -61,21 +61,14 @@ public class ReferenceBean<T> implements FactoryBean<Object>, InitializingBean {
 
     private URL buildUrl(ApplicationConfig applicationConfig) {
         //获得本机IP
-        String host = NetUtils.getIp();
-        URL url = new URL(Const.PROTOCOL_REGISTRY, host, 0, serviceInterface.getName());
+        URL url = new URL(Const.PROTOCOL_REGISTRY, NetUtils.getIp(), 0, getServiceName());
+        url.addParameter(Const.INTERFACE_KEY, getServiceName());
+
         url.addParameter(Const.APPLICATION_KEY, applicationConfig.getApplicationName());
-
-        String version = reference.version();
-        if (StringUtils.isNotBlank(version)) {
-            url.addParameter(Const.VERSION_KEY, version);
-        } else {
-            url.addParameter(Const.VERSION_KEY, applicationConfig.getVersion());
-        }
-
+        url.addParameter(Const.VERSION_KEY, getVersion(applicationConfig));
         url.addParameter(Const.ENVIRONMENT_KEY, applicationConfig.getEnvironment());
         url.addParameter(Const.PROXY_KEY, reference.proxy());
         url.addParameter(Const.GROUP_KEY, reference.group());
-        url.addParameter(Const.INTERFACE_KEY, serviceInterface.getName());
         url.addParameter(Const.RETRY_KEY, String.valueOf(reference.retries()));
         url.addParameter(Const.TIMEOUT_KEY, String.valueOf(reference.timeout()));
         url.addParameter(Const.CONNECTIONS_KEY, String.valueOf(reference.connections()));
@@ -87,6 +80,18 @@ public class ReferenceBean<T> implements FactoryBean<Object>, InitializingBean {
         url.addParameter(Const.SERVER_KEY, reference.protocol());
         url.addParameter(Const.REGISTRY_KEY, RegistryUtils.buildRegistryUrlString(registryConfigs));
         return url;
+    }
+
+    private String getServiceName() {
+        return serviceInterface.getName();
+    }
+
+    private String getVersion(ApplicationConfig applicationConfig) {
+        String version = reference.version();
+        if (StringUtils.isBlank(version)) {
+            version = applicationConfig.getVersion();
+        }
+        return version;
     }
 
     @Override

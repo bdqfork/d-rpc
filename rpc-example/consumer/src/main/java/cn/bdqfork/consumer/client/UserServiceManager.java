@@ -13,19 +13,12 @@ import java.util.concurrent.ExecutionException;
  */
 @Component
 public class UserServiceManager {
-    @Reference(group = "rpc-test", version = "1", async = true)
+    @Reference(group = "rpc-test", version = "1", async = false)
     private UserService userService;
 
     public void sayHello() {
-        userService.getUserName();
-        try {
-            String username = (String) RpcContext.getRpcContext()
-                    .getFuture()
-                    .get();
-            userService.sayHello(username);
-        } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
-        }
+        String username = userService.getUserName();
+        userService.sayHello(username);
     }
 
 
