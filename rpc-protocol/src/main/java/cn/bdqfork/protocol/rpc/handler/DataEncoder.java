@@ -13,7 +13,6 @@ import io.netty.handler.codec.MessageToByteEncoder;
  * @author bdq
  * @since 2019-02-21
  */
-@ChannelHandler.Sharable
 public class DataEncoder extends MessageToByteEncoder<Object> {
     private Serializer serializer;
 

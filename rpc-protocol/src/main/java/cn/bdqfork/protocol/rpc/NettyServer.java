@@ -13,6 +13,7 @@ import io.netty.channel.ChannelOption;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
+import io.netty.handler.timeout.IdleStateHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,6 +49,7 @@ public class NettyServer extends AbstractRpcServer {
                                     .addLast(new LengthFieldBasedFrameDecoder(64 * 1024, 15, 4, 0, 0))
                                     .addLast(new DataDecoder(serializer))
                                     .addLast(new DataEncoder(serializer))
+                                    .addLast(new IdleStateHandler(0, 0, 200))
                                     .addLast(nettyServerHandler);
                         }
                     });

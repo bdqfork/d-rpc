@@ -18,7 +18,6 @@ import java.util.List;
  * @author bdq
  * @since 2019-02-27
  */
-@ChannelHandler.Sharable
 public class DataDecoder extends ByteToMessageDecoder {
     private Serializer serializer;
 
@@ -50,8 +49,12 @@ public class DataDecoder extends ByteToMessageDecoder {
             byte[] data = new byte[length];
             in.readBytes(data);
 
-            Invocation invocation = serializer.deserialize(data, Invocation.class);
-            request.setData(invocation);
+            if (!isEvent) {
+                Invocation invocation = serializer.deserialize(data, Invocation.class);
+                request.setData(invocation);
+            } else {
+                request.setData(serializer.deserialize(data, String.class));
+            }
 
             out.add(request);
         } else if (Const.RESPOSE_FLAGE == flage) {
@@ -68,9 +71,13 @@ public class DataDecoder extends ByteToMessageDecoder {
             byte[] data = new byte[length];
             in.readBytes(data);
 
-            Result result = serializer.deserialize(data, Result.class);
-            response.setData(result);
-            response.setMessage(result.getMessage());
+            if (!isEvent) {
+                Result result = serializer.deserialize(data, Result.class);
+                response.setData(result);
+                response.setMessage(result.getMessage());
+            } else {
+                response.setData(serializer.deserialize(data, String.class));
+            }
 
             out.add(response);
         }

@@ -15,6 +15,7 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
+import io.netty.handler.timeout.IdleStateHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,6 +50,7 @@ public class NettyClient implements RemoteClient {
                                 .addLast(new LengthFieldBasedFrameDecoder(64 * 1024, 15, 4, 0, 0))
                                 .addLast(new DataDecoder(serializer))
                                 .addLast(new DataEncoder(serializer))
+                                .addLast(new IdleStateHandler(60, 0, 0))
                                 .addLast(new NettyClientHandler());
                     }
                 });
