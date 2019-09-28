@@ -1,10 +1,11 @@
-package cn.bdqfork.protocol.rpc;
+package cn.bdqfork.protocol.rpc.handler;
 
 import cn.bdqfork.common.constant.Const;
 import cn.bdqfork.rpc.protocol.Request;
 import cn.bdqfork.rpc.protocol.Response;
 import cn.bdqfork.rpc.protocol.Serializer;
 import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
 
@@ -12,6 +13,7 @@ import io.netty.handler.codec.MessageToByteEncoder;
  * @author bdq
  * @since 2019-02-21
  */
+@ChannelHandler.Sharable
 public class DataEncoder extends MessageToByteEncoder<Object> {
     private Serializer serializer;
 
@@ -31,6 +33,8 @@ public class DataEncoder extends MessageToByteEncoder<Object> {
             out.writeLong(request.getId());
             //status
             out.writeInt(Response.OK);
+            //event
+            out.writeBoolean(request.isEvent());
 
             byte[] data = serializer.serialize(request.getData());
             //length
@@ -45,6 +49,8 @@ public class DataEncoder extends MessageToByteEncoder<Object> {
             out.writeLong(response.getId());
             //status
             out.writeInt(response.getStatus());
+            //event
+            out.writeBoolean(response.isEvent());
 
             byte[] data = serializer.serialize(response.getData());
             //length

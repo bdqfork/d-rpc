@@ -2,6 +2,9 @@ package cn.bdqfork.protocol.rpc;
 
 import cn.bdqfork.common.exception.RemoteException;
 import cn.bdqfork.common.exception.RpcException;
+import cn.bdqfork.protocol.rpc.handler.DataDecoder;
+import cn.bdqfork.protocol.rpc.handler.DataEncoder;
+import cn.bdqfork.protocol.rpc.handler.NettyClientHandler;
 import cn.bdqfork.rpc.protocol.RemoteClient;
 import cn.bdqfork.rpc.protocol.Request;
 import cn.bdqfork.rpc.protocol.Serializer;
@@ -43,10 +46,10 @@ public class NettyClient implements RemoteClient {
                     @Override
                     protected void initChannel(SocketChannel ch) throws Exception {
                         ch.pipeline()
-                                .addLast(new LengthFieldBasedFrameDecoder(64 * 1024, 14, 4, 0, 0))
+                                .addLast(new LengthFieldBasedFrameDecoder(64 * 1024, 15, 4, 0, 0))
                                 .addLast(new DataDecoder(serializer))
                                 .addLast(new DataEncoder(serializer))
-                                .addLast(new ClientContextHandler());
+                                .addLast(new NettyClientHandler());
                     }
                 });
     }

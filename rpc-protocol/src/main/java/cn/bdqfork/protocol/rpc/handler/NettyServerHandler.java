@@ -1,14 +1,13 @@
-package cn.bdqfork.protocol.rpc;
+package cn.bdqfork.protocol.rpc.handler;
 
+import cn.bdqfork.common.URL;
 import cn.bdqfork.common.constant.Const;
 import cn.bdqfork.common.exception.RpcException;
 import cn.bdqfork.rpc.Invocation;
 import cn.bdqfork.rpc.Invoker;
+import cn.bdqfork.rpc.Result;
 import cn.bdqfork.rpc.protocol.Request;
 import cn.bdqfork.rpc.protocol.Response;
-import cn.bdqfork.rpc.Result;
-import cn.bdqfork.common.URL;
-import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import org.apache.commons.lang3.StringUtils;
@@ -22,9 +21,8 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author bdq
  * @since 2019-02-20
  */
-@ChannelHandler.Sharable
-public class InvokerHandler extends ChannelInboundHandlerAdapter {
-    private static final Logger log = LoggerFactory.getLogger(InvokerHandler.class);
+public class NettyServerHandler extends ChannelInboundHandlerAdapter {
+    private static final Logger log = LoggerFactory.getLogger(NettyServerHandler.class);
     private final Map<String, Invoker> invokers = new ConcurrentHashMap<>();
 
     public void addInvoker(Invoker<?> invoker) {

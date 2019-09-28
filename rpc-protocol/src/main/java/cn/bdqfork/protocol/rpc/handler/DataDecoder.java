@@ -1,4 +1,4 @@
-package cn.bdqfork.protocol.rpc;
+package cn.bdqfork.protocol.rpc.handler;
 
 import cn.bdqfork.common.constant.Const;
 import cn.bdqfork.common.exception.RpcException;
@@ -8,6 +8,7 @@ import cn.bdqfork.rpc.protocol.Response;
 import cn.bdqfork.rpc.Result;
 import cn.bdqfork.rpc.protocol.Serializer;
 import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 
@@ -17,6 +18,7 @@ import java.util.List;
  * @author bdq
  * @since 2019-02-27
  */
+@ChannelHandler.Sharable
 public class DataDecoder extends ByteToMessageDecoder {
     private Serializer serializer;
 
@@ -40,6 +42,9 @@ public class DataDecoder extends ByteToMessageDecoder {
 
             //skip status
             in.skipBytes(4);
+            //event
+            boolean isEvent = in.readBoolean();
+            request.setEvent(isEvent);
 
             int length = in.readInt();
             byte[] data = new byte[length];
@@ -55,6 +60,9 @@ public class DataDecoder extends ByteToMessageDecoder {
 
             int status = in.readInt();
             response.setStatus(status);
+            //event
+            boolean isEvent = in.readBoolean();
+            response.setEvent(isEvent);
 
             int length = in.readInt();
             byte[] data = new byte[length];

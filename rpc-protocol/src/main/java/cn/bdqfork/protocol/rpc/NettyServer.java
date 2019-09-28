@@ -1,6 +1,9 @@
 package cn.bdqfork.protocol.rpc;
 
 import cn.bdqfork.common.URL;
+import cn.bdqfork.protocol.rpc.handler.DataDecoder;
+import cn.bdqfork.protocol.rpc.handler.DataEncoder;
+import cn.bdqfork.protocol.rpc.handler.NettyServerHandler;
 import cn.bdqfork.rpc.protocol.AbstractRpcServer;
 import cn.bdqfork.rpc.Invoker;
 import io.netty.bootstrap.ServerBootstrap;
@@ -21,11 +24,11 @@ public class NettyServer extends AbstractRpcServer {
     private static final Logger log = LoggerFactory.getLogger(NettyServer.class);
     private NioEventLoopGroup boss;
     private NioEventLoopGroup worker;
-    private InvokerHandler invokerHandler;
+    private NettyServerHandler nettyServerHandler;
 
     public NettyServer(URL url) {
         super(url);
-        this.invokerHandler = new InvokerHandler();
+        this.nettyServerHandler = new NettyServerHandler();
     }
 
     @Override
@@ -42,10 +45,10 @@ public class NettyServer extends AbstractRpcServer {
                         @Override
                         protected void initChannel(Channel ch) throws Exception {
                             ch.pipeline()
-                                    .addLast(new LengthFieldBasedFrameDecoder(64 * 1024, 14, 4, 0, 0))
+                                    .addLast(new LengthFieldBasedFrameDecoder(64 * 1024, 15, 4, 0, 0))
                                     .addLast(new DataDecoder(serializer))
                                     .addLast(new DataEncoder(serializer))
-                                    .addLast(invokerHandler);
+                                    .addLast(nettyServerHandler);
                         }
                     });
             bootstrap.bind(host, port).sync();
@@ -57,7 +60,7 @@ public class NettyServer extends AbstractRpcServer {
 
     @Override
     public void addInvoker(Invoker<?> invoker) {
-        invokerHandler.addInvoker(invoker);
+        nettyServerHandler.addInvoker(invoker);
     }
 
     @Override
