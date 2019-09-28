@@ -8,15 +8,18 @@
 4. 支持使用Netty实现网络通信
 5. 支持负载均衡扩展
 6. 支持异步调用
-7. 支持SPI扩展
+7. 支持超时重试
+8. 支持SPI扩展
+9. 支持Protocol扩展
 
 #### todolist:
 1. etcd注册中心、nacos注册中心
-2. netty通信协议优化
-3. 服务端rpc-context重构
+2. jdk compiler
+3. context参数完善
 4. javassist代理
 5. http协议
 6. 条件路由
-7. 添加监控
-8. 测试用例增加
-9. 文档编写
+7. log日志添加
+8. 添加监控
+9. 测试用例增加
+10. 文档编写
