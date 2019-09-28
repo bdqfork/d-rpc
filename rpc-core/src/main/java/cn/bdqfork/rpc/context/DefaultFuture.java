@@ -3,14 +3,18 @@ package cn.bdqfork.rpc.context;
 import cn.bdqfork.common.exception.RpcException;
 import cn.bdqfork.rpc.protocol.Request;
 import cn.bdqfork.rpc.protocol.Response;
+import io.netty.util.HashedWheelTimer;
+import io.netty.util.Timeout;
+import io.netty.util.Timer;
+import io.netty.util.TimerTask;
+import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 /**
@@ -24,7 +28,12 @@ public class DefaultFuture extends CompletableFuture<Object> {
     private long id;
     private long timeout;
     private Request request;
-    private Timer timer;
+    private Timer timer = new HashedWheelTimer(new BasicThreadFactory.Builder()
+            .daemon(true)
+            .namingPattern("rpc-future-timeout")
+            .build(),
+            30, TimeUnit.MILLISECONDS);
+    private Timeout timeoutCheckTask;
 
     private DefaultFuture(Request request, long timeout) {
         this.request = request;
@@ -41,9 +50,7 @@ public class DefaultFuture extends CompletableFuture<Object> {
 
     private static void doTimeoutCheck(DefaultFuture future) {
         TimeoutCheckTask task = new TimeoutCheckTask(future.getId());
-        Timer timer = new Timer("timeout", true);
-        timer.schedule(task, future.timeout);
-        future.timer = timer;
+        future.timeoutCheckTask = future.timer.newTimeout(task, future.timeout, TimeUnit.MILLISECONDS);
     }
 
     public static void received(Response response) {
@@ -55,8 +62,8 @@ public class DefaultFuture extends CompletableFuture<Object> {
             DefaultFuture future = FUTURES.remove(response.getId());
             if (future != null) {
                 if (!timeout) {
-                    Timer timer = future.timer;
-                    timer.cancel();
+                    Timeout timeoutCheckTask = future.timeoutCheckTask;
+                    timeoutCheckTask.cancel();
                 }
                 future.doReceived(response);
             } else {
@@ -91,7 +98,7 @@ public class DefaultFuture extends CompletableFuture<Object> {
         this.cancel(true);
     }
 
-    private static class TimeoutCheckTask extends TimerTask {
+    private static class TimeoutCheckTask implements TimerTask {
         private final Long requestID;
 
         TimeoutCheckTask(Long requestID) {
@@ -99,7 +106,7 @@ public class DefaultFuture extends CompletableFuture<Object> {
         }
 
         @Override
-        public void run() {
+        public void run(Timeout timeout) throws Exception {
             DefaultFuture future = DefaultFuture.getFuture(requestID);
             if (future == null || future.isDone()) {
                 return;
