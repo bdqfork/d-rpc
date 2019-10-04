@@ -1,7 +1,7 @@
 package cn.bdqfork.rpc.context;
 
 
-import cn.bdqfork.rpc.Invocation;
+import cn.bdqfork.common.Invocation;
 import cn.bdqfork.common.URL;
 
 import java.util.HashMap;

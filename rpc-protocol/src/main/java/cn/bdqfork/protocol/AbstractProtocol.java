@@ -3,12 +3,10 @@ package cn.bdqfork.protocol;
 import cn.bdqfork.common.URL;
 import cn.bdqfork.common.constant.Const;
 import cn.bdqfork.rpc.Exporter;
-import cn.bdqfork.rpc.Invoker;
+import cn.bdqfork.common.Invoker;
 import cn.bdqfork.rpc.protocol.Protocol;
 import cn.bdqfork.rpc.protocol.RpcExporter;
 import cn.bdqfork.rpc.protocol.RpcServer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

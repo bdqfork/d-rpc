@@ -1,7 +1,7 @@
 package cn.bdqfork.rpc.protocol;
 
 import cn.bdqfork.rpc.Exporter;
-import cn.bdqfork.rpc.Invoker;
+import cn.bdqfork.common.Invoker;
 
 /**
  * @author bdq

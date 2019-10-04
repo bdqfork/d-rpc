@@ -7,7 +7,7 @@ import cn.bdqfork.common.constant.Const;
 import cn.bdqfork.common.extension.ExtensionLoader;
 import cn.bdqfork.common.util.NetUtils;
 import cn.bdqfork.common.util.RegistryUtils;
-import cn.bdqfork.rpc.Invoker;
+import cn.bdqfork.common.Invoker;
 import cn.bdqfork.rpc.protocol.Protocol;
 import cn.bdqfork.rpc.config.annotation.Reference;
 import cn.bdqfork.rpc.proxy.ProxyFactory;

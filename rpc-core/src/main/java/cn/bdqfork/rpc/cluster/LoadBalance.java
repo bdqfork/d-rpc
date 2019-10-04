@@ -5,8 +5,8 @@ import cn.bdqfork.common.constant.Const;
 import cn.bdqfork.common.exception.RpcException;
 import cn.bdqfork.common.extension.Adaptive;
 import cn.bdqfork.common.extension.SPI;
-import cn.bdqfork.rpc.Invocation;
-import cn.bdqfork.rpc.Invoker;
+import cn.bdqfork.common.Invocation;
+import cn.bdqfork.common.Invoker;
 
 import java.util.List;
 

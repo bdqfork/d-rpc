@@ -3,9 +3,9 @@ package cn.bdqfork.protocol;
 import cn.bdqfork.common.URL;
 import cn.bdqfork.common.constant.Const;
 import cn.bdqfork.common.exception.RpcException;
-import cn.bdqfork.rpc.Invocation;
-import cn.bdqfork.rpc.Invoker;
-import cn.bdqfork.rpc.Result;
+import cn.bdqfork.common.Invocation;
+import cn.bdqfork.common.Invoker;
+import cn.bdqfork.common.Result;
 import cn.bdqfork.rpc.context.AsyncResult;
 
 import java.util.concurrent.ExecutionException;

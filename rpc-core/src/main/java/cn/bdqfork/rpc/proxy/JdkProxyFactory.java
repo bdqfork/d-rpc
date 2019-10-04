@@ -1,6 +1,6 @@
 package cn.bdqfork.rpc.proxy;
 
-import cn.bdqfork.rpc.Invoker;
+import cn.bdqfork.common.Invoker;
 
 import java.lang.reflect.Proxy;
 

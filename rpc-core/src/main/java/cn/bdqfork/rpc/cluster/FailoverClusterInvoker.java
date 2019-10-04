@@ -3,9 +3,9 @@ package cn.bdqfork.rpc.cluster;
 import cn.bdqfork.common.constant.Const;
 import cn.bdqfork.common.exception.RpcException;
 import cn.bdqfork.rpc.Directory;
-import cn.bdqfork.rpc.Invocation;
-import cn.bdqfork.rpc.Invoker;
-import cn.bdqfork.rpc.Result;
+import cn.bdqfork.common.Invocation;
+import cn.bdqfork.common.Invoker;
+import cn.bdqfork.common.Result;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

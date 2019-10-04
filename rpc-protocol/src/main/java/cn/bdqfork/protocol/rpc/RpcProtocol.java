@@ -4,7 +4,7 @@ import cn.bdqfork.common.URL;
 import cn.bdqfork.common.constant.Const;
 import cn.bdqfork.common.extension.ExtensionLoader;
 import cn.bdqfork.protocol.AbstractProtocol;
-import cn.bdqfork.rpc.Invoker;
+import cn.bdqfork.common.Invoker;
 import cn.bdqfork.rpc.protocol.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

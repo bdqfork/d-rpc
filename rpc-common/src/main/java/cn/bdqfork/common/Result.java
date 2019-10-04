@@ -1,4 +1,4 @@
-package cn.bdqfork.rpc;
+package cn.bdqfork.common;
 
 import java.io.Serializable;
 

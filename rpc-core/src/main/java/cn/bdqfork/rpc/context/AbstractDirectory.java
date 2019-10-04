@@ -4,8 +4,8 @@ import cn.bdqfork.common.Node;
 import cn.bdqfork.common.URL;
 import cn.bdqfork.common.constant.Const;
 import cn.bdqfork.rpc.Directory;
-import cn.bdqfork.rpc.Invocation;
-import cn.bdqfork.rpc.Invoker;
+import cn.bdqfork.common.Invocation;
+import cn.bdqfork.common.Invoker;
 
 import java.util.ArrayList;
 import java.util.Collections;

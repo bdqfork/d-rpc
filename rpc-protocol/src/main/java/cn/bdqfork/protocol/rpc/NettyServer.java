@@ -5,7 +5,7 @@ import cn.bdqfork.protocol.rpc.handler.DataDecoder;
 import cn.bdqfork.protocol.rpc.handler.DataEncoder;
 import cn.bdqfork.protocol.rpc.handler.NettyServerHandler;
 import cn.bdqfork.rpc.protocol.AbstractRpcServer;
-import cn.bdqfork.rpc.Invoker;
+import cn.bdqfork.common.Invoker;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;

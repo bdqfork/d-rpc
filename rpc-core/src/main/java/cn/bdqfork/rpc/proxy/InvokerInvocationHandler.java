@@ -1,8 +1,8 @@
 package cn.bdqfork.rpc.proxy;
 
 import cn.bdqfork.rpc.context.RpcInvocation;
-import cn.bdqfork.rpc.Invoker;
-import cn.bdqfork.rpc.Result;
+import cn.bdqfork.common.Invoker;
+import cn.bdqfork.common.Result;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;

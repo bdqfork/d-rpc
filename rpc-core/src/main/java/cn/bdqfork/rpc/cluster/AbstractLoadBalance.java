@@ -3,8 +3,8 @@ package cn.bdqfork.rpc.cluster;
 import cn.bdqfork.common.URL;
 import cn.bdqfork.common.exception.RpcException;
 import cn.bdqfork.common.util.CollectionUtils;
-import cn.bdqfork.rpc.Invocation;
-import cn.bdqfork.rpc.Invoker;
+import cn.bdqfork.common.Invocation;
+import cn.bdqfork.common.Invoker;
 
 import java.util.List;
 

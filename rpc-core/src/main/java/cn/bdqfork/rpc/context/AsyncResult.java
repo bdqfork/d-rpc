@@ -1,6 +1,6 @@
 package cn.bdqfork.rpc.context;
 
-import cn.bdqfork.rpc.Result;
+import cn.bdqfork.common.Result;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

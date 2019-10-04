@@ -1,6 +1,6 @@
 package cn.bdqfork.rpc.protocol;
 
-import cn.bdqfork.rpc.Invoker;
+import cn.bdqfork.common.Invoker;
 import cn.bdqfork.common.Node;
 
 /**

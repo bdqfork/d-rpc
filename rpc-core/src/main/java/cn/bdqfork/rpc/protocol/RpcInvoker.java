@@ -2,12 +2,12 @@ package cn.bdqfork.rpc.protocol;
 
 import cn.bdqfork.common.constant.Const;
 import cn.bdqfork.common.exception.RpcException;
-import cn.bdqfork.rpc.Invocation;
+import cn.bdqfork.common.Invocation;
 import cn.bdqfork.rpc.context.AbstractInvoker;
 import cn.bdqfork.rpc.context.AsyncResult;
 import cn.bdqfork.rpc.context.FutureAdapter;
 import cn.bdqfork.common.URL;
-import cn.bdqfork.rpc.Result;
+import cn.bdqfork.common.Result;
 import cn.bdqfork.rpc.context.DefaultFuture;
 import cn.bdqfork.rpc.context.RpcContext;
 

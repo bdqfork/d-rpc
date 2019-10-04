@@ -4,9 +4,9 @@ import cn.bdqfork.common.exception.RpcException;
 import cn.bdqfork.common.extension.ExtensionLoader;
 import cn.bdqfork.rpc.Directory;
 import cn.bdqfork.common.URL;
-import cn.bdqfork.rpc.Invocation;
-import cn.bdqfork.rpc.Invoker;
-import cn.bdqfork.rpc.Result;
+import cn.bdqfork.common.Invocation;
+import cn.bdqfork.common.Invoker;
+import cn.bdqfork.common.Result;
 
 import java.util.List;
 
