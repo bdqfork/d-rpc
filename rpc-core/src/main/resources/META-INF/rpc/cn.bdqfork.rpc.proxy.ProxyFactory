@@ -1,1 +1,2 @@
 jdk=cn.bdqfork.rpc.proxy.JdkProxyFactory
+javassist=cn.bdqfork.rpc.proxy.JavassistProxyFactory

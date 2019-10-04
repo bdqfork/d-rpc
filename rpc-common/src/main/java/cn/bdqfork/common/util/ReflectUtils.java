@@ -7,7 +7,7 @@ import java.lang.reflect.Method;
  * @since 2019/10/1
  */
 public class ReflectUtils {
-    public static String getSign(Method method) {
+    public static String getSignature(Method method) {
         StringBuilder signBuilder = new StringBuilder();
         signBuilder.append(method.getName())
                 .append("(");
@@ -22,8 +22,4 @@ public class ReflectUtils {
         return signBuilder.toString();
     }
 
-    public static String getName(Class<?> clazz) {
-        String className = clazz.getCanonicalName();
-        return className.substring(0, className.lastIndexOf("."));
-    }
 }

@@ -5,5 +5,7 @@ package cn.bdqfork.rpc.proxy;
  * @since 2019/10/1
  */
 public interface UserService {
-    public void sayHello(String test);
+    String getUsername(int id);
+
+    void sayHello(String username);
 }

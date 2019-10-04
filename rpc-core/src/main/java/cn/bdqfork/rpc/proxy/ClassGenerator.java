@@ -7,14 +7,19 @@ import java.lang.reflect.Modifier;
 import java.security.ProtectionDomain;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author bdq
  * @since 2019/10/1
  */
 public class ClassGenerator {
+    private static final Map<ClassLoader, ClassPool> POOL_CACHE = new ConcurrentHashMap<>();
+    private static final String INIT_FLAG = "<init>";
     private ClassPool classPool;
     private String className;
+    private String simpleName;
     private String superClass;
     private boolean addDefaultConstructor;
     private List<String> interfaces;
@@ -30,8 +35,12 @@ public class ClassGenerator {
         if (classLoader == null) {
             classPool = ClassPool.getDefault();
         } else {
-            classPool = new ClassPool(true);
-            classPool.appendClassPath(new LoaderClassPath(classLoader));
+            classPool = POOL_CACHE.get(classLoader);
+            if (classPool == null) {
+                classPool = new ClassPool(true);
+                classPool.appendClassPath(new LoaderClassPath(classLoader));
+                POOL_CACHE.putIfAbsent(classLoader, classPool);
+            }
         }
     }
 
@@ -57,48 +66,93 @@ public class ClassGenerator {
         return modifier.toString();
     }
 
-    public void setClassName(String className) {
+    public ClassGenerator setClassName(String className) {
         this.className = className;
+        this.simpleName = className.substring(className.lastIndexOf(".") + 1);
+        return this;
     }
 
-    public void setSuperClass(String superClass) {
+    public ClassGenerator setSuperClass(String superClass) {
         this.superClass = superClass;
+        return this;
     }
 
-    public void addInterface(String interfaceName) {
+    public ClassGenerator addInterface(String interfaceName) {
         if (interfaces == null) {
             interfaces = new LinkedList<>();
         }
         interfaces.add(interfaceName);
+        return this;
     }
 
-    public void addConstructor(String constructor) {
+    public ClassGenerator addConstructor(String constructor) {
         if (constructors == null) {
             constructors = new LinkedList<>();
         }
         constructors.add(constructor);
+        return this;
     }
 
-    public void addDefaultConstructor() {
+    public ClassGenerator addConstructor(int modifier, Class<?>[] parameters, String body) {
+        return addConstructor(modifier, parameters, null, body);
+    }
+
+    public ClassGenerator addConstructor(int modifier, Class<?>[] parameters, Class<?>[] exceptions, String body) {
+        StringBuilder codeBuilder = new StringBuilder();
+        codeBuilder.append(modifier(modifier))
+                .append(" ")
+                .append(INIT_FLAG)
+                .append("(");
+        for (int i = 0; i < parameters.length; i++) {
+            if (i > 0) {
+                codeBuilder.append(",");
+            }
+            Class<?> parameter = parameters[i];
+            codeBuilder.append(parameter.getCanonicalName())
+                    .append(" ")
+                    .append("arg")
+                    .append(i);
+        }
+        codeBuilder.append(")");
+        if (exceptions != null && exceptions.length > 0) {
+            codeBuilder.append("throws ");
+            for (int i = 0; i < exceptions.length; i++) {
+                if (i > 0) {
+                    codeBuilder.append(",");
+                }
+                Class<?> exceptionClass = exceptions[i];
+                codeBuilder.append(exceptionClass.getCanonicalName());
+            }
+        }
+        codeBuilder.append("{")
+                .append(body)
+                .append("}");
+        return addConstructor(codeBuilder.toString());
+    }
+
+    public ClassGenerator addDefaultConstructor() {
         addDefaultConstructor = true;
+        return this;
     }
 
-    public void addField(String field) {
+    public ClassGenerator addField(String field) {
         if (fields == null) {
             fields = new LinkedList<>();
         }
         fields.add(field);
+        return this;
     }
 
-    public void addMethod(String method) {
+    public ClassGenerator addMethod(String method) {
         if (methods == null) {
             methods = new LinkedList<>();
         }
         methods.add(method);
+        return this;
     }
 
-    public void addMethod(int modifier, Class<?> returnType, String methodName, Class<?>[] parameterTypes,
-                          Class<?>[] exceptionTypes, String body) {
+    public ClassGenerator addMethod(int modifier, Class<?> returnType, String methodName, Class<?>[] parameterTypes,
+                                    Class<?>[] exceptionTypes, String body) {
         StringBuilder methodBuilder = new StringBuilder();
         methodBuilder.append(modifier(modifier))
                 .append(" ")
@@ -128,6 +182,7 @@ public class ClassGenerator {
         methodBuilder.append("{").append(body).append("}");
 
         addMethod(methodBuilder.toString());
+        return this;
     }
 
     public Class<?> toClass() {
@@ -135,30 +190,42 @@ public class ClassGenerator {
     }
 
     public Class<?> toClass(ClassLoader classLoader, ProtectionDomain protectionDomain) {
-        //TODO:参数空校验
         try {
             CtClass ctClass = classPool.makeClass(className);
 
-            ctClass.setSuperclass(classPool.get(superClass));
+            if (superClass != null) {
+                ctClass.setSuperclass(classPool.get(superClass));
+            }
 
-            for (String interfaceName : interfaces) {
-                ctClass.addInterface(classPool.get(interfaceName));
+            if (interfaces != null) {
+                for (String interfaceName : interfaces) {
+                    ctClass.addInterface(classPool.get(interfaceName));
+                }
             }
 
             if (addDefaultConstructor) {
                 ctClass.addConstructor(CtNewConstructor.defaultConstructor(ctClass));
             }
 
-            for (String field : fields) {
-                ctClass.addField(CtField.make(field, ctClass));
+            if (fields != null) {
+                for (String field : fields) {
+                    ctClass.addField(CtField.make(field, ctClass));
+                }
             }
 
-            for (String constructor : constructors) {
-                ctClass.addConstructor(CtNewConstructor.make(constructor, ctClass));
+            if (constructors != null) {
+                for (String constructor : constructors) {
+                    if (constructor.contains(INIT_FLAG)) {
+                        constructor = constructor.replace(INIT_FLAG, simpleName);
+                    }
+                    ctClass.addConstructor(CtNewConstructor.make(constructor, ctClass));
+                }
             }
 
-            for (String method : methods) {
-                ctClass.addMethod(CtNewMethod.make(method, ctClass));
+            if (methods != null) {
+                for (String method : methods) {
+                    ctClass.addMethod(CtNewMethod.make(method, ctClass));
+                }
             }
 
             return ctClass.toClass(classLoader, protectionDomain);

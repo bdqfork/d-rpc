@@ -10,7 +10,7 @@ import cn.bdqfork.common.URL;
  * @author bdq
  * @since 2019-08-26
  */
-@SPI(JdkProxyFactory.NAME)
+@SPI(JavassistProxyFactory.NAME)
 public interface ProxyFactory {
 
     @Adaptive({Const.PROXY_KEY})
