@@ -11,15 +11,15 @@
 7. 支持超时重试
 8. 支持SPI扩展
 9. 支持Protocol扩展
+10.支持JDK和Javassist动态代理
 
 #### todolist:
 1. etcd注册中心、nacos注册中心
 2. jdk compiler
 3. context参数完善
-4. javassist代理
-5. http协议
-6. 条件路由
-7. log日志添加
-8. 添加监控
-9. 测试用例增加
-10. 文档编写
+4. http协议
+5. 条件路由
+6. log日志添加
+7. 添加监控
+8. 测试用例增加
+9. 文档编写
