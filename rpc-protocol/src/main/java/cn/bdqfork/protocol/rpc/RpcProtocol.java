@@ -1,10 +1,10 @@
 package cn.bdqfork.protocol.rpc;
 
+import cn.bdqfork.common.Invoker;
 import cn.bdqfork.common.URL;
 import cn.bdqfork.common.constant.Const;
 import cn.bdqfork.common.extension.ExtensionLoader;
 import cn.bdqfork.protocol.AbstractProtocol;
-import cn.bdqfork.common.Invoker;
 import cn.bdqfork.rpc.protocol.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,8 +40,8 @@ public class RpcProtocol extends AbstractProtocol {
 
     private URL buildServerUrl(URL url) {
         URL serverUrl = new URL(url.getProtocol(), url.getHost(), url.getPort(), "");
-        String serialization = url.getParameter(Const.SERIALIZATION_KEY);
-        serverUrl.addParameter(Const.SERIALIZATION_KEY, serialization);
+        serverUrl.addParameter(Const.SERIALIZATION_KEY, url.getParameter(Const.SERIALIZATION_KEY));
+        serverUrl.addParameter(Const.SERVER_KEY, url.getParameter(Const.SERVER_KEY));
         return serverUrl;
     }
 

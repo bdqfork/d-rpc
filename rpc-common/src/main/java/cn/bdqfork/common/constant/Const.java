@@ -37,4 +37,5 @@ public class Const {
     public static final String CONSUMER = "consumer";
     public static final String PROVIDER = "provider";
     public static final String REGISTRY = "registry";
+    public static final String DEFAULT_PROTOCOL = "rpc";
 }

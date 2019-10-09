@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
  * @since 2019-02-20
  */
 public class NettyServer extends AbstractRpcServer {
+    public static final String NAME = "netty";
     private static final Logger log = LoggerFactory.getLogger(NettyServer.class);
     private NioEventLoopGroup boss;
     private NioEventLoopGroup worker;

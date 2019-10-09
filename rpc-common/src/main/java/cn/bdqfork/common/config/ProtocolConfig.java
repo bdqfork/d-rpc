@@ -22,7 +22,7 @@ public class ProtocolConfig {
     /**
      * transport方式
      */
-    private String server = "rpc";
+    private String server = "netty";
     /**
      * 序列化方式
      */

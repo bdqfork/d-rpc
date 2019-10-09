@@ -29,8 +29,8 @@ public class RegistryProtocol implements Protocol {
         invoker = buildInvokerChain(invoker, Const.PROVIDER);
 
         URL url = invoker.getUrl();
-        String server = url.getParameter(Const.PROTOCOL_KEY);
-        url.setProtocol(server);
+        String protocolString = url.getParameter(Const.PROTOCOL_KEY);
+        url.setProtocol(protocolString);
 
         List<Registry> registries = getRegistries(url);
 

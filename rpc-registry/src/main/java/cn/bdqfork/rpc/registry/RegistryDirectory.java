@@ -104,11 +104,11 @@ public class RegistryDirectory<T> extends AbstractDirectory<T> implements Notifi
     }
 
     private boolean checkServer(URL url) {
-        String serverString = this.url.getParameter(Const.SERVER_KEY, "rpc");
-        String[] servers = serverString.split(",");
-        String serverType = url.getParameter(Const.SERVER_KEY);
-        for (String server : servers) {
-            if (server.equals(serverType)) {
+        String protocolString = this.url.getParameter(Const.PROTOCOL_KEY);
+        String[] protocols = protocolString.split(",");
+        String protocolType = url.getParameter(Const.PROTOCOL_KEY);
+        for (String protocol : protocols) {
+            if (protocol.equals(protocolType)) {
                 return true;
             }
         }

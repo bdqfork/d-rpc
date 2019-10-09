@@ -76,10 +76,13 @@ public class ReferenceBean<T> implements FactoryBean<Object>, InitializingBean {
         url.addParameter(Const.CLUSTER_KEY, reference.cluster());
         url.addParameter(Const.LOADBALANCE_KEY, reference.loadBalance());
         url.addParameter(Const.ASYNC_KEY, reference.async());
-
-        url.addParameter(Const.SERVER_KEY, reference.protocol());
+        url.addParameter(Const.PROTOCOL_KEY, getProtocol());
         url.addParameter(Const.REGISTRY_KEY, RegistryUtils.buildRegistryUrlString(registryConfigs));
         return url;
+    }
+
+    private String getProtocol() {
+        return reference.protocol().equals("") ? Const.DEFAULT_PROTOCOL : reference.protocol();
     }
 
     private String getServiceName() {
