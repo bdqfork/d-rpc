@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 @Activate(group = Const.PROVIDER_SIDE, value = Const.ACCESS_LOG_KEY)
 public class AccessLogFilter implements Filter {
     private static final Logger log = LoggerFactory.getLogger(AccessLogFilter.class);
+    private Gson gson = new Gson();
 
     @Override
     public Result invoke(Invoker<?> invoker, Invocation invocation) throws RpcException {
@@ -59,7 +60,6 @@ public class AccessLogFilter implements Filter {
 
             logBuilder.append(")");
 
-            Gson gson = new Gson();
             logBuilder.append(gson.toJson(invocation.getArguments()));
 
             log.info(logBuilder.toString());
