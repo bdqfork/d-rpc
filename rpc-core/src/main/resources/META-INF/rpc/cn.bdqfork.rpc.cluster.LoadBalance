@@ -1,2 +1,2 @@
-roundRobin=cn.bdqfork.rpc.cluster.RoundRobinLoadBalance
-random=cn.bdqfork.rpc.cluster.RandomLoadBalance
+roundRobin=cn.bdqfork.rpc.cluster.loadbalance.RoundRobinLoadBalance
+random=cn.bdqfork.rpc.cluster.loadbalance.RandomLoadBalance

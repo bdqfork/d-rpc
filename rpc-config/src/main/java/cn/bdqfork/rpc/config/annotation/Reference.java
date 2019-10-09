@@ -33,8 +33,6 @@ public @interface Reference {
 
     /**
      * 支持的协议,多个协议用,隔开
-     *
-     * @return
      */
     String protocol() default "";
 

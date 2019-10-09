@@ -22,20 +22,27 @@ public class ExtensionLoader<T> {
     private static final String PREFIX = "META-INF/rpc/";
     private static final Pattern NAME_PATTERN = Pattern.compile("[A-Z][a-z]+");
     private static final Map<String, ExtensionLoader> CACHES = new ConcurrentHashMap<>();
-
-    private Class<T> type;
-    private String defaultName;
-    private volatile Class<T> adaptiveClass;
-    private volatile T adaptiveExtension;
-    private volatile Map<String, T> cacheExtensions;
     private final Map<Class<T>, String> classNames = new ConcurrentHashMap<>();
     private final Map<String, Class<T>> extensionClasses = new ConcurrentHashMap<>();
     private final Map<String, Class<T>> activateClasses = new ConcurrentHashMap<>();
+
+    private volatile Class<T> adaptiveClass;
+    private volatile T adaptiveExtension;
+    private volatile Map<String, T> cacheExtensions;
+    private Class<T> type;
+    private String defaultName;
 
     private ExtensionLoader(Class<T> type) {
         this.type = type;
     }
 
+    /**
+     * 获取扩展接口对应的ExtensionLoader
+     *
+     * @param clazz 扩展接口
+     * @param <T>   Class类型
+     * @return ExtensionLoader<T>
+     */
     @SuppressWarnings("unchecked")
     public static <T> ExtensionLoader<T> getExtensionLoader(Class<T> clazz) {
         String className = clazz.getName();
@@ -62,11 +69,22 @@ public class ExtensionLoader<T> {
         return extensionLoader;
     }
 
+    /**
+     * 获取默认扩展
+     *
+     * @return T
+     */
     public T getDefaultExtension() {
         String defaultName = getDefaultName();
         return getExtension(defaultName);
     }
 
+    /**
+     * 根据extensionName获取扩展实例
+     *
+     * @param extensionName 扩展名称
+     * @return T
+     */
     public T getExtension(String extensionName) {
         T extension = getExtensions().get(extensionName);
         if (extension != null) {
@@ -75,6 +93,11 @@ public class ExtensionLoader<T> {
         throw new IllegalStateException("No extension named " + extensionName + " for class " + type.getName() + "!");
     }
 
+    /**
+     * 获取所有扩展
+     *
+     * @return Map<String, T>
+     */
     public Map<String, T> getExtensions() {
         if (cacheExtensions == null) {
             cacheExtensions = new ConcurrentHashMap<>();
@@ -153,6 +176,11 @@ public class ExtensionLoader<T> {
         }
     }
 
+    /**
+     * 获取Adaptive扩展
+     *
+     * @return T
+     */
     public T getAdaptiveExtension() {
         if (adaptiveExtension == null) {
             try {
@@ -205,6 +233,13 @@ public class ExtensionLoader<T> {
         return defaultName;
     }
 
+    /**
+     * 根据url和group获取Activate集合扩展
+     *
+     * @param url       url
+     * @param groupName 分组
+     * @return List<T>
+     */
     public List<T> getActivateExtensions(URL url, String groupName) {
         getExtensionClasses();
         return activateClasses.values()
@@ -221,6 +256,14 @@ public class ExtensionLoader<T> {
         return activate.order();
     }
 
+    /**
+     * 根据url，extensionName和group获取Activate集合扩展
+     *
+     * @param url           url
+     * @param extensionName 扩展名
+     * @param groupName     分组
+     * @return T
+     */
     public T getActivateExtension(URL url, String extensionName, String groupName) {
         getExtensionClasses();
 

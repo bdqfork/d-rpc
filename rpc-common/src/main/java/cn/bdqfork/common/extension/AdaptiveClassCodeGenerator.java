@@ -10,6 +10,8 @@ import java.util.Arrays;
 import java.util.stream.Collectors;
 
 /**
+ * 生成Adaptive的wrapper类
+ *
  * @author bdq
  * @since 2019/9/22
  */

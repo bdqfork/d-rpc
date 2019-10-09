@@ -1,4 +1,4 @@
-package cn.bdqfork.protocol.rpc.handler;
+package cn.bdqfork.protocol.rpc.client;
 
 import cn.bdqfork.rpc.context.DefaultFuture;
 import cn.bdqfork.rpc.protocol.Request;

@@ -1,4 +1,4 @@
-package cn.bdqfork.rpc.cluster;
+package cn.bdqfork.rpc.cluster.loadbalance;
 
 import cn.bdqfork.common.URL;
 import cn.bdqfork.common.exception.RpcException;

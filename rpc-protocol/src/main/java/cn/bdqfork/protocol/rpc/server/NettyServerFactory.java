@@ -1,4 +1,4 @@
-package cn.bdqfork.protocol.rpc;
+package cn.bdqfork.protocol.rpc.server;
 
 import cn.bdqfork.common.URL;
 import cn.bdqfork.common.constant.Const;

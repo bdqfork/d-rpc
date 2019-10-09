@@ -1,5 +1,6 @@
 package cn.bdqfork.rpc.config;
 
+import cn.bdqfork.common.Invoker;
 import cn.bdqfork.common.URL;
 import cn.bdqfork.common.config.ApplicationConfig;
 import cn.bdqfork.common.config.ProtocolConfig;
@@ -8,8 +9,6 @@ import cn.bdqfork.common.constant.Const;
 import cn.bdqfork.common.extension.ExtensionLoader;
 import cn.bdqfork.common.extension.compiler.AdaptiveCompiler;
 import cn.bdqfork.common.util.RegistryUtils;
-import cn.bdqfork.rpc.Exporter;
-import cn.bdqfork.common.Invoker;
 import cn.bdqfork.rpc.config.annotation.Service;
 import cn.bdqfork.rpc.protocol.Protocol;
 import cn.bdqfork.rpc.proxy.ProxyFactory;
@@ -38,7 +37,6 @@ public class ServiceBean<T> implements InitializingBean, DisposableBean, Applica
     private Service service;
     private Class<T> serviceInterface;
     private List<Invoker<?>> invokers;
-    private List<Exporter> exporters;
     private boolean inited = false;
 
     @Override
