@@ -9,6 +9,7 @@ ext {
             spring      : "5.1.4.RELEASE",
             javassist   : "3.25.0-GA",
             etcd4j      : "2.15.0",
+            gson        : "2.8.5"
     ]
 }
 

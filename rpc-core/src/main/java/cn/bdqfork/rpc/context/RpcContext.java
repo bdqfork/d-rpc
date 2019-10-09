@@ -1,9 +1,9 @@
 package cn.bdqfork.rpc.context;
 
 
-import cn.bdqfork.common.Invocation;
 import cn.bdqfork.common.URL;
 
+import java.net.InetSocketAddress;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Future;
@@ -15,6 +15,8 @@ import java.util.concurrent.Future;
 public class RpcContext {
     private static ThreadLocal<RpcContext> threadLocal = ThreadLocal.withInitial(RpcContext::new);
 
+    private final Map<String, Object> attachments = new HashMap<>();
+
     private URL url;
 
     private String methodName;
@@ -23,11 +25,11 @@ public class RpcContext {
 
     private Object[] arguments;
 
-    private Invocation invocation;
+    private InetSocketAddress localAddress;
+
+    private InetSocketAddress remoteAddress;
 
     private Future<?> future;
-
-    private Map<String, Object> attachments = new HashMap<>();
 
     public static RpcContext getRpcContext() {
         return threadLocal.get();
@@ -41,55 +43,71 @@ public class RpcContext {
         return url;
     }
 
-    public void setUrl(URL url) {
+    public RpcContext setUrl(URL url) {
         this.url = url;
+        return this;
     }
 
     public String getMethodName() {
         return methodName;
     }
 
-    public void setMethodName(String methodName) {
+    public RpcContext setMethodName(String methodName) {
         this.methodName = methodName;
+        return this;
     }
 
     public Class<?>[] getParameterTypes() {
         return parameterTypes;
     }
 
-    public void setParameterTypes(Class<?>[] parameterTypes) {
+    public RpcContext setParameterTypes(Class<?>[] parameterTypes) {
         this.parameterTypes = parameterTypes;
+        return this;
     }
 
     public Object[] getArguments() {
         return arguments;
     }
 
-    public void setArguments(Object[] arguments) {
+    public RpcContext setArguments(Object[] arguments) {
         this.arguments = arguments;
+        return this;
     }
 
-    public Invocation getInvocation() {
-        return invocation;
+    public InetSocketAddress getLocalAddress() {
+        return localAddress;
     }
 
-    public void setInvocation(Invocation invocation) {
-        this.invocation = invocation;
+    public RpcContext setLocalAddress(String host, Integer port) {
+        this.localAddress = new InetSocketAddress(host, port);
+        return this;
+    }
+
+    public InetSocketAddress getRemoteAddress() {
+        return remoteAddress;
+    }
+
+    public RpcContext setRemoteAddress(String host, Integer port) {
+        this.remoteAddress = new InetSocketAddress(host, port);
+        return this;
     }
 
     public Future<?> getFuture() {
         return future;
     }
 
-    public void setFuture(Future<?> future) {
+    public RpcContext setFuture(Future<?> future) {
         this.future = future;
+        return this;
     }
 
     public Map<String, Object> getAttachments() {
         return attachments;
     }
 
-    public void setAttachments(Map<String, Object> attachments) {
-        this.attachments = attachments;
+    public RpcContext setAttachments(Map<String, Object> attachments) {
+        this.attachments.putAll(attachments);
+        return this;
     }
 }

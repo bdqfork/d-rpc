@@ -21,4 +21,6 @@ public @interface Service {
 
     String[] protocol() default {};
 
+    boolean accesslog() default false;
+
 }

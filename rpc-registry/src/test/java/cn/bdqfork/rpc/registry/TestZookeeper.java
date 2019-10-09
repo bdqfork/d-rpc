@@ -17,7 +17,7 @@ public class TestZookeeper {
         registryConfig.setProtocol("zookeeper");
 //        Registry registry = new ZkRegistry(registryConfig);
 
-        URL url = new URL(Const.PROTOCOL_PROVIDER, "127.0.0.1", 9000, "cn.registry.test");
+        URL url = new URL(Const.PROVIDER_SIDE, "127.0.0.1", 9000, "cn.registry.test");
 
         url.addParameter(Const.APPLICATION_KEY, "test");
         url.addParameter(Const.GROUP_KEY, "rpc");

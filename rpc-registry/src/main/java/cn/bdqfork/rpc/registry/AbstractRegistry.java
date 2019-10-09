@@ -1,6 +1,7 @@
 package cn.bdqfork.rpc.registry;
 
 import cn.bdqfork.common.URL;
+import cn.bdqfork.common.constant.Const;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -9,7 +10,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @since 2019-03-03
  */
 public abstract class AbstractRegistry implements Registry {
-    public static final String DEFAULT_ROOT = "rpc";
+    public static final String DEFAULT_ROOT = Const.DEFAULT_GROUP;
     protected URL url;
     protected volatile boolean isAvailable;
     protected AtomicBoolean destroyed = new AtomicBoolean(false);

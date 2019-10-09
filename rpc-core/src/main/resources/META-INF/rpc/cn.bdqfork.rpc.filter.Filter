@@ -1,1 +1,3 @@
-rpc.context=cn.bdqfork.rpc.filter.RpcContextFilter
+consumer.context=cn.bdqfork.rpc.filter.ConsumerContextFilter
+provider.context=cn.bdqfork.rpc.filter.ContextFilter
+access.log=cn.bdqfork.rpc.filter.AccessLogFilter

@@ -7,7 +7,7 @@ import cn.bdqfork.rpc.config.annotation.Service;
  * @author bdq
  * @date 2019-02-15
  */
-@Service(group = "rpc-test", version = "1")
+@Service(group = "rpc-test", version = "1", accesslog = true)
 public class UserServiceImpl implements UserService {
 
     @Override

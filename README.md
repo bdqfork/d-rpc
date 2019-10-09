@@ -13,14 +13,15 @@
 9. 支持SPI扩展
 10. 支持Protocol扩展
 11. 支持JDK和Javassist动态代理
+12. 支持Filter扩展
+13. 支持通过RpcContext获取调用信息
+14. 支持AccessLog
 
 #### todolist:
 1. etcd注册中心、nacos注册中心
 2. jdk compiler
-3. context参数完善
-4. http协议
-5. 条件路由
-6. log日志添加
-7. 添加监控
-8. 测试用例增加
-9. 文档编写
+3. http协议
+4. 条件路由
+5. 添加监控
+6. 测试用例增加
+7. 文档编写

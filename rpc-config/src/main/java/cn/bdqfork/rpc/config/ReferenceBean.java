@@ -61,7 +61,7 @@ public class ReferenceBean<T> implements FactoryBean<Object>, InitializingBean {
 
     private URL buildUrl(ApplicationConfig applicationConfig) {
         //获得本机IP
-        URL url = new URL(Const.PROTOCOL_REGISTRY, NetUtils.getIp(), 0, getServiceName());
+        URL url = new URL(Const.PROTOCOL_REGISTRY, NetUtils.getLocalHost(), 0, getServiceName());
         url.addParameter(Const.INTERFACE_KEY, getServiceName());
 
         url.addParameter(Const.APPLICATION_KEY, applicationConfig.getApplicationName());

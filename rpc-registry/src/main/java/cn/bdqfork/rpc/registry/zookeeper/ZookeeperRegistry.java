@@ -105,7 +105,7 @@ public class ZookeeperRegistry extends AbstractRegistry {
     @Override
     public void subscribe(URL url, Notifier notifier) {
         String group = url.getParameter(Const.GROUP_KEY, DEFAULT_ROOT);
-        String path = "/" + group + url.toServiceCategory() + "/" + Const.PROTOCOL_PROVIDER;
+        String path = "/" + group + url.toServiceCategory() + "/" + Const.PROVIDER_SIDE;
         try {
             TreeCache treeCache = new TreeCache(client, path);
             treeCache.start();
@@ -140,7 +140,7 @@ public class ZookeeperRegistry extends AbstractRegistry {
     @Override
     public List<URL> lookup(URL url) {
         String group = url.getParameter(Const.GROUP_KEY, DEFAULT_ROOT);
-        String path = "/" + group + url.toServiceCategory() + "/" + Const.PROTOCOL_PROVIDER;
+        String path = "/" + group + url.toServiceCategory() + "/" + Const.PROVIDER_SIDE;
         try {
             if (client.checkExists().forPath(path) != null) {
                 List<URL> urls = new LinkedList<>();

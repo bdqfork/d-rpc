@@ -6,6 +6,7 @@ import cn.bdqfork.common.exception.RpcException;
 import cn.bdqfork.common.Invocation;
 import cn.bdqfork.common.Invoker;
 import cn.bdqfork.common.Result;
+import cn.bdqfork.rpc.context.RpcContext;
 import cn.bdqfork.rpc.protocol.Request;
 import cn.bdqfork.rpc.protocol.Response;
 import io.netty.channel.ChannelHandler;
@@ -16,6 +17,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.InetSocketAddress;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -55,8 +57,13 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
         Invoker<?> invoker = getInvoker(serviceInterface, version);
 
         if (invoker != null) {
+            InetSocketAddress inetSocketAddress = (InetSocketAddress) ctx.channel().remoteAddress();
+            RpcContext.getRpcContext()
+                    .setRemoteAddress(inetSocketAddress.getHostString(), inetSocketAddress.getPort());
+
             Response response = new Response();
             response.setId(request.getId());
+
             Result result = invoker.invoke(invocation);
             response.setData(result);
             ctx.writeAndFlush(response);

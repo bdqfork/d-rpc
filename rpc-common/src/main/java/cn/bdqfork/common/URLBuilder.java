@@ -10,7 +10,7 @@ import cn.bdqfork.common.util.NetUtils;
  */
 public class URLBuilder {
     public static URL buildRegistryURL(RegistryConfig registryConfig) {
-        URL url = new URL(registryConfig.getProtocol(), NetUtils.getIp(), 0, "");
+        URL url = new URL(registryConfig.getProtocol(), NetUtils.getLocalHost(), 0, "");
         url.addParameter(Const.REGISTRY_KEY, registryConfig.getAddress());
         url.addParameter(Const.SEESION_TIMEOUT_KEY, registryConfig.getSessionTimeout());
         url.addParameter(Const.CONNECTION_TIMEOUT_KEY, registryConfig.getConnectionTimeout());

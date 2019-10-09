@@ -88,7 +88,8 @@ public class ServiceBean<T> implements InitializingBean, DisposableBean, Applica
         url.addParameter(Const.INTERFACE_KEY, getServiceName());
         url.addParameter(Const.SERVER_KEY, protocolConfig.getServer());
         url.addParameter(Const.SERIALIZATION_KEY, protocolConfig.getSerialization());
-
+        url.addParameter(Const.ACCESS_LOG_KEY, service.accesslog());
+        
         List<RegistryConfig> registryConfigs = getRegistryConfigs(service);
         url.addParameter(Const.REGISTRY_KEY, RegistryUtils.buildRegistryUrlString(registryConfigs));
 

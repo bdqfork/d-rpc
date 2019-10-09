@@ -24,15 +24,15 @@ import java.util.concurrent.TimeoutException;
 public class DefaultFuture extends CompletableFuture<Object> {
     private static Logger log = LoggerFactory.getLogger(DefaultFuture.class);
     private static Map<Long, DefaultFuture> FUTURES = new ConcurrentHashMap<>();
-
-    private long id;
-    private long timeout;
-    private Request request;
-    private Timer timer = new HashedWheelTimer(new BasicThreadFactory.Builder()
+    private static Timer timer = new HashedWheelTimer(new BasicThreadFactory.Builder()
             .daemon(true)
             .namingPattern("rpc-future-timeout")
             .build(),
             30, TimeUnit.MILLISECONDS);
+
+    private long id;
+    private long timeout;
+    private Request request;
     private Timeout timeoutCheckTask;
 
     private DefaultFuture(Request request, long timeout) {
