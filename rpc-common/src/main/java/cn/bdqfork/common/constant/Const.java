@@ -31,6 +31,7 @@ public class Const {
     public static final String PROXY_KEY = "proxy";
     public static final String CLUSTER_KEY = "cluster";
     public static final String ACCESS_LOG_KEY = "accesslog";
+    public static final String PROTOCOL_KEY = "protocol";
 
     public static final String DEFAULT_GROUP = "rpc";
     public static final String CONSUMER = "consumer";

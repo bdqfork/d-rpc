@@ -79,17 +79,18 @@ public class ServiceBean<T> implements InitializingBean, DisposableBean, Applica
     }
 
     private URL buildUrl(ProtocolConfig protocolConfig, ApplicationConfig applicationConfig, Service service) {
-        URL url = new URL(Const.PROTOCOL_REGISTRY, protocolConfig.getHost(), protocolConfig.getPort(), getServiceName());
+        URL url = new URL(Const.REGISTRY, protocolConfig.getHost(), protocolConfig.getPort(), getServiceName());
 
         url.addParameter(Const.APPLICATION_KEY, applicationConfig.getApplicationName());
         url.addParameter(Const.GROUP_KEY, service.group());
         url.addParameter(Const.VERSION_KEY, service.version());
         url.addParameter(Const.SIDE_KEY, Const.PROVIDER);
         url.addParameter(Const.INTERFACE_KEY, getServiceName());
+        url.addParameter(Const.PROTOCOL_KEY, protocolConfig.getName());
         url.addParameter(Const.SERVER_KEY, protocolConfig.getServer());
         url.addParameter(Const.SERIALIZATION_KEY, protocolConfig.getSerialization());
         url.addParameter(Const.ACCESS_LOG_KEY, service.accesslog());
-        
+
         List<RegistryConfig> registryConfigs = getRegistryConfigs(service);
         url.addParameter(Const.REGISTRY_KEY, RegistryUtils.buildRegistryUrlString(registryConfigs));
 

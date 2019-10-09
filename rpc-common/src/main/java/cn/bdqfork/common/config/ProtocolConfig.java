@@ -8,6 +8,10 @@ package cn.bdqfork.common.config;
  */
 public class ProtocolConfig {
     /**
+     * 协议名称
+     */
+    private String name = "rpc";
+    /**
      * ip地址
      */
     private String host;
@@ -23,6 +27,14 @@ public class ProtocolConfig {
      * 序列化方式
      */
     private String serialization = "hessian";
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 
     public String getHost() {
         return host;
