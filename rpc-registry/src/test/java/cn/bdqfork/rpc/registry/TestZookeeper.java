@@ -17,11 +17,11 @@ public class TestZookeeper {
         registryConfig.setProtocol("zookeeper");
 //        Registry registry = new ZkRegistry(registryConfig);
 
-        URL url = new URL(Const.PROVIDER_SIDE, "127.0.0.1", 9000, "cn.registry.test");
+        URL url = new URL(Const.PROVIDER, "127.0.0.1", 9000, "cn.registry.test");
 
         url.addParameter(Const.APPLICATION_KEY, "test");
         url.addParameter(Const.GROUP_KEY, "rpc");
-        url.addParameter(Const.SIDE_KEY, Const.PROVIDER_SIDE);
+        url.addParameter(Const.SIDE_KEY, Const.PROVIDER);
         url.addParameter(Const.REF_NAME_KEY, "test");
         url.addParameter(Const.SERVER_KEY, "netty");
         url.addParameter(Const.SERIALIZATION_KEY, "jdk");

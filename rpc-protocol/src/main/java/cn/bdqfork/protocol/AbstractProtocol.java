@@ -22,7 +22,7 @@ public abstract class AbstractProtocol implements Protocol {
     public <T> Exporter export(Invoker<T> invoker) {
         URL url = invoker.getUrl();
         String side = url.getParameter(Const.SIDE_KEY);
-        if (Const.PROVIDER_SIDE.equals(side)) {
+        if (Const.PROVIDER.equals(side)) {
             doExport(invoker);
         }
         return new RpcExporter(invoker);

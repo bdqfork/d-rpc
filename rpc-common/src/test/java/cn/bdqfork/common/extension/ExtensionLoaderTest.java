@@ -5,8 +5,6 @@ import cn.bdqfork.common.constant.Const;
 import cn.bdqfork.common.extension.adaptive.AdaptiveExt;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
-
 public class ExtensionLoaderTest {
 
     @Test
@@ -20,7 +18,7 @@ public class ExtensionLoaderTest {
 
     @Test
     public void getActivateExtension() {
-        ExtensionFactory extensionFactory = ExtensionLoader.getExtensionLoader(ExtensionFactory.class).getActivateExtension(null, "test", Const.PROVIDER_SIDE);
+        ExtensionFactory extensionFactory = ExtensionLoader.getExtensionLoader(ExtensionFactory.class).getActivateExtension(null, "test", Const.PROVIDER);
         System.out.println(extensionFactory);
     }
 

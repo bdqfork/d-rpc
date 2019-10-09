@@ -26,7 +26,7 @@ public class RegistryProtocol implements Protocol {
 
     @Override
     public <T> Exporter export(Invoker<T> invoker) {
-        invoker = buildInvokerChain(invoker, Const.PROVIDER_SIDE);
+        invoker = buildInvokerChain(invoker, Const.PROVIDER);
 
         URL url = invoker.getUrl();
         String server = url.getParameter(Const.SERVER_KEY);
@@ -48,7 +48,7 @@ public class RegistryProtocol implements Protocol {
         RegistryDirectory<T> directory = new RegistryDirectory<>(type, url, registries);
         directory.subscribe();
         Invoker<T> invoker = cluster.join(directory);
-        return buildInvokerChain(invoker, Const.CONSUMER_SIDE);
+        return buildInvokerChain(invoker, Const.CONSUMER);
     }
 
     private List<Registry> getRegistries(URL url) {

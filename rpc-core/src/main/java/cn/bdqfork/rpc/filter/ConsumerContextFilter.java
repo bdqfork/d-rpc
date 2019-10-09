@@ -17,7 +17,7 @@ import java.util.Map;
  * @author bdq
  * @since 2019-09-04
  */
-@Activate(group = Const.CONSUMER_SIDE, order = -1000)
+@Activate(group = Const.CONSUMER, order = -1000)
 public class ConsumerContextFilter implements Filter {
     @Override
     public Result invoke(Invoker<?> invoker, Invocation invocation) throws RpcException {

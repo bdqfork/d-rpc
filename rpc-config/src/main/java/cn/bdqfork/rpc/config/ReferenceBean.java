@@ -1,5 +1,6 @@
 package cn.bdqfork.rpc.config;
 
+import cn.bdqfork.common.Invoker;
 import cn.bdqfork.common.URL;
 import cn.bdqfork.common.config.ApplicationConfig;
 import cn.bdqfork.common.config.RegistryConfig;
@@ -7,9 +8,8 @@ import cn.bdqfork.common.constant.Const;
 import cn.bdqfork.common.extension.ExtensionLoader;
 import cn.bdqfork.common.util.NetUtils;
 import cn.bdqfork.common.util.RegistryUtils;
-import cn.bdqfork.common.Invoker;
-import cn.bdqfork.rpc.protocol.Protocol;
 import cn.bdqfork.rpc.config.annotation.Reference;
+import cn.bdqfork.rpc.protocol.Protocol;
 import cn.bdqfork.rpc.proxy.ProxyFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.FactoryBean;
@@ -61,7 +61,7 @@ public class ReferenceBean<T> implements FactoryBean<Object>, InitializingBean {
 
     private URL buildUrl(ApplicationConfig applicationConfig) {
         //获得本机IP
-        URL url = new URL(Const.PROTOCOL_REGISTRY, NetUtils.getLocalHost(), 0, getServiceName());
+        URL url = new URL(Const.REGISTRY, NetUtils.getLocalHost(), 0, getServiceName());
         url.addParameter(Const.INTERFACE_KEY, getServiceName());
 
         url.addParameter(Const.APPLICATION_KEY, applicationConfig.getApplicationName());
@@ -72,7 +72,7 @@ public class ReferenceBean<T> implements FactoryBean<Object>, InitializingBean {
         url.addParameter(Const.RETRY_KEY, String.valueOf(reference.retries()));
         url.addParameter(Const.TIMEOUT_KEY, String.valueOf(reference.timeout()));
         url.addParameter(Const.CONNECTIONS_KEY, String.valueOf(reference.connections()));
-        url.addParameter(Const.SIDE_KEY, Const.CONSUMER_SIDE);
+        url.addParameter(Const.SIDE_KEY, Const.CONSUMER);
         url.addParameter(Const.CLUSTER_KEY, reference.cluster());
         url.addParameter(Const.LOADBALANCE_KEY, reference.loadBalance());
         url.addParameter(Const.ASYNC_KEY, reference.async());

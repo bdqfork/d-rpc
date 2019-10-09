@@ -84,7 +84,7 @@ public class ServiceBean<T> implements InitializingBean, DisposableBean, Applica
         url.addParameter(Const.APPLICATION_KEY, applicationConfig.getApplicationName());
         url.addParameter(Const.GROUP_KEY, service.group());
         url.addParameter(Const.VERSION_KEY, service.version());
-        url.addParameter(Const.SIDE_KEY, Const.PROVIDER_SIDE);
+        url.addParameter(Const.SIDE_KEY, Const.PROVIDER);
         url.addParameter(Const.INTERFACE_KEY, getServiceName());
         url.addParameter(Const.SERVER_KEY, protocolConfig.getServer());
         url.addParameter(Const.SERIALIZATION_KEY, protocolConfig.getSerialization());

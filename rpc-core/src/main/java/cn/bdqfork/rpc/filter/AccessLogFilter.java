@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
  * @author bdq
  * @since 2019/10/9
  */
-@Activate(group = Const.PROVIDER_SIDE, value = Const.ACCESS_LOG_KEY)
+@Activate(group = Const.PROVIDER, value = Const.ACCESS_LOG_KEY)
 public class AccessLogFilter implements Filter {
     private static final Logger log = LoggerFactory.getLogger(AccessLogFilter.class);
     private Gson gson = new Gson();

@@ -11,8 +11,6 @@ public class Const {
 
     public static final String GROUP_KEY = "group";
     public static final String SIDE_KEY = "side";
-    public static final String CONSUMER_SIDE = "consumer";
-    public static final String PROVIDER_SIDE = "provider";
     public static final String APPLICATION_KEY = "application";
     public static final String REF_NAME_KEY = "refName";
     public static final String SERVER_KEY = "server";
@@ -32,7 +30,10 @@ public class Const {
     public static final String ASYNC_KEY = "async";
     public static final String PROXY_KEY = "proxy";
     public static final String CLUSTER_KEY = "cluster";
-    public static final String PROTOCOL_REGISTRY = "registry";
-    public static final String DEFAULT_GROUP = "rpc";
     public static final String ACCESS_LOG_KEY = "accesslog";
+
+    public static final String DEFAULT_GROUP = "rpc";
+    public static final String CONSUMER = "consumer";
+    public static final String PROVIDER = "provider";
+    public static final String REGISTRY = "registry";
 }
