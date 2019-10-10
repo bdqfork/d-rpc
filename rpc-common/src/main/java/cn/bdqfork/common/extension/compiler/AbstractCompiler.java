@@ -1,6 +1,5 @@
 package cn.bdqfork.common.extension.compiler;
 
-import cn.bdqfork.common.extension.Compiler;
 import cn.bdqfork.common.util.ClassUtils;
 
 import java.util.regex.Matcher;

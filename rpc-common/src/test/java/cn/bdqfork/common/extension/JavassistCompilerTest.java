@@ -1,6 +1,8 @@
 package cn.bdqfork.common.extension;
 
 import cn.bdqfork.common.extension.adaptive.AdaptiveExt;
+import cn.bdqfork.common.extension.compiler.AdaptiveClassCodeGenerator;
+import cn.bdqfork.common.extension.compiler.Compiler;
 import cn.bdqfork.common.extension.compiler.javassist.JavassistCompiler;
 import org.junit.Test;
 

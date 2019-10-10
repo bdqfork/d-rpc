@@ -1,4 +1,6 @@
-package cn.bdqfork.common.extension;
+package cn.bdqfork.common.extension.compiler;
+
+import cn.bdqfork.common.extension.SPI;
 
 /**
  * Adaptive扩展类的动态编译器

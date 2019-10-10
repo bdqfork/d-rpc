@@ -1,6 +1,7 @@
 package cn.bdqfork.common.extension;
 
 import cn.bdqfork.common.extension.adaptive.AdaptiveExt;
+import cn.bdqfork.common.extension.compiler.AdaptiveClassCodeGenerator;
 import org.junit.Test;
 
 public class AdaptiveClassCodeGeneratorTest {

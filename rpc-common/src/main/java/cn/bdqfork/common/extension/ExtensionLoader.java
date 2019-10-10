@@ -1,6 +1,8 @@
 package cn.bdqfork.common.extension;
 
 import cn.bdqfork.common.URL;
+import cn.bdqfork.common.extension.compiler.AdaptiveClassCodeGenerator;
+import cn.bdqfork.common.extension.compiler.Compiler;
 import cn.bdqfork.common.util.ClassUtils;
 import cn.bdqfork.common.util.StringUtils;
 
@@ -148,8 +150,8 @@ public class ExtensionLoader<T> {
 
                         if (clazz.isAnnotationPresent(Adaptive.class)) {
                             cacheAdaptiveClass(name, clazz);
-                        } else {
-                            cacheActivateClass(name, clazz);
+                        } else if (clazz.isAnnotationPresent(Activate.class)) {
+                            activateClasses.putIfAbsent(name, clazz);
                         }
 
                         classNames.putIfAbsent(clazz, name);
@@ -158,13 +160,7 @@ public class ExtensionLoader<T> {
                 }
             }
         } catch (Exception e) {
-            throw new IllegalArgumentException("Fail to get extension class from " + PREFIX + type.getName() + "!", e.getCause());
-        }
-    }
-
-    private void cacheActivateClass(String name, Class<T> clazz) {
-        if (clazz.isAnnotationPresent(Activate.class)) {
-            activateClasses.putIfAbsent(name, clazz);
+            throw new IllegalArgumentException("Fail to get extension class from " + PREFIX + type.getName() + "!", e);
         }
     }
 
@@ -183,11 +179,7 @@ public class ExtensionLoader<T> {
      */
     public T getAdaptiveExtension() {
         if (adaptiveExtension == null) {
-            try {
-                createAdaptiveExtension();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            createAdaptiveExtension();
         }
         return adaptiveExtension;
     }

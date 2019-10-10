@@ -1,2 +1,3 @@
 javassist=cn.bdqfork.common.extension.compiler.javassist.JavassistCompiler
+jdk=cn.bdqfork.common.extension.compiler.jdk.JdkCompiler
 adaptive.Compiler=cn.bdqfork.common.extension.compiler.AdaptiveCompiler

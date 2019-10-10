@@ -1,6 +1,8 @@
-package cn.bdqfork.common.extension;
+package cn.bdqfork.common.extension.compiler;
 
 import cn.bdqfork.common.URL;
+import cn.bdqfork.common.extension.Adaptive;
+import cn.bdqfork.common.extension.ExtensionLoader;
 import cn.bdqfork.common.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
